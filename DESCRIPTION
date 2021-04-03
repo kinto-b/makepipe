@@ -1,0 +1,17 @@
+Package: piper
+Title: Pipeline Tools Inspired by GNU Make
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Kinto",
+           family = "Behr",
+           role = c("aut", "cre"),
+           email = "kinto.behr@gmail.com")
+Description: Tools for constructing simple make-like pipelines. 
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    R6,
+    usethis
