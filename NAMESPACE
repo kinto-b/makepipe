@@ -3,6 +3,7 @@
 export(Pipeline)
 export(get_pipeline)
 export(is_pipeline)
+export(make_with_recipe)
 export(make_with_source)
 export(out_of_date)
 export(set_pipeline)

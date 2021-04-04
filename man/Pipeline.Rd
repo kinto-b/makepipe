@@ -26,28 +26,29 @@ sources.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-pipeline_network}{\code{Pipeline$pipeline_network()}}
-\item \href{#method-refresh_nodes}{\code{Pipeline$refresh_nodes()}}
+\item \href{#method-add_source_segment}{\code{Pipeline$add_source_segment()}}
+\item \href{#method-add_recipe_segment}{\code{Pipeline$add_recipe_segment()}}
+\item \href{#method-style_nodes}{\code{Pipeline$style_nodes()}}
 \item \href{#method-print}{\code{Pipeline$print()}}
 \item \href{#method-clone}{\code{Pipeline$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-pipeline_network"></a>}}
-\if{latex}{\out{\hypertarget{method-pipeline_network}{}}}
-\subsection{Method \code{pipeline_network()}}{
+\if{html}{\out{<a id="method-add_source_segment"></a>}}
+\if{latex}{\out{\hypertarget{method-add_source_segment}{}}}
+\subsection{Method \code{add_source_segment()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$pipeline_network(dependencies, source, targets)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
-
 \item{\code{source}}{The path to an R script which makes the \code{targets}}
 
 \item{\code{targets}}{A character vector of paths to files}
+
+\item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
 }
 \if{html}{\out{</div>}}
 }
@@ -56,11 +57,34 @@ sources.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-refresh_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-refresh_nodes}{}}}
-\subsection{Method \code{refresh_nodes()}}{
+\if{html}{\out{<a id="method-add_recipe_segment"></a>}}
+\if{latex}{\out{\hypertarget{method-add_recipe_segment}{}}}
+\subsection{Method \code{add_recipe_segment()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$refresh_nodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{recipe}}{A character vector containing a deparsed expression, which would make the \code{targets} if evaluated.}
+
+\item{\code{targets}}{A character vector of paths to files}
+
+\item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-style_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-style_nodes}{}}}
+\subsection{Method \code{style_nodes()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$style_nodes()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

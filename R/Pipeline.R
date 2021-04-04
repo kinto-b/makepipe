@@ -19,6 +19,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     to = character(0),
     arrows = character(0),
     .source = logical(0),
+    .recipe = logical(0),
     stringsAsFactors = FALSE
   ),
 
@@ -31,19 +32,19 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     colour = character(0)
   ),
 
+  #' @param source The path to an R script which makes the `targets`
   #' @param targets A character vector of paths to files
   #' @param dependencies A character vector of paths to files which the `targets` depend on
-  #' @param source The path to an R script which makes the `targets`
   #' @return `self`
-  pipeline_network = function(dependencies, source, targets) {
+  add_source_segment = function(source, targets, dependencies) {
     stopifnot(is.character(dependencies))
     stopifnot(is.character(source))
     stopifnot(is.character(targets))
 
     # Construct new edges
     new_edges <- rbind(
-      expand.grid(from = dependencies, to = source, arrows = "to", .source = TRUE, stringsAsFactors = FALSE),
-      expand.grid(from = source, to = targets, arrows = "to", .source = FALSE, stringsAsFactors = FALSE)
+      expand.grid(from = dependencies, to = source, arrows = "to", .source = TRUE, .recipe = FALSE, stringsAsFactors = FALSE),
+      expand.grid(from = source, to = targets, arrows = "to", .source = FALSE, .recipe = FALSE, stringsAsFactors = FALSE)
     )
 
     # Convert old edges to character and bind
@@ -54,12 +55,44 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     # Regenerate nodes using edges
     self$nodes <- data.frame(
       id = factor(unique(c(self$edges$from, self$edges$to))),
-      label = fs::path_file(unique(c(self$edges$from, self$edges$to))),
-      title = unique(c(self$edges$from, self$edges$to)),
-      shape = ifelse(grepl("\\.R$", unique(c(self$edges$from, self$edges$to))), "triangle", "square")
+      title = unique(c(self$edges$from, self$edges$to))
+    )
+    self$style_nodes()
+
+    # Convert edges back to factor
+    self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
+    self$edges$to <- factor(self$edges$to, levels = levels(self$nodes$id))
+
+
+    invisible(self)
+  },
+
+  #' @param recipe A character vector containing a deparsed expression, which would make the `targets` if evaluated.
+  #' @param targets A character vector of paths to files
+  #' @param dependencies A character vector of paths to files which the `targets` depend on
+  #' @return `self`
+  add_recipe_segment = function(recipe, targets, dependencies) {
+    stopifnot(is.character(dependencies))
+    stopifnot(is.character(recipe))
+    stopifnot(is.character(targets))
+
+    # Construct new edges
+    new_edges <- rbind(
+      expand.grid(from = dependencies, to = recipe, arrows = "to", .source = TRUE, .recipe = TRUE, stringsAsFactors = FALSE),
+      expand.grid(from = recipe, to = targets, arrows = "to", .source = FALSE, .recipe = FALSE, stringsAsFactors = FALSE)
     )
 
-    self$refresh_nodes()
+    # Convert old edges to character and bind
+    self$edges$from <- as.character(self$edges$from)
+    self$edges$to <- as.character(self$edges$to)
+    self$edges <- rbind(self$edges, new_edges)
+
+    # Regenerate nodes using edges
+    self$nodes <- data.frame(
+      id = factor(unique(c(self$edges$from, self$edges$to))),
+      title = unique(c(self$edges$from, self$edges$to))
+    )
+    self$style_nodes()
 
     # Convert edges back to factor
     self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
@@ -70,17 +103,29 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   },
 
   #' @return `self`
-  refresh_nodes = function() {
+  style_nodes = function() {
     nodes <- self$nodes
     edges <- self$edges
+
+    # Out of date?
     edges$from_mtime <- file.mtime(as.character(edges$from))
     edges$to_mtime <- file.mtime(as.character(edges$to))
     edges$out_of_date <- edges$from_mtime > edges$to_mtime
     for (i in nrow(edges)) {
       edges$out_of_date <- (edges$from %in% edges[edges$out_of_date, "to"]) | (edges$out_of_date)
     }
+    edges$out_of_date <- ifelse(edges$.recipe, FALSE, edges$out_of_date)
+
+    # Group
     nodes$group <- ifelse(nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date")
     nodes$group <- ifelse(nodes$id %in% edges[edges$.source, "to"], "Source", nodes$group)
+
+    # Colour
+    nodes$shape <- ifelse(nodes$id %in% edges[edges$.source, "to"], "triangle", "square")
+    nodes$shape <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "circle", "square")
+
+    # Label
+    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", fs::path_file(nodes$title))
 
     self$nodes <- nodes
     invisible(self)
