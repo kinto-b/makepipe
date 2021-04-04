@@ -1,2 +1,4 @@
 ^piper\.Rproj$
 ^\.Rproj\.user$
+^scratch
+^LICENSE\.md$
