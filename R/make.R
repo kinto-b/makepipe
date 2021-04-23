@@ -18,7 +18,10 @@ make_with_source <- function(source, targets, dependencies, ...) {
   outdated <- out_of_date(targets, c(dependencies, source))
 
   pipeline <- get_pipeline()
-  if (is.null(pipeline)) set_pipeline(Pipeline$new())
+  if (is.null(pipeline)) {
+    pipeline <- Pipeline$new()
+    set_pipeline(pipeline)
+  }
   pipeline$add_source_segment(
     source = source,
     targets = targets,
@@ -64,7 +67,10 @@ make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
 
   pipeline <- get_pipeline()
-  if (is.null(pipeline)) set_pipeline(Pipeline$new())
+  if (is.null(pipeline)) {
+    pipeline <- Pipeline$new()
+    set_pipeline(pipeline)
+  }
   pipeline$add_recipe_segment(
     recipe = recipe_txt,
     targets = targets,
