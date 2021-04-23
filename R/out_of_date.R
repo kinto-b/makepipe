@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # TODO
+#'   out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
 #' }
 out_of_date <- function (targets, dependencies) {
   stopifnot(is.character(targets))

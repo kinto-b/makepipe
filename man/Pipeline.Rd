@@ -8,11 +8,11 @@ A Pipeline object is automatically constructed as calls to \verb{make_*()} are
 made. It stores the relationships between targets, dependencies, and
 sources.
 }
-\examples{
-\dontrun{
-# TODO
+\seealso{
+Other pipeline: 
+\code{\link{pipeline-accessors}}
 }
-}
+\concept{pipeline}
 \keyword{internal}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -37,6 +37,8 @@ sources.
 \if{html}{\out{<a id="method-add_source_segment"></a>}}
 \if{latex}{\out{\hypertarget{method-add_source_segment}{}}}
 \subsection{Method \code{add_source_segment()}}{
+Add a pipeline segment corresponding to a \code{make_with_source()}
+call
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies)}\if{html}{\out{</div>}}
 }
@@ -48,7 +50,8 @@ sources.
 
 \item{\code{targets}}{A character vector of paths to files}
 
-\item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
+\item{\code{dependencies}}{A character vector of paths to files which the
+\code{targets} depend on}
 }
 \if{html}{\out{</div>}}
 }
@@ -60,6 +63,8 @@ sources.
 \if{html}{\out{<a id="method-add_recipe_segment"></a>}}
 \if{latex}{\out{\hypertarget{method-add_recipe_segment}{}}}
 \subsection{Method \code{add_recipe_segment()}}{
+Add a pipeline segment corresponding to a \code{make_with_recipe()}
+call
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies)}\if{html}{\out{</div>}}
 }
@@ -83,6 +88,7 @@ sources.
 \if{html}{\out{<a id="method-style_nodes"></a>}}
 \if{latex}{\out{\hypertarget{method-style_nodes}{}}}
 \subsection{Method \code{style_nodes()}}{
+Style pipeline nodes
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$style_nodes()}\if{html}{\out{</div>}}
 }
@@ -95,6 +101,7 @@ sources.
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
+Display pipeline
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$print()}\if{html}{\out{</div>}}
 }

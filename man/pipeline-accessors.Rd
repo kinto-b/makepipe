@@ -6,7 +6,7 @@
 \alias{get_pipeline}
 \alias{show_pipeline}
 \alias{is_pipeline}
-\title{Access Pipeline.}
+\title{Access and interface with Pipeline.}
 \usage{
 set_pipeline(pipeline)
 
@@ -20,7 +20,22 @@ is_pipeline(pipeline)
 \item{pipeline}{A pipeline. See \link{Pipeline} for more details.}
 }
 \description{
-\code{get_pipeline()} and \code{set_pipeline()} access and modify the current "active"
-pipeline.
+\code{get_pipeline()}, \code{set_pipeline()} access and modify the current \emph{active}
+pipeline, while \code{show_pipeline()} and \code{is_pipeline()} are used to display
+or test a given pipeline.
 }
-\keyword{internal}
+\examples{
+
+\dontrun{
+ # Build up a pipeline from scratch:
+ set_pipeline(Pipeline$new())
+ # A series of `make_with_*()` blocks go here...
+ saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+ show_pipeline()
+}
+}
+\seealso{
+Other pipeline: 
+\code{\link{Pipeline}}
+}
+\concept{pipeline}

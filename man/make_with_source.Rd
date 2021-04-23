@@ -33,7 +33,19 @@ Make targets out of dependencies using a source file
 \examples{
 
 \dontrun{
-# TODO
+# Merge files in fresh environment if raw data has been updated
+# since last merged
+make_with_source(
+  source = "merge_data.R",
+  targets = "data/merged_data.Rds",
+  dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+  local = new.env()
+)
 }
 
 }
+\seealso{
+Other make: 
+\code{\link{make_with_recipe}()}
+}
+\concept{make}

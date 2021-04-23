@@ -6,11 +6,19 @@
 #'
 #' @return `NULL` invisibly.
 #' @export
+#' @family make
 #'
 #' @examples
 #'
 #' \dontrun{
-#' # TODO
+#' # Merge files in fresh environment if raw data has been updated
+#' # since last merged
+#' make_with_source(
+#'   source = "merge_data.R",
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+#'   local = new.env()
+#' )
 #' }
 #'
 make_with_source <- function(source, targets, dependencies, quiet = getOption("piper.quiet"),...) {
@@ -57,13 +65,25 @@ make_with_source <- function(source, targets, dependencies, quiet = getOption("p
 #' @return The result of evaluating the `recipe` if the `targets` are out of
 #'   date otherwise `NULL``
 #' @export
+#' @family make
 #'
 #' @examples
 #'
 #' \dontrun{
-#' # TODO
+#' # Merge files in fresh environment if raw data has been updated
+#' # since last merged
+#' make_with_recipe(
+#'   recipe = {
+#'     dat <- readRDS("data/raw_data.Rds")
+#'     pop <- readRDS("data/pop_data.Rds")
+#'     merged_dat <- merge(dat, pop, by = "id")
+#'     saveRDS("data/merged_data.Rds")
+#'   },
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+#'   envir = new.env()
+#' )
 #' }
-#'
 make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame(), quiet = getOption("piper.quiet"), ...) {
   outdated <- out_of_date(targets, dependencies)
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")

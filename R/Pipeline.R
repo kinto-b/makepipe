@@ -1,17 +1,14 @@
 #' Pipeline visualisations
 #'
-#' A Pipeline object is automatically constructed as calls to `make_*()` are
+#' @description A Pipeline object is automatically constructed as calls to `make_*()` are
 #' made. It stores the relationships between targets, dependencies, and
 #' sources.
 #'
 #' @keywords internal
+#' @family pipeline
 #' @export Pipeline
 #' @aliases Pipeline
 #' @importFrom R6 R6Class
-#' @examples
-#' \dontrun{
-#' # TODO
-#' }
 Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #' @field edges A data frame
   edges = data.frame(
@@ -32,9 +29,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     colour = character(0)
   ),
 
+  #' @description Add a pipeline segment corresponding to a `make_with_source()`
+  #'   call
   #' @param source The path to an R script which makes the `targets`
   #' @param targets A character vector of paths to files
-  #' @param dependencies A character vector of paths to files which the `targets` depend on
+  #' @param dependencies A character vector of paths to files which the
+  #'   `targets` depend on
   #' @return `self`
   add_source_segment = function(source, targets, dependencies) {
     stopifnot(is.character(dependencies))
@@ -67,6 +67,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     invisible(self)
   },
 
+  #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
+  #'   call
   #' @param recipe A character vector containing a deparsed expression, which would make the `targets` if evaluated.
   #' @param targets A character vector of paths to files
   #' @param dependencies A character vector of paths to files which the `targets` depend on
@@ -102,6 +104,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     invisible(self)
   },
 
+  #' @description Style pipeline nodes
   #' @return `self`
   style_nodes = function() {
     nodes <- self$nodes
@@ -131,6 +134,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     invisible(self)
   },
 
+  #' @description Display pipeline
   #' @return `self`
   print = function() {
     out <- visNetwork::visNetwork(self$nodes, self$edges)
@@ -142,14 +146,24 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 
 # -------------------------------------------------------------------------
 
-#' Access Pipeline.
+#' Access and interface with Pipeline.
 #'
-#' `get_pipeline()` and `set_pipeline()` access and modify the current "active"
-#' pipeline.
+#' `get_pipeline()`, `set_pipeline()` access and modify the current *active*
+#' pipeline, while `show_pipeline()` and `is_pipeline()` are used to display
+#' or test a given pipeline.
 #'
 #' @param pipeline A pipeline. See [Pipeline] for more details.
-#' @keywords internal
 #' @name pipeline-accessors
+#' @family pipeline
+#' @examples
+#'
+#' \dontrun{
+#'  # Build up a pipeline from scratch:
+#'  set_pipeline(Pipeline$new())
+#'  # A series of `make_with_*()` blocks go here...
+#'  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+#'  show_pipeline()
+#' }
 NULL
 piper_env <- new.env(parent = emptyenv())
 
