@@ -4,14 +4,23 @@
 \alias{make_with_source}
 \title{Make targets out of dependencies using a source file}
 \usage{
-make_with_source(source, targets, dependencies, ...)
+make_with_source(
+  source,
+  targets,
+  dependencies,
+  quiet = getOption("piper.quiet"),
+  ...
+)
 }
 \arguments{
 \item{source}{The path to an R script which makes the \code{targets}}
 
 \item{targets}{A character vector of paths to files}
 
-\item{dependencies}{A character vector of paths to files which the \code{targets} depend on}
+\item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
+
+\item{quiet}{A logical determining whether or not messages are signaled}
 
 \item{...}{Additional parameters to pass to \code{base::source()}}
 }

@@ -4,16 +4,26 @@
 \alias{make_with_recipe}
 \title{Make targets out of dependencies using a recipe}
 \usage{
-make_with_recipe(recipe, targets, dependencies, envir = parent.frame(), ...)
+make_with_recipe(
+  recipe,
+  targets,
+  dependencies,
+  envir = parent.frame(),
+  quiet = getOption("piper.quiet"),
+  ...
+)
 }
 \arguments{
 \item{recipe}{A chunk of R code which makes the \code{targets}}
 
 \item{targets}{A character vector of paths to files}
 
-\item{dependencies}{A character vector of paths to files which the \code{targets} depend on}
+\item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
 
 \item{envir}{The environment in which to run \code{recipe}}
+
+\item{quiet}{A logical determining whether or not messages are signaled}
 
 \item{...}{Additional parameters to pass to \code{base::eval()}}
 }

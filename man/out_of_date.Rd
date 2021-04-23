@@ -9,7 +9,8 @@ out_of_date(targets, dependencies)
 \arguments{
 \item{targets}{A character vector of paths to files}
 
-\item{dependencies}{A character vector of paths to files which the \code{targets} depend on}
+\item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
 }
 \value{
 \code{TRUE} if any of \code{targets} are older than any of \code{dependencies} or if

@@ -13,7 +13,7 @@
 #' # TODO
 #' }
 #'
-make_with_source <- function(source, targets, dependencies, ...) {
+make_with_source <- function(source, targets, dependencies, quiet = getOption("piper.quiet"),...) {
   stopifnot(is.character(source))
   outdated <- out_of_date(targets, c(dependencies, source))
 
@@ -29,16 +29,18 @@ make_with_source <- function(source, targets, dependencies, ...) {
   )
 
   if (outdated) {
-    cli::cli_process_start(
-      "Targets are out of date. Updating...",
-      msg_done = "Finished updating",
-      msg_failed = "Something went wrong"
-    )
-    cli::cat_line()
+    if (!quiet) {
+      cli::cli_process_start(
+        "Targets are out of date. Updating...",
+        msg_done = "Finished updating",
+        msg_failed = "Something went wrong"
+      )
+      cli::cat_line()
+    }
     source(source, ...)
-    cli::cli_process_done()
+    if (!quiet) cli::cli_process_done()
   } else {
-    cli::cli_alert_success("Targets are up to date")
+    if (!quiet) cli::cli_alert_success("Targets are up to date")
   }
 
   invisible(NULL)
@@ -62,7 +64,7 @@ make_with_source <- function(source, targets, dependencies, ...) {
 #' # TODO
 #' }
 #'
-make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame(), ...) {
+make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame(), quiet = getOption("piper.quiet"), ...) {
   outdated <- out_of_date(targets, dependencies)
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
 
@@ -78,16 +80,18 @@ make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame
   )
 
   if (outdated) {
-    cli::cli_process_start(
-      "Targets are out of date. Updating...",
-      msg_done = "Finished updating",
-      msg_failed = "Something went wrong"
-    )
-    cli::cat_line()
+    if (!quiet) {
+      cli::cli_process_start(
+        "Targets are out of date. Updating...",
+        msg_done = "Finished updating",
+        msg_failed = "Something went wrong"
+      )
+      cli::cat_line()
+    }
     out <- eval(recipe, envir = envir, ...)
-    cli::cli_process_done()
+    if (!quiet) cli::cli_process_done()
   } else {
-    cli::cli_alert_success("Targets are up to date")
+    if (!quiet) cli::cli_alert_success("Targets are up to date")
     out <- NULL
   }
 

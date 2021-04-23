@@ -6,7 +6,10 @@
 \arguments{
 \item{targets}{A character vector of paths to files}
 
-\item{dependencies}{A character vector of paths to files which the \code{targets} depend on}
+\item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
+
+\item{quiet}{A logical determining whether or not messages are signaled}
 }
 \description{
 Parameters for make-like functions
