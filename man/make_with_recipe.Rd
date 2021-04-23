@@ -4,7 +4,7 @@
 \alias{make_with_recipe}
 \title{Make targets out of dependencies using a recipe}
 \usage{
-make_with_recipe(recipe, targets, dependencies, envir = parent.frame())
+make_with_recipe(recipe, targets, dependencies, envir = parent.frame(), ...)
 }
 \arguments{
 \item{recipe}{A chunk of R code which makes the \code{targets}}
@@ -14,6 +14,8 @@ make_with_recipe(recipe, targets, dependencies, envir = parent.frame())
 \item{dependencies}{A character vector of paths to files which the \code{targets} depend on}
 
 \item{envir}{The environment in which to run \code{recipe}}
+
+\item{...}{Additional parameters to pass to \code{base::eval()}}
 }
 \value{
 The result of evaluating the \code{recipe} if the \code{targets} are out of

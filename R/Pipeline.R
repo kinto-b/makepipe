@@ -125,7 +125,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     nodes$shape <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "circle", "square")
 
     # Label
-    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", fs::path_file(nodes$title))
+    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", basename(nodes$title))
 
     self$nodes <- nodes
     invisible(self)

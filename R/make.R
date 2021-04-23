@@ -26,10 +26,16 @@ make_with_source <- function(source, targets, dependencies, ...) {
   )
 
   if (outdated) {
-    usethis::ui_info("Targets are out of date. Updating...")
-    source(source)
+    cli::cli_process_start(
+      "Targets are out of date. Updating...",
+      msg_done = "Finished updating",
+      msg_failed = "Something went wrong"
+    )
+    cli::cat_line()
+    source(source, ...)
+    cli::cli_process_done()
   } else {
-    usethis::ui_done("Targets are up to date")
+    cli::cli_alert_success("Targets are up to date")
   }
 
   invisible(NULL)
@@ -41,6 +47,7 @@ make_with_source <- function(source, targets, dependencies, ...) {
 #' @inheritParams make_params
 #' @param recipe A chunk of R code which makes the `targets`
 #' @param envir The environment in which to run `recipe`
+#' @param ... Additional parameters to pass to `base::eval()`
 #'
 #' @return The result of evaluating the `recipe` if the `targets` are out of
 #'   date otherwise `NULL``
@@ -52,7 +59,7 @@ make_with_source <- function(source, targets, dependencies, ...) {
 #' # TODO
 #' }
 #'
-make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame()) {
+make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame(), ...) {
   outdated <- out_of_date(targets, dependencies)
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
 
@@ -65,10 +72,16 @@ make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame
   )
 
   if (outdated) {
-    usethis::ui_info("Targets are out of date. Updating...")
-    out <- eval(recipe, envir = envir)
+    cli::cli_process_start(
+      "Targets are out of date. Updating...",
+      msg_done = "Finished updating",
+      msg_failed = "Something went wrong"
+    )
+    cli::cat_line()
+    out <- eval(recipe, envir = envir, ...)
+    cli::cli_process_done()
   } else {
-    usethis::ui_done("Targets are up to date")
+    cli::cli_alert_success("Targets are up to date")
     out <- NULL
   }
 

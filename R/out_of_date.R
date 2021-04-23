@@ -16,7 +16,7 @@ out_of_date <- function (targets, dependencies) {
   any(unlist(lapply(targets, function(fp_x) {
     unlist(lapply(dependencies, function (fp_y) {
       # Target x older than dependency y?
-      if (!file.exists(fp_y)) usethis::ui_stop("{fp_y} does not exist")
+      if (!file.exists(fp_y)) stop("{fp_y} does not exist", call. = FALSE)
       if (!file.exists(fp_x)) return(TRUE)
       file.mtime(fp_x) < file.mtime(fp_y)
     }))
