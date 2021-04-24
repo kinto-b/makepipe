@@ -10,7 +10,8 @@ sources.
 }
 \seealso{
 Other pipeline: 
-\code{\link{pipeline-accessors}}
+\code{\link{pipeline-accessors}},
+\code{\link{pipeline-vis}}
 }
 \concept{pipeline}
 \keyword{internal}
@@ -30,6 +31,7 @@ Other pipeline:
 \item \href{#method-add_recipe_segment}{\code{Pipeline$add_recipe_segment()}}
 \item \href{#method-style_nodes}{\code{Pipeline$style_nodes()}}
 \item \href{#method-print}{\code{Pipeline$print()}}
+\item \href{#method-save}{\code{Pipeline$save()}}
 \item \href{#method-clone}{\code{Pipeline$clone()}}
 }
 }
@@ -106,6 +108,28 @@ Display pipeline
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$print()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save"></a>}}
+\if{latex}{\out{\hypertarget{method-save}{}}}
+\subsection{Method \code{save()}}{
+Save pipeline
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save(file, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{File to save HTML into}
+
+\item{\code{...}}{Additional arguments to pass to \code{visNetwork::visSave()}}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 \code{self}
 }

@@ -2,40 +2,36 @@
 % Please edit documentation in R/Pipeline.R
 \name{pipeline-accessors}
 \alias{pipeline-accessors}
+\alias{is_pipeline}
 \alias{set_pipeline}
 \alias{get_pipeline}
-\alias{show_pipeline}
-\alias{is_pipeline}
 \title{Access and interface with Pipeline.}
 \usage{
+is_pipeline(pipeline)
+
 set_pipeline(pipeline)
 
 get_pipeline()
-
-show_pipeline(pipeline = get_pipeline())
-
-is_pipeline(pipeline)
 }
 \arguments{
 \item{pipeline}{A pipeline. See \link{Pipeline} for more details.}
 }
 \description{
 \code{get_pipeline()}, \code{set_pipeline()} access and modify the current \emph{active}
-pipeline, while \code{show_pipeline()} and \code{is_pipeline()} are used to display
-or test a given pipeline.
+pipeline, while all other helper functions do not affect the active pipeline
 }
 \examples{
 
 \dontrun{
- # Build up a pipeline from scratch:
+ # Build up a pipeline from scratch and save it out
  set_pipeline(Pipeline$new())
  # A series of `make_with_*()` blocks go here...
  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
- show_pipeline()
 }
 }
 \seealso{
 Other pipeline: 
-\code{\link{Pipeline}}
+\code{\link{Pipeline}},
+\code{\link{pipeline-vis}}
 }
 \concept{pipeline}

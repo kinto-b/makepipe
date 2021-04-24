@@ -22,9 +22,17 @@ You can install the development version from
 devtools::install_github("kinto-b/piper")
 ```
 
-## Example
+## Building a pipeline
 
-This is a basic example which shows you how to solve a common problem:
+To construct a pipeline, one simply needs to chain together a number of
+`make_with_*()` statements. When the pipeline is run through, each
+`make_with_*()` block is evaluated if and only if the `targets` are
+out-of-date with respect to the `dependencies` (and `source` file). But,
+whether or not the block is evaluated, a segment will be added to the
+Pipeline object behind the scenes. At the end of the script, once the
+entire pipeline has been run through, one can display the accumulated
+Pipeline object to produce a flow-chart visualisation of the pipeline.
+For example:
 
 ``` r
 library(piper)
@@ -40,7 +48,10 @@ make_with_recipe(
     },
     targets = c("scratch/data/2_data.Rds")
 )
-show_pipeline()
+show_pipeline(labels = c(
+  "scratch/lookup/concordance.csv" = "Postcode concordance",
+  "scratch/data/0_raw_data.csv" = "Raw survey data"
+))
 ```
 
 <img src="man/figures/README-example_pipeline.png" width="75%" style="display: block; margin: auto;" />

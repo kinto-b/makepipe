@@ -128,7 +128,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     nodes$shape <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "circle", "square")
 
     # Label
-    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", basename(nodes$title))
+    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", basename(as.character(nodes$id)))
 
     self$nodes <- nodes
     invisible(self)
@@ -140,7 +140,22 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     out <- visNetwork::visNetwork(self$nodes, self$edges)
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
-    visNetwork::visLegend(out)
+    out <- visNetwork::visLegend(out)
+    print(out)
+    invisible(self)
+  },
+
+  #' @description Save pipeline
+  #' @param file File to save HTML into
+  #' @param ... Additional arguments to pass to `visNetwork::visSave()`
+  #' @return `self`
+  save = function(file, ...) {
+    out <- visNetwork::visNetwork(self$nodes, self$edges)
+    out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
+    out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
+    out <- visNetwork::visLegend(out)
+    visNetwork::visSave(out, file, ...)
+    invisible(self)
   }
 ))
 
@@ -149,8 +164,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 #' Access and interface with Pipeline.
 #'
 #' `get_pipeline()`, `set_pipeline()` access and modify the current *active*
-#' pipeline, while `show_pipeline()` and `is_pipeline()` are used to display
-#' or test a given pipeline.
+#' pipeline, while all other helper functions do not affect the active pipeline
+#'
 #'
 #' @param pipeline A pipeline. See [Pipeline] for more details.
 #' @name pipeline-accessors
@@ -158,19 +173,24 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 #' @examples
 #'
 #' \dontrun{
-#'  # Build up a pipeline from scratch:
+#'  # Build up a pipeline from scratch and save it out
 #'  set_pipeline(Pipeline$new())
 #'  # A series of `make_with_*()` blocks go here...
 #'  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
-#'  show_pipeline()
 #' }
 NULL
 piper_env <- new.env(parent = emptyenv())
 
 #' @rdname pipeline-accessors
 #' @export
+is_pipeline <- function(pipeline) {
+  inherits(pipeline, c("Pipeline", "R6"))
+}
+
+#' @rdname pipeline-accessors
+#' @export
 set_pipeline <- function(pipeline) {
-  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object")
+  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
   old <- piper_env$pipeline
   piper_env$pipeline <- pipeline
   invisible(old)
@@ -182,15 +202,100 @@ get_pipeline <- function() {
   piper_env$pipeline
 }
 
-#' @rdname pipeline-accessors
+
+#' Visualise the Pipeline.
+#'
+#' Produce an HTML flowchart visualisation of the pipeline.
+#'
+#' Tooltips and labels must be supplied as named character vector where the
+#' names correspond to the filepaths of nodes (i.e. `targets`, `dependencies`,
+#' or `source` scripts)
+#'
+#' @param file File to save HTML into
+#' @param pipeline A pipeline. See [Pipeline] for more details.
+#' @param tooltips A named character vector mapping nodes in the `pipeline` onto
+#'   tooltips to display on hover-over.
+#' @param labels A named character vector mapping nodes in the `pipeline` onto
+#'   labels to display beside them.
+#' @param ... Additional arguments to pass to `visNetwork::visSave()`.
+#' @name pipeline-vis
+#' @family pipeline
+#' @examples
+#'
+#' \dontrun{
+#'  # Run pipeline
+#'  make_with_source(
+#'    "recode.R",
+#'    "data/0 raw_data.R",
+#'    "data/1 data.R"
+#'  )
+#'  make_with_source(
+#'    "merge.R",
+#'    c("data/1 data.R", "data/0 raw_pop.R"),
+#'    "data/2 data.R"
+#'  )
+#'
+#'  # Visualise pipeline with custom tooltips
+#'  show_pipeline(tooltips = c(
+#'    "data/0 raw_data.R" = "Raw survey data",
+#'    "data/0 raw_pop.R" = "Raw population data",
+#'    "data/1 data.R" = "Survey data with recodes applied",
+#'    "data/2 data.R" = "Survey data with demographic variables merged in"
+#'  ))
+#'
+#' }
+NULL
+#' @rdname pipeline-vis
 #' @export
-show_pipeline <- function(pipeline = get_pipeline()) {
-  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object")
+show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL) {
+  pipeline <- annotate_pipeline(pipeline, tooltips, labels)
   pipeline$print()
 }
 
-#' @rdname pipeline-accessors
+#' @rdname pipeline-vis
 #' @export
-is_pipeline <- function(pipeline) {
-  inherits(pipeline, c("Pipeline", "R6"))
+save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
+  pipeline <- annotate_pipeline(pipeline, tooltips, labels)
+  pipeline$save(file, ...)
+}
+
+#' @noRd
+annotate_pipeline <- function(pipeline, tooltips, labels) {
+  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
+
+  if (!is.null(tooltips)) {
+    stopifnot(is.character(tooltips))
+    if (!identical(length(names(tooltips)), length(tooltips))) stop("`tooltips` must be named", call. = FALSE)
+    bad_nodes <- setdiff(names(tooltips), as.character(pipeline$nodes$id))
+    if (length(bad_nodes) > 0) stop("`", paste(bad_nodes, collapse = "`, "), "` are not nodes in `pipeline`", call. = FALSE)
+    if (any(duplicated(names(tooltips)))) stop("names of `tooltips` must not be duplicated")
+
+    pipeline <- pipeline$clone(deep = TRUE)
+    old_nodes <- pipeline$nodes
+    old_nodes$node_id <- as.character(old_nodes$id)
+    tooltips <- data.frame(node_id = names(tooltips), new_title = tooltips)
+    new_nodes <- merge(old_nodes, tooltips, by = "node_id", all.x = TRUE)
+    new_nodes$title <- ifelse(is.na(new_nodes$new_title), new_nodes$title, new_nodes$new_title)
+    new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "new_title"))]
+    pipeline$nodes <- new_nodes
+  }
+
+  if (!is.null(labels)) {
+    stopifnot(is.character(labels))
+    if (!identical(length(names(labels)), length(labels))) stop("`labels` must be named", call. = FALSE)
+    bad_nodes <- setdiff(names(labels), as.character(pipeline$nodes$id))
+    if (length(bad_nodes) > 0) stop("`", paste(bad_nodes, collapse = "`, "), "` are not nodes in `pipeline`", call. = FALSE)
+    if (any(duplicated(names(labels)))) stop("names of `labels` must not be duplicated")
+
+    pipeline <- pipeline$clone(deep = TRUE)
+    old_nodes <- pipeline$nodes
+    old_nodes$node_id <- as.character(old_nodes$id)
+    labels <- data.frame(node_id = names(labels), new_label = labels)
+    new_nodes <- merge(old_nodes, labels, by = "node_id", all.x = TRUE)
+    new_nodes$label <- ifelse(is.na(new_nodes$new_label), new_nodes$label, new_nodes$new_label)
+    new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "new_label"))]
+    pipeline$nodes <- new_nodes
+  }
+
+  pipeline
 }
