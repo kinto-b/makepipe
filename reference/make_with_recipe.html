@@ -178,7 +178,7 @@ date otherwise `NULL``</p>
     <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"data/raw_data.Rds"</span><span class='op'>)</span>
     <span class='va'>pop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"data/pop_data.Rds"</span><span class='op'>)</span>
     <span class='va'>merged_dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/merge.html'>merge</a></span><span class='op'>(</span><span class='va'>dat</span>, <span class='va'>pop</span>, by <span class='op'>=</span> <span class='st'>"id"</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span><span class='st'>"data/merged_data.Rds"</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span><span class='va'>merged_dat</span>, <span class='st'>"data/merged_data.Rds"</span><span class='op'>)</span>
   <span class='op'>}</span>,
   targets <span class='op'>=</span> <span class='st'>"data/merged_data.Rds"</span>,
   dependencies <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"data/raw_data.Rds"</span>, <span class='st'>"data/raw_pop.Rds"</span><span class='op'>)</span>,
