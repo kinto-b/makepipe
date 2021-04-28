@@ -37,20 +37,23 @@ For example:
 ``` r
 library(piper)
 make_with_source(
-  dependencies = c("scratch/data/0_raw_data.csv", "scratch/lookup/concordance.csv"),
-  source = c("scratch/1 data_prep.R"),
-  targets = c("scratch/data/1_data.Rds")
+  dependencies = c("data/0_raw_data.csv", "lookup/concordance.csv"),
+  source = c("1 data_prep.R"),
+  targets = c("data/1_data.Rds")
 )
 make_with_recipe(
-    dependencies = c("scratch/data/1_data.Rds", "scratch/data/0_pop.Rds"),
+    dependencies = c("data/1_data.Rds", "data/0_pop.Rds"),
     recipe = {
-      usethis::ui_info("Merging...")
+      dat <- readRDS("data/raw_data.Rds")
+      pop <- readRDS("data/pop_data.Rds")
+      merged_dat <- merge(dat, pop, by = "id")
+      saveRDS(merged_dat, "data/2_data.Rds")
     },
-    targets = c("scratch/data/2_data.Rds")
+    targets = c("data/2_data.Rds")
 )
 show_pipeline(labels = c(
-  "scratch/lookup/concordance.csv" = "Postcode concordance",
-  "scratch/data/0_raw_data.csv" = "Raw survey data"
+  "lookup/concordance.csv" = "Postcode concordance",
+  "data/0_raw_data.csv" = "Raw survey data"
 ))
 ```
 

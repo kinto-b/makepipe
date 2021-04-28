@@ -77,7 +77,7 @@ make_with_source <- function(source, targets, dependencies, quiet = getOption("p
 #'     dat <- readRDS("data/raw_data.Rds")
 #'     pop <- readRDS("data/pop_data.Rds")
 #'     merged_dat <- merge(dat, pop, by = "id")
-#'     saveRDS("data/merged_data.Rds")
+#'     saveRDS(merged_dat, "data/merged_data.Rds")
 #'   },
 #'   targets = "data/merged_data.Rds",
 #'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),

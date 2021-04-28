@@ -114,10 +114,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     edges$from_mtime <- file.mtime(as.character(edges$from))
     edges$to_mtime <- file.mtime(as.character(edges$to))
     edges$out_of_date <- edges$from_mtime > edges$to_mtime
-    for (i in nrow(edges)) {
+    edges$out_of_date <- ifelse(is.na(edges$out_of_date), FALSE, edges$out_of_date)
+    for (i in seq_along(edges$from)) {
+      x <- edges$out_of_date
       edges$out_of_date <- (edges$from %in% edges[edges$out_of_date, "to"]) | (edges$out_of_date)
+      if (identical(edges$out_of_date, x)) break
     }
-    edges$out_of_date <- ifelse(edges$.recipe, FALSE, edges$out_of_date)
 
     # Group
     nodes$group <- ifelse(nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date")
