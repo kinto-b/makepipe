@@ -8,6 +8,9 @@ Authors@R:
            email = "kinto.behr@gmail.com")
 Description: Tools for constructing simple make-like pipelines. 
 License: GPL (>= 3)
+URL: https://kinto-b.github.io/piper/,
+     https://github.com/kinto-b/piper
+BugReports: https://github.com/kinto-b/piper/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
