@@ -163,6 +163,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
+    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
     print(out)
     invisible(self)
   },
@@ -176,6 +177,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
+    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
     visNetwork::visSave(out, file, ...)
     invisible(self)
   }
