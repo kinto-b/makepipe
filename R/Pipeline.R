@@ -113,13 +113,33 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     # Out of date?
     edges$from_mtime <- file.mtime(as.character(edges$from))
     edges$to_mtime <- file.mtime(as.character(edges$to))
-    edges$out_of_date <- edges$from_mtime > edges$to_mtime
-    edges$out_of_date <- ifelse(is.na(edges$out_of_date), FALSE, edges$out_of_date)
-    for (i in seq_along(edges$from)) {
-      x <- edges$out_of_date
-      edges$out_of_date <- (edges$from %in% edges[edges$out_of_date, "to"]) | (edges$out_of_date)
-      if (identical(edges$out_of_date, x)) break
+    edges$out_of_date <- ifelse(edges$.source, FALSE, edges$from_mtime > edges$to_mtime)
+
+    # Propagate out-of-dateness
+    edges_i <- edges
+    for (i in 1:nrow(edges)) {
+      edges_i <- merge(
+          edges_i,
+          edges_i[, c("from", "to", "to_mtime")],
+          by.x = "to",
+          by.y = "from",
+          suffixes = c("", "2")
+        )
+
+      edges_i$to <- edges_i$to2
+      edges_i$to_mtime <- edges_i$to_mtime2
+      edges_i$out_of_date <-
+        ifelse(
+          is.na(edges_i$from_mtime > edges_i$to_mtime),
+          edges_i$out_of_date,
+          edges_i$out_of_date | edges_i$from_mtime > edges_i$to_mtime
+        )
+      outdated <- edges_i[edges_i$out_of_date, "to"]
+      edges$out_of_date <- (edges$to %in% outdated) | (edges$out_of_date)
+
+      edges_i <- edges_i[, names(edges)]
     }
+
 
     # Group
     nodes$group <- ifelse(nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date")
@@ -143,6 +163,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
+    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
     print(out)
     invisible(self)
   },
@@ -156,6 +177,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
+    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
     visNetwork::visSave(out, file, ...)
     invisible(self)
   }
