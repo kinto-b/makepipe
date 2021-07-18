@@ -8,6 +8,7 @@ make_with_recipe(
   recipe,
   targets,
   dependencies,
+  packages = NULL,
   envir = parent.frame(),
   quiet = getOption("piper.quiet"),
   ...
@@ -19,6 +20,9 @@ make_with_recipe(
 \item{targets}{A character vector of paths to files}
 
 \item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
+
+\item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 
 \item{envir}{The environment in which to run \code{recipe}}

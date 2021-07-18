@@ -8,6 +8,7 @@ make_with_source(
   source,
   targets,
   dependencies,
+  packages = NULL,
   quiet = getOption("piper.quiet"),
   ...
 )
@@ -18,6 +19,9 @@ make_with_source(
 \item{targets}{A character vector of paths to files}
 
 \item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
+
+\item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 
 \item{quiet}{A logical determining whether or not messages are signaled}

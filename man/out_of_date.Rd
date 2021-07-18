@@ -4,12 +4,15 @@
 \alias{out_of_date}
 \title{Check if targets are out-of-date vis-a-vis their dependencies}
 \usage{
-out_of_date(targets, dependencies)
+out_of_date(targets, dependencies, packages = NULL)
 }
 \arguments{
 \item{targets}{A character vector of paths to files}
 
 \item{dependencies}{A character vector of paths to files which the \code{targets}
+depend on}
+
+\item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 }
 \value{

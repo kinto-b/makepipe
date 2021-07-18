@@ -42,7 +42,7 @@ Other pipeline:
 Add a pipeline segment corresponding to a \code{make_with_source()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -54,6 +54,9 @@ call
 
 \item{\code{dependencies}}{A character vector of paths to files which the
 \code{targets} depend on}
+
+\item{\code{packages}}{A character vector of names of packages which \code{targets}
+depend on}
 }
 \if{html}{\out{</div>}}
 }
@@ -68,7 +71,7 @@ call
 Add a pipeline segment corresponding to a \code{make_with_recipe()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -79,6 +82,9 @@ call
 \item{\code{targets}}{A character vector of paths to files}
 
 \item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
+
+\item{\code{packages}}{A character vector of names of packages which \code{targets}
+depend on}
 }
 \if{html}{\out{</div>}}
 }

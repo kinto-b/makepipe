@@ -21,9 +21,9 @@
 #' )
 #' }
 #'
-make_with_source <- function(source, targets, dependencies, quiet = getOption("piper.quiet"),...) {
+make_with_source <- function(source, targets, dependencies, packages = NULL, quiet = getOption("piper.quiet"),...) {
   stopifnot(is.character(source))
-  outdated <- out_of_date(targets, c(dependencies, source))
+  outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
@@ -33,7 +33,8 @@ make_with_source <- function(source, targets, dependencies, quiet = getOption("p
   pipeline$add_source_segment(
     source = source,
     targets = targets,
-    dependencies = dependencies
+    dependencies = dependencies,
+    packages = packages
   )
 
   if (outdated) {
@@ -84,8 +85,8 @@ make_with_source <- function(source, targets, dependencies, quiet = getOption("p
 #'   envir = new.env()
 #' )
 #' }
-make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame(), quiet = getOption("piper.quiet"), ...) {
-  outdated <- out_of_date(targets, dependencies)
+make_with_recipe <- function(recipe, targets, dependencies, packages = NULL, envir = parent.frame(), quiet = getOption("piper.quiet"), ...) {
+  outdated <- out_of_date(targets, c(dependencies), packages = packages)
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
 
   pipeline <- get_pipeline()
@@ -96,7 +97,8 @@ make_with_recipe <- function(recipe, targets, dependencies, envir = parent.frame
   pipeline$add_recipe_segment(
     recipe = recipe_txt,
     targets = targets,
-    dependencies = dependencies
+    dependencies = dependencies,
+    packages = packages
   )
 
   if (outdated) {

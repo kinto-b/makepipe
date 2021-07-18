@@ -18,7 +18,8 @@ RoxygenNote: 7.1.1
 Imports: 
     R6,
     cli,
-    visNetwork
+    visNetwork,
+    utils
 Suggests: 
     testthat (>= 3.0.0),
     withr
