@@ -6,13 +6,15 @@
 \alias{save_pipeline}
 \title{Visualise the Pipeline.}
 \usage{
-show_pipeline(pipeline = get_pipeline(), tooltips = NULL, labels = NULL)
+show_pipeline(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...)
 
 save_pipeline(
   file,
   pipeline = get_pipeline(),
   tooltips = NULL,
   labels = NULL,
+  selfcontained = TRUE,
+  background = "white",
   ...
 )
 }
@@ -25,9 +27,16 @@ tooltips to display on hover-over.}
 \item{labels}{A named character vector mapping nodes in the \code{pipeline} onto
 labels to display beside them.}
 
+\item{...}{Arguments (other than \code{nodes} and \code{edges}) to pass to
+\code{visNetwork::visNetwork()}}
+
 \item{file}{File to save HTML into}
 
-\item{...}{Additional arguments to pass to \code{visNetwork::visSave()}.}
+\item{selfcontained}{Whether to save the HTML as a single self-contained
+file (with external resources base64 encoded) or a file with external
+resources placed in an adjacent directory.}
+
+\item{background}{Text string giving the html background color of the widget. Defaults to white.}
 }
 \description{
 Produce an HTML flowchart visualisation of the pipeline.

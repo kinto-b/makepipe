@@ -229,9 +229,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   },
 
   #' @description Display pipeline
+  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+  #'   `visNetwork::visNetwork()`
   #' @return `self`
-  print = function() {
-    out <- visNetwork::visNetwork(self$nodes, self$edges)
+  print = function(...) {
+    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
@@ -242,15 +244,20 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 
   #' @description Save pipeline
   #' @param file File to save HTML into
-  #' @param ... Additional arguments to pass to `visNetwork::visSave()`
+  #' @param selfcontained Whether to save the HTML as a single self-contained
+  #'   file (with external resources base64 encoded) or a file with external
+  #'   resources placed in an adjacent directory.
+  #' @param background Text string giving the html background color of the widget. Defaults to white.
+  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+  #'   `visNetwork::visNetwork()`
   #' @return `self`
-  save = function(file, ...) {
-    out <- visNetwork::visNetwork(self$nodes, self$edges)
+  save = function(file, selfcontained = TRUE, background = "white", ...) {
+    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
     out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
-    visNetwork::visSave(out, file, ...)
+    visNetwork::visSave(out, file, selfcontained, background)
     invisible(self)
   }
 ))
@@ -313,7 +320,12 @@ get_pipeline <- function() {
 #'   tooltips to display on hover-over.
 #' @param labels A named character vector mapping nodes in the `pipeline` onto
 #'   labels to display beside them.
-#' @param ... Additional arguments to pass to `visNetwork::visSave()`.
+#' @param selfcontained Whether to save the HTML as a single self-contained
+#'   file (with external resources base64 encoded) or a file with external
+#'   resources placed in an adjacent directory.
+#' @param background Text string giving the html background color of the widget. Defaults to white.
+#' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+#'   `visNetwork::visNetwork()`
 #' @name pipeline-vis
 #' @family pipeline
 #' @examples
@@ -343,14 +355,14 @@ get_pipeline <- function() {
 NULL
 #' @rdname pipeline-vis
 #' @export
-show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL) {
+show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
   pipeline <- annotate_pipeline(pipeline, tooltips, labels)
   pipeline$print()
 }
 
 #' @rdname pipeline-vis
 #' @export
-save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
+save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, selfcontained = TRUE, background = "white", ...) {
   pipeline <- annotate_pipeline(pipeline, tooltips, labels)
   pipeline$save(file, ...)
 }
