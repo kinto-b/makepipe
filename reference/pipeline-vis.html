@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">piper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -128,13 +128,15 @@
     <p>Produce an HTML flowchart visualisation of the pipeline.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>show_pipeline</span><span class='op'>(</span>pipeline <span class='op'>=</span> <span class='fu'><a href='pipeline-accessors.html'>get_pipeline</a></span><span class='op'>(</span><span class='op'>)</span>, tooltips <span class='op'>=</span> <span class='cn'>NULL</span>, labels <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>show_pipeline</span><span class='op'>(</span>pipeline <span class='op'>=</span> <span class='fu'><a href='pipeline-accessors.html'>get_pipeline</a></span><span class='op'>(</span><span class='op'>)</span>, tooltips <span class='op'>=</span> <span class='cn'>NULL</span>, labels <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>save_pipeline</span><span class='op'>(</span>
   <span class='va'>file</span>,
   pipeline <span class='op'>=</span> <span class='fu'><a href='pipeline-accessors.html'>get_pipeline</a></span><span class='op'>(</span><span class='op'>)</span>,
   tooltips <span class='op'>=</span> <span class='cn'>NULL</span>,
   labels <span class='op'>=</span> <span class='cn'>NULL</span>,
+  selfcontained <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  background <span class='op'>=</span> <span class='st'>"white"</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -156,12 +158,23 @@ tooltips to display on hover-over.</p></td>
 labels to display beside them.</p></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p>Arguments (other than <code>nodes</code> and <code>edges</code>) to pass to
+<code><a href='https://rdrr.io/pkg/visNetwork/man/visNetwork.html'>visNetwork::visNetwork()</a></code></p></td>
+    </tr>
+    <tr>
       <th>file</th>
       <td><p>File to save HTML into</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Additional arguments to pass to <code><a href='https://rdrr.io/pkg/visNetwork/man/visSave.html'>visNetwork::visSave()</a></code>.</p></td>
+      <th>selfcontained</th>
+      <td><p>Whether to save the HTML as a single self-contained
+file (with external resources base64 encoded) or a file with external
+resources placed in an adjacent directory.</p></td>
+    </tr>
+    <tr>
+      <th>background</th>
+      <td><p>Text string giving the html background color of the widget. Defaults to white.</p></td>
     </tr>
     </table>
 

@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">piper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -122,6 +122,14 @@
       <small>Source: <a href='https://github.com/kinto-b/piper/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="piper-003" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.3">
+<a href="#piper-003" class="anchor"></a>piper 0.0.3</h1>
+<ul>
+<li><p>Added arguments to <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code> and <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, allowing the user to specify e.g. height and width of output widgets.</p></li>
+<li><p>Added <code>packages</code> argument to <code>make_*()</code> functions, allowing the user to easily add packages as dependencies of their targets. If any of the <code>packages</code> specified have been updated since the <code>targets</code> were last produced, the <code>targets</code> will be registered as out-of-date when <code>make_*()</code> is run.</p></li>
+</ul>
+</div>
     <div id="piper-002" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.2">
 <a href="#piper-002" class="anchor"></a>piper 0.0.2</h1>

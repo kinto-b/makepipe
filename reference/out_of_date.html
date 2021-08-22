@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">piper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@
     <p>Check if targets are out-of-date vis-a-vis their dependencies</p>
     </div>
 
-    <pre class="usage"><span class='fu'>out_of_date</span><span class='op'>(</span><span class='va'>targets</span>, <span class='va'>dependencies</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>out_of_date</span><span class='op'>(</span><span class='va'>targets</span>, <span class='va'>dependencies</span>, packages <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +140,11 @@
     <tr>
       <th>dependencies</th>
       <td><p>A character vector of paths to files which the <code>targets</code>
+depend on</p></td>
+    </tr>
+    <tr>
+      <th>packages</th>
+      <td><p>A character vector of names of packages which <code>targets</code>
 depend on</p></td>
     </tr>
     </table>
