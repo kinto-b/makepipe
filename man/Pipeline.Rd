@@ -42,7 +42,7 @@ Other pipeline:
 Add a pipeline segment corresponding to a \code{make_with_source()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -54,6 +54,9 @@ call
 
 \item{\code{dependencies}}{A character vector of paths to files which the
 \code{targets} depend on}
+
+\item{\code{packages}}{A character vector of names of packages which \code{targets}
+depend on}
 }
 \if{html}{\out{</div>}}
 }
@@ -68,7 +71,7 @@ call
 Add a pipeline segment corresponding to a \code{make_with_recipe()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -79,6 +82,9 @@ call
 \item{\code{targets}}{A character vector of paths to files}
 
 \item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
+
+\item{\code{packages}}{A character vector of names of packages which \code{targets}
+depend on}
 }
 \if{html}{\out{</div>}}
 }
@@ -105,9 +111,17 @@ Style pipeline nodes
 \subsection{Method \code{print()}}{
 Display pipeline
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$print()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$print(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Arguments (other than \code{nodes} and \code{edges}) to pass to
+\code{visNetwork::visNetwork()}}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 \code{self}
 }
@@ -118,7 +132,7 @@ Display pipeline
 \subsection{Method \code{save()}}{
 Save pipeline
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save(file, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save(file, selfcontained = TRUE, background = "white", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -126,7 +140,14 @@ Save pipeline
 \describe{
 \item{\code{file}}{File to save HTML into}
 
-\item{\code{...}}{Additional arguments to pass to \code{visNetwork::visSave()}}
+\item{\code{selfcontained}}{Whether to save the HTML as a single self-contained
+file (with external resources base64 encoded) or a file with external
+resources placed in an adjacent directory.}
+
+\item{\code{background}}{Text string giving the html background color of the widget. Defaults to white.}
+
+\item{\code{...}}{Arguments (other than \code{nodes} and \code{edges}) to pass to
+\code{visNetwork::visNetwork()}}
 }
 \if{html}{\out{</div>}}
 }

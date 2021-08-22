@@ -1,6 +1,6 @@
 Package: piper
 Title: Pipeline Tools Inspired by GNU Make
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     person(given = "Kinto",
            family = "Behr",
@@ -18,7 +18,8 @@ RoxygenNote: 7.1.1
 Imports: 
     R6,
     cli,
-    visNetwork
+    visNetwork,
+    utils
 Suggests: 
     testthat (>= 3.0.0),
     withr

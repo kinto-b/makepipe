@@ -9,6 +9,9 @@
 \item{dependencies}{A character vector of paths to files which the \code{targets}
 depend on}
 
+\item{packages}{A character vector of names of packages which \code{targets}
+depend on}
+
 \item{quiet}{A logical determining whether or not messages are signaled}
 }
 \description{

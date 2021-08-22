@@ -1,3 +1,6 @@
+
+# R6 Object --------------------------------------------------------------------
+
 #' Pipeline visualisations
 #'
 #' @description A Pipeline object is automatically constructed as calls to `make_*()` are
@@ -17,6 +20,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     arrows = character(0),
     .source = logical(0),
     .recipe = logical(0),
+    .pkg = logical(0),
     stringsAsFactors = FALSE
   ),
 
@@ -35,17 +39,51 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #' @param targets A character vector of paths to files
   #' @param dependencies A character vector of paths to files which the
   #'   `targets` depend on
+  #' @param packages A character vector of names of packages which `targets`
+  #'   depend on
   #' @return `self`
-  add_source_segment = function(source, targets, dependencies) {
+  add_source_segment = function(source, targets, dependencies, packages) {
     stopifnot(is.character(dependencies))
     stopifnot(is.character(source))
     stopifnot(is.character(targets))
+    stopifnot(is.character(packages) | is.null(packages))
 
     # Construct new edges
     new_edges <- rbind(
-      expand.grid(from = dependencies, to = source, arrows = "to", .source = TRUE, .recipe = FALSE, stringsAsFactors = FALSE),
-      expand.grid(from = source, to = targets, arrows = "to", .source = FALSE, .recipe = FALSE, stringsAsFactors = FALSE)
+      expand.grid(
+        from = dependencies,
+        to = source,
+        arrows = "to",
+        .source = TRUE,
+        .recipe = FALSE,
+        .pkg = FALSE,
+        stringsAsFactors = FALSE
+      ),
+      expand.grid(
+        from = source,
+        to = targets,
+        arrows = "to",
+        .source = FALSE,
+        .recipe = FALSE,
+        .pkg = FALSE,
+        stringsAsFactors = FALSE
+      )
     )
+
+    if (length(packages) > 0) {
+      new_edges <- rbind(
+        expand.grid(
+          from = packages,
+          to = source,
+          arrows = "to",
+          .source = TRUE,
+          .recipe = FALSE,
+          .pkg = TRUE,
+          stringsAsFactors = FALSE
+        ),
+        new_edges
+      )
+    }
 
     # Convert old edges to character and bind
     self$edges$from <- as.character(self$edges$from)
@@ -72,17 +110,51 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #' @param recipe A character vector containing a deparsed expression, which would make the `targets` if evaluated.
   #' @param targets A character vector of paths to files
   #' @param dependencies A character vector of paths to files which the `targets` depend on
+  #' @param packages A character vector of names of packages which `targets`
+  #'   depend on
   #' @return `self`
-  add_recipe_segment = function(recipe, targets, dependencies) {
+  add_recipe_segment = function(recipe, targets, dependencies, packages) {
     stopifnot(is.character(dependencies))
     stopifnot(is.character(recipe))
     stopifnot(is.character(targets))
+    stopifnot(is.character(packages) | is.null(packages))
 
     # Construct new edges
     new_edges <- rbind(
-      expand.grid(from = dependencies, to = recipe, arrows = "to", .source = TRUE, .recipe = TRUE, stringsAsFactors = FALSE),
-      expand.grid(from = recipe, to = targets, arrows = "to", .source = FALSE, .recipe = FALSE, stringsAsFactors = FALSE)
+      expand.grid(
+        from = dependencies,
+        to = recipe,
+        arrows = "to",
+        .source = TRUE,
+        .recipe = TRUE,
+        .pkg = FALSE,
+        stringsAsFactors = FALSE
+      ),
+      expand.grid(
+        from = recipe,
+        to = targets,
+        arrows = "to",
+        .source = FALSE,
+        .recipe = FALSE,
+        .pkg = FALSE,
+        stringsAsFactors = FALSE
+      )
     )
+
+    if (length(packages) > 0) {
+      new_edges <- rbind(
+        expand.grid(
+          from = packages,
+          to = source,
+          arrows = "to",
+          .source = TRUE,
+          .recipe = FALSE,
+          .pkg = TRUE,
+          stringsAsFactors = FALSE
+        ),
+        new_edges
+      )
+    }
 
     # Convert old edges to character and bind
     self$edges$from <- as.character(self$edges$from)
@@ -146,8 +218,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     nodes$group <- ifelse(nodes$id %in% edges[edges$.source, "to"], "Source", nodes$group)
 
     # Colour
-    nodes$shape <- ifelse(nodes$id %in% edges[edges$.source, "to"], "triangle", "square")
     nodes$shape <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "circle", "square")
+    nodes$shape <- ifelse(nodes$id %in% edges[edges$.pkg, "from"], "triangle", nodes$shape)
 
     # Label
     nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", basename(as.character(nodes$id)))
@@ -157,9 +229,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   },
 
   #' @description Display pipeline
+  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+  #'   `visNetwork::visNetwork()`
   #' @return `self`
-  print = function() {
-    out <- visNetwork::visNetwork(self$nodes, self$edges)
+  print = function(...) {
+    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
@@ -170,20 +244,25 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 
   #' @description Save pipeline
   #' @param file File to save HTML into
-  #' @param ... Additional arguments to pass to `visNetwork::visSave()`
+  #' @param selfcontained Whether to save the HTML as a single self-contained
+  #'   file (with external resources base64 encoded) or a file with external
+  #'   resources placed in an adjacent directory.
+  #' @param background Text string giving the html background color of the widget. Defaults to white.
+  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+  #'   `visNetwork::visNetwork()`
   #' @return `self`
-  save = function(file, ...) {
-    out <- visNetwork::visNetwork(self$nodes, self$edges)
+  save = function(file, selfcontained = TRUE, background = "white", ...) {
+    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
     out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
     out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
     out <- visNetwork::visLegend(out)
     out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
-    visNetwork::visSave(out, file, ...)
+    visNetwork::visSave(out, file, selfcontained, background)
     invisible(self)
   }
 ))
 
-# -------------------------------------------------------------------------
+# Functions --------------------------------------------------------------------
 
 #' Access and interface with Pipeline.
 #'
@@ -241,7 +320,12 @@ get_pipeline <- function() {
 #'   tooltips to display on hover-over.
 #' @param labels A named character vector mapping nodes in the `pipeline` onto
 #'   labels to display beside them.
-#' @param ... Additional arguments to pass to `visNetwork::visSave()`.
+#' @param selfcontained Whether to save the HTML as a single self-contained
+#'   file (with external resources base64 encoded) or a file with external
+#'   resources placed in an adjacent directory.
+#' @param background Text string giving the html background color of the widget. Defaults to white.
+#' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+#'   `visNetwork::visNetwork()`
 #' @name pipeline-vis
 #' @family pipeline
 #' @examples
@@ -271,14 +355,14 @@ get_pipeline <- function() {
 NULL
 #' @rdname pipeline-vis
 #' @export
-show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL) {
+show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
   pipeline <- annotate_pipeline(pipeline, tooltips, labels)
   pipeline$print()
 }
 
 #' @rdname pipeline-vis
 #' @export
-save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
+save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, selfcontained = TRUE, background = "white", ...) {
   pipeline <- annotate_pipeline(pipeline, tooltips, labels)
   pipeline$save(file, ...)
 }
