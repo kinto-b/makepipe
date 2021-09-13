@@ -1,6 +1,6 @@
 Package: makepipe
 Title: Pipeline Tools Inspired by GNU Make
-Version: 0.0.3
+Version: 0.0.3.9000
 Authors@R: 
     person(given = "Kinto",
            family = "Behr",
