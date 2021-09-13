@@ -20,7 +20,8 @@
 #' )
 #' }
 #'
-make_with_source <- function(source, targets, dependencies, packages = NULL, quiet = getOption("makepipe.quiet"), ...) {
+make_with_source <- function(source, targets, dependencies, packages = NULL,
+                             quiet = getOption("makepipe.quiet"), ...) {
   stopifnot(is.character(source))
   outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
 
@@ -83,7 +84,9 @@ make_with_source <- function(source, targets, dependencies, packages = NULL, qui
 #'   envir = new.env()
 #' )
 #' }
-make_with_recipe <- function(recipe, targets, dependencies, packages = NULL, envir = parent.frame(), quiet = getOption("makepipe.quiet"), ...) {
+make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
+                             envir = parent.frame(),
+                             quiet = getOption("makepipe.quiet"), ...) {
   outdated <- out_of_date(targets, c(dependencies), packages = packages)
   recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
 

@@ -36,7 +36,8 @@ labels to display beside them.}
 file (with external resources base64 encoded) or a file with external
 resources placed in an adjacent directory.}
 
-\item{background}{Text string giving the html background color of the widget. Defaults to white.}
+\item{background}{Text string giving the html background color of the widget.
+Defaults to white.}
 }
 \description{
 Produce an HTML flowchart visualisation of the pipeline.

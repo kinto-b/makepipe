@@ -60,7 +60,9 @@ package_description_date <- function(package) {
     for (fld in desc) {
       r <- fld
       if (is.null(r) | is.na(r)) next
-      if (fld == "Built") r <- strsplit(r, split = "; ", fixed = TRUE)[[1L]][[3L]]
+      if (fld == "Built") {
+        r <- strsplit(r, split = "; ", fixed = TRUE)[[1L]][[3L]]
+      }
       r <- as.POSIXct(r, optional = TRUE)
       if (!is.na(r)) break
     }
