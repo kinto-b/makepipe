@@ -148,7 +148,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
       new_edges <- rbind(
         expand.grid(
           from = packages,
-          to = source,
+          to = recipe,
           arrows = "to",
           .source = TRUE,
           .recipe = FALSE,

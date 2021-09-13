@@ -113,3 +113,29 @@ test_that("make_with_recipe", {
     ))
   })
 })
+
+test_that("old packages do not invalidate pipeline", {
+  withr::with_tempfile(c("dependency", "target"), {
+    saveRDS(iris, dependency)
+    Sys.sleep(0.1)
+    saveRDS(iris, target)
+
+    expect_condition(
+      make_with_recipe(2 + 2, target, dependency, packages = "base"),
+      regexp = "Targets are up to date"
+    )
+  })
+
+
+  withr::with_tempfile(c("dependency", "target", "source"), {
+    saveRDS(iris, dependency)
+    saveRDS(iris, source)
+    Sys.sleep(0.1)
+    saveRDS(iris, target)
+
+    expect_condition(
+      make_with_source(source, target, dependency, packages = "base"),
+      regexp = "Targets are up to date"
+    )
+  })
+})
