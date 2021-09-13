@@ -4,6 +4,10 @@
 # makepipe <img src='man/figures/logo.png' align="right" height="139"/>
 
 <!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://codecov.io/gh/kinto-b/makepipe?branch=master)
+[![R-CMD-check](https://github.com/kinto-b/makepipe/workflows/R-CMD-check/badge.svg)](https://github.com/kinto-b/makepipe/actions)
 <!-- badges: end -->
 
 The goal of `makepipe` is to allow for the construction of make-like

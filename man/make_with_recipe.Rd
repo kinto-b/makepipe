@@ -39,7 +39,6 @@ date otherwise `NULL``
 Make targets out of dependencies using a recipe
 }
 \examples{
-
 \dontrun{
 # Merge files in fresh environment if raw data has been updated
 # since last merged

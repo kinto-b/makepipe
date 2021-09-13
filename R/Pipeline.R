@@ -191,12 +191,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     edges_i <- edges
     for (i in 1:nrow(edges)) {
       edges_i <- merge(
-          edges_i,
-          edges_i[, c("from", "to", "to_mtime")],
-          by.x = "to",
-          by.y = "from",
-          suffixes = c("", "2")
-        )
+        edges_i,
+        edges_i[, c("from", "to", "to_mtime")],
+        by.x = "to",
+        by.y = "from",
+        suffixes = c("", "2")
+      )
 
       edges_i$to <- edges_i$to2
       edges_i$to_mtime <- edges_i$to_mtime2
@@ -274,12 +274,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 #' @name pipeline-accessors
 #' @family pipeline
 #' @examples
-#'
 #' \dontrun{
-#'  # Build up a pipeline from scratch and save it out
-#'  set_pipeline(Pipeline$new())
-#'  # A series of `make_with_*()` blocks go here...
-#'  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+#' # Build up a pipeline from scratch and save it out
+#' set_pipeline(Pipeline$new())
+#' # A series of `make_with_*()` blocks go here...
+#' saveRDS(get_pipeline(), "data/my_pipeline.Rds")
 #' }
 NULL
 makepipe_env <- new.env(parent = emptyenv())
@@ -329,28 +328,26 @@ get_pipeline <- function() {
 #' @name pipeline-vis
 #' @family pipeline
 #' @examples
-#'
 #' \dontrun{
-#'  # Run pipeline
-#'  make_with_source(
-#'    "recode.R",
-#'    "data/0 raw_data.R",
-#'    "data/1 data.R"
-#'  )
-#'  make_with_source(
-#'    "merge.R",
-#'    c("data/1 data.R", "data/0 raw_pop.R"),
-#'    "data/2 data.R"
-#'  )
+#' # Run pipeline
+#' make_with_source(
+#'   "recode.R",
+#'   "data/0 raw_data.R",
+#'   "data/1 data.R"
+#' )
+#' make_with_source(
+#'   "merge.R",
+#'   c("data/1 data.R", "data/0 raw_pop.R"),
+#'   "data/2 data.R"
+#' )
 #'
-#'  # Visualise pipeline with custom tooltips
-#'  show_pipeline(tooltips = c(
-#'    "data/0 raw_data.R" = "Raw survey data",
-#'    "data/0 raw_pop.R" = "Raw population data",
-#'    "data/1 data.R" = "Survey data with recodes applied",
-#'    "data/2 data.R" = "Survey data with demographic variables merged in"
-#'  ))
-#'
+#' # Visualise pipeline with custom tooltips
+#' show_pipeline(tooltips = c(
+#'   "data/0 raw_data.R" = "Raw survey data",
+#'   "data/0 raw_pop.R" = "Raw population data",
+#'   "data/1 data.R" = "Survey data with recodes applied",
+#'   "data/2 data.R" = "Survey data with demographic variables merged in"
+#' ))
 #' }
 NULL
 #' @rdname pipeline-vis

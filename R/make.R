@@ -9,7 +9,6 @@
 #' @family make
 #'
 #' @examples
-#'
 #' \dontrun{
 #' # Merge files in fresh environment if raw data has been updated
 #' # since last merged
@@ -21,7 +20,7 @@
 #' )
 #' }
 #'
-make_with_source <- function(source, targets, dependencies, packages = NULL, quiet = getOption("makepipe.quiet"),...) {
+make_with_source <- function(source, targets, dependencies, packages = NULL, quiet = getOption("makepipe.quiet"), ...) {
   stopifnot(is.character(source))
   outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
 
@@ -69,7 +68,6 @@ make_with_source <- function(source, targets, dependencies, packages = NULL, qui
 #' @family make
 #'
 #' @examples
-#'
 #' \dontrun{
 #' # Merge files in fresh environment if raw data has been updated
 #' # since last merged
@@ -119,4 +117,3 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL, env
 
   invisible(out)
 }
-

@@ -58,7 +58,7 @@ test_that("make_with_source", {
     saveRDS(iris, target)
 
     expect_error(make_with_source(
-      'script2', target, dependency
+      "script2", target, dependency
     ))
   })
 })
@@ -72,7 +72,7 @@ test_that("make_with_recipe", {
 
     expect_condition(
       expect_condition(
-        make_with_recipe(2+2, target, dependency),
+        make_with_recipe(2 + 2, target, dependency),
         regexp = "Targets are out of date. Updating..."
       ),
       regexp = "Finished updating"
@@ -86,7 +86,7 @@ test_that("make_with_recipe", {
     saveRDS(iris, target)
 
     expect_condition(
-      make_with_recipe(2+2, target, dependency),
+      make_with_recipe(2 + 2, target, dependency),
       regexp = "Targets are up to date"
     )
   })
@@ -97,7 +97,7 @@ test_that("make_with_recipe", {
 
     expect_condition(
       expect_condition(
-        make_with_recipe(2+2, "target.Rds", dependency),
+        make_with_recipe(2 + 2, "target.Rds", dependency),
         regexp = "Targets are out of date. Updating..."
       ),
       regexp = "Finished updating"
@@ -109,7 +109,7 @@ test_that("make_with_recipe", {
     saveRDS(iris, target)
 
     expect_error(make_with_recipe(
-      2+2, target, "dependency.Rds"
+      2 + 2, target, "dependency.Rds"
     ))
   })
 })

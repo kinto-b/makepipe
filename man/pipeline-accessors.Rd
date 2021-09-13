@@ -21,12 +21,11 @@ get_pipeline()
 pipeline, while all other helper functions do not affect the active pipeline
 }
 \examples{
-
 \dontrun{
- # Build up a pipeline from scratch and save it out
- set_pipeline(Pipeline$new())
- # A series of `make_with_*()` blocks go here...
- saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+# Build up a pipeline from scratch and save it out
+set_pipeline(Pipeline$new())
+# A series of `make_with_*()` blocks go here...
+saveRDS(get_pipeline(), "data/my_pipeline.Rds")
 }
 }
 \seealso{

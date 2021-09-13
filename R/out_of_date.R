@@ -7,28 +7,34 @@
 #'
 #' @examples
 #' \dontrun{
-#'   out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
+#' out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
 #' }
-out_of_date <- function (targets, dependencies, packages = NULL) {
+out_of_date <- function(targets, dependencies, packages = NULL) {
   stopifnot(is.character(targets))
   stopifnot(is.character(dependencies))
 
   outdated <- any(unlist(lapply(targets, function(fp_x) {
-    unlist(lapply(dependencies, function (fp_y) {
+    unlist(lapply(dependencies, function(fp_y) {
       # Target x older than dependency y?
       if (!file.exists(fp_y)) stop("{fp_y} does not exist", call. = FALSE)
-      if (!file.exists(fp_x)) return(TRUE)
+      if (!file.exists(fp_x)) {
+        return(TRUE)
+      }
       file.mtime(fp_x) < file.mtime(fp_y)
     }))
   })))
-  if (outdated) return(outdated)
+  if (outdated) {
+    return(outdated)
+  }
 
   if (!is.null(packages)) {
     stopifnot(is.character(packages))
     outdated <- outdated | any(unlist(lapply(targets, function(fp_x) {
-      unlist(lapply(packages, function (fp_y) {
+      unlist(lapply(packages, function(fp_y) {
         # Target x older than package y?
-        if (!file.exists(fp_x)) return(TRUE)
+        if (!file.exists(fp_x)) {
+          return(TRUE)
+        }
         file.mtime(fp_x) < package_datetime(packages)
       }))
     })))

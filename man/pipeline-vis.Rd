@@ -47,28 +47,26 @@ names correspond to the filepaths of nodes (i.e. \code{targets}, \code{dependenc
 or \code{source} scripts)
 }
 \examples{
-
 \dontrun{
- # Run pipeline
- make_with_source(
-   "recode.R",
-   "data/0 raw_data.R",
-   "data/1 data.R"
- )
- make_with_source(
-   "merge.R",
-   c("data/1 data.R", "data/0 raw_pop.R"),
-   "data/2 data.R"
- )
+# Run pipeline
+make_with_source(
+  "recode.R",
+  "data/0 raw_data.R",
+  "data/1 data.R"
+)
+make_with_source(
+  "merge.R",
+  c("data/1 data.R", "data/0 raw_pop.R"),
+  "data/2 data.R"
+)
 
- # Visualise pipeline with custom tooltips
- show_pipeline(tooltips = c(
-   "data/0 raw_data.R" = "Raw survey data",
-   "data/0 raw_pop.R" = "Raw population data",
-   "data/1 data.R" = "Survey data with recodes applied",
-   "data/2 data.R" = "Survey data with demographic variables merged in"
- ))
-
+# Visualise pipeline with custom tooltips
+show_pipeline(tooltips = c(
+  "data/0 raw_data.R" = "Raw survey data",
+  "data/0 raw_pop.R" = "Raw population data",
+  "data/1 data.R" = "Survey data with recodes applied",
+  "data/2 data.R" = "Survey data with demographic variables merged in"
+))
 }
 }
 \seealso{

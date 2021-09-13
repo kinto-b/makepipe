@@ -13,7 +13,6 @@
 #' @examples
 #'
 #' package_datetime(c("utils", "makepipe"))
-#'
 package_datetime <- function(package) {
   stopifnot(is.character(package))
   missing_package <- setdiff(package, utils::installed.packages()[, 1])
@@ -54,7 +53,9 @@ package_description_date <- function(package) {
   for (pkg in package) {
     date_fields <- c("Date", "Packaged", "Date/Publication", "Built")
     desc <- utils::packageDescription(pkg, fields = date_fields)
-    if (!(is.list(desc) && length(names(desc)) >= 1)) return(NULL)
+    if (!(is.list(desc) && length(names(desc)) >= 1)) {
+      return(NULL)
+    }
 
     for (fld in desc) {
       r <- fld
