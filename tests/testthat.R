@@ -1,4 +1,4 @@
 library(testthat)
-library(piper)
+library(makepipe)
 
-test_check("piper")
+test_check("makepipe")

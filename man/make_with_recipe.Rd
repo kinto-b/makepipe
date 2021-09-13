@@ -10,7 +10,7 @@ make_with_recipe(
   dependencies,
   packages = NULL,
   envir = parent.frame(),
-  quiet = getOption("piper.quiet"),
+  quiet = getOption("makepipe.quiet"),
   ...
 )
 }

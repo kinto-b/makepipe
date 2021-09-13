@@ -1,4 +1,4 @@
-Package: piper
+Package: makepipe
 Title: Pipeline Tools Inspired by GNU Make
 Version: 0.0.3
 Authors@R: 
@@ -8,9 +8,9 @@ Authors@R:
            email = "kinto.behr@gmail.com")
 Description: Tools for constructing simple make-like pipelines. 
 License: GPL (>= 3)
-URL: https://kinto-b.github.io/piper/,
-     https://github.com/kinto-b/piper
-BugReports: https://github.com/kinto-b/piper/issues
+URL: https://kinto-b.github.io/makepipe/,
+     https://github.com/kinto-b/makepipe
+BugReports: https://github.com/kinto-b/makepipe/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

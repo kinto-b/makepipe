@@ -282,7 +282,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 #'  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
 #' }
 NULL
-piper_env <- new.env(parent = emptyenv())
+makepipe_env <- new.env(parent = emptyenv())
 
 #' @rdname pipeline-accessors
 #' @export
@@ -294,15 +294,15 @@ is_pipeline <- function(pipeline) {
 #' @export
 set_pipeline <- function(pipeline) {
   if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
-  old <- piper_env$pipeline
-  piper_env$pipeline <- pipeline
+  old <- makepipe_env$pipeline
+  makepipe_env$pipeline <- pipeline
   invisible(old)
 }
 
 #' @rdname pipeline-accessors
 #' @export
 get_pipeline <- function() {
-  piper_env$pipeline
+  makepipe_env$pipeline
 }
 
 

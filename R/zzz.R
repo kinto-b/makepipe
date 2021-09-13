@@ -1,10 +1,10 @@
 .onLoad <- function(libname, pkgname) {
   op <- options()
-  op.piper <- list(
-    piper.quiet = FALSE
+  op.makepipe <- list(
+    makepipe.quiet = FALSE
   )
-  toset <- !(names(op.piper) %in% names(op))
-  if (any(toset)) options(op.piper[toset])
+  toset <- !(names(op.makepipe) %in% names(op))
+  if (any(toset)) options(op.makepipe[toset])
 
   invisible()
 }

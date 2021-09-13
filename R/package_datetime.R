@@ -12,7 +12,7 @@
 #'
 #' @examples
 #'
-#' package_datetime(c("utils", "piper"))
+#' package_datetime(c("utils", "makepipe"))
 #'
 package_datetime <- function(package) {
   stopifnot(is.character(package))

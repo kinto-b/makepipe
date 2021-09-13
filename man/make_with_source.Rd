@@ -9,7 +9,7 @@ make_with_source(
   targets,
   dependencies,
   packages = NULL,
-  quiet = getOption("piper.quiet"),
+  quiet = getOption("makepipe.quiet"),
   ...
 )
 }
