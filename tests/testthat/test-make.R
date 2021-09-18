@@ -130,3 +130,78 @@ test_that("error thrown if dependency doesn't exist", {
   ))
 })
 
+## Environment -----------------------------------------------------------------
+
+test_that("by default source eval'd in fresh env whose parent is calling env", {
+  source <- withr::local_tempfile(fileext = ".R")
+  writeLines(".res <- object_from_parent_environment*2", source)
+  expect_error(make_with_source(source, target1, dependency, quiet = TRUE))
+
+  object_from_parent_environment <- 5
+  make_with_source(source, target1, dependency, quiet = TRUE)
+  expect_error(.res, regexp = "object '.res' not found")
+})
+
+test_that("by default recipe eval'd in fresh env whose parent is calling env", {
+  order_filetimes(target1, dependency)
+
+  expect_error(make_with_recipe({
+    .res <- object_from_parent_environment*2
+  }, target1, dependency, quiet = TRUE))
+
+  object_from_parent_environment <- 5
+  make_with_recipe({
+    .res <- object_from_parent_environment*2
+  }, target1, dependency, quiet = TRUE)
+  expect_error(.res, regexp = "object '.res' not found")
+})
+
+test_that("obj available when eval source in calling env", {
+  source <- withr::local_tempfile(fileext = ".R")
+  object_from_parent_environment <- 5
+  writeLines(".res <- object_from_parent_environment*2", source)
+  make_with_source(source, target1, dependency, envir = environment(), quiet = TRUE)
+  expect_identical(.res, object_from_parent_environment*2)
+})
+
+test_that("source evaluated in supplied environment", {
+  source <- withr::local_tempfile(fileext = ".R")
+  writeLines(".res <- object_from_parent_environment*2", source)
+
+  object_from_parent_environment <- 5 # Decoy
+
+  my_env <- new.env()
+  my_env$object_from_parent_environment <- 500
+
+  make_with_source(source, target1, dependency, envir = my_env, quiet = TRUE)
+  expect_equal(my_env$.res, 1000)
+})
+
+test_that("recipe evaluated in supplied environment", {
+  order_filetimes(target1, dependency)
+
+  object_from_parent_environment <- 5 # Decoy
+
+  my_env <- new.env()
+  my_env$object_from_parent_environment <- 500
+
+  x <- make_with_recipe({
+    .res <- object_from_parent_environment*2
+    .res
+  }, target1, dependency, envir = my_env, quiet = TRUE)
+
+  expect_equal(my_env$.res, 1000)
+  expect_equal(x, 1000)
+})
+
+# Returns ----------------------------------------------------------------------
+
+test_that("make_with_recipe returns what's `return()`ed", {
+  order_filetimes(target1, dependency)
+  x <- make_with_recipe({
+    res <- 1+1
+    res
+  }, target1, dependency, quiet = TRUE)
+
+  expect_equal(x, 2)
+})

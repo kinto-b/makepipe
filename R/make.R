@@ -10,17 +10,39 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Merge files in fresh environment if raw data has been updated
-#' # since last merged
+#' # Merge files in fresh environment if raw data has been updated since last
+#' # merged
+#' make_with_source(
+#'   source = "merge_data.R",
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds")
+#' )
+#'
+#'
+#' # Merge files in current environment if raw data has been updated since last
+#' # merged. (If source executed, all objects bound in source will be available
+#' # in current env).
 #' make_with_source(
 #'   source = "merge_data.R",
 #'   targets = "data/merged_data.Rds",
 #'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
-#'   local = new.env()
+#'   envir = environment()
+#' )
+#'
+#'
+#' # Merge files in global environment if raw data has been updated since last
+#' # merged. (If source executed, all objects bound in source will be available
+#' # in global env).
+#' make_with_source(
+#'   source = "merge_data.R",
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+#'   envir = globalenv()
 #' )
 #' }
 #'
 make_with_source <- function(source, targets, dependencies, packages = NULL,
+                             envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
   stopifnot(is.character(source))
   outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
@@ -46,7 +68,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
       )
       cli::cat_line()
     }
-    source(source, ...)
+    source(source, local = envir, ...)
     if (!quiet) cli::cli_process_done()
   } else {
     if (!quiet) cli::cli_alert_success("Targets are up to date")
@@ -60,9 +82,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #'
 #' @inheritParams make_params
 #' @param recipe A chunk of R code which makes the `targets`
-#' @param envir The environment in which to run `recipe`
 #' @param ... Additional parameters to pass to `base::eval()`
-#'
 #' @return The result of evaluating the `recipe` if the `targets` are out of
 #'   date otherwise `NULL``
 #' @export
@@ -70,8 +90,22 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' # Merge files in fresh environment if raw data has been updated
-#' # since last merged
+#' # Merge files in fresh environment if raw data has been updated since last
+#' # merged
+#' make_with_recipe(
+#'   recipe = {
+#'     dat <- readRDS("data/raw_data.Rds")
+#'     pop <- readRDS("data/pop_data.Rds")
+#'     merged_dat <- merge(dat, pop, by = "id")
+#'     saveRDS(merged_dat, "data/merged_data.Rds")
+#'   },
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds")
+#' )
+#'
+#' # Merge files in current environment if raw data has been updated since last
+#' # merged. (If recipe executed, all objects bound in source will be available
+#' # in current env).
 #' make_with_recipe(
 #'   recipe = {
 #'     dat <- readRDS("data/raw_data.Rds")
@@ -81,14 +115,30 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #'   },
 #'   targets = "data/merged_data.Rds",
 #'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
-#'   envir = new.env()
+#'   envir = environment()
+#' )
+#'
+#' # Merge files in global environment if raw data has been updated since last
+#' # merged. (If source executed, all objects bound in source will be available
+#' # in global env).
+#' make_with_recipe(
+#'   recipe = {
+#'     dat <- readRDS("data/raw_data.Rds")
+#'     pop <- readRDS("data/pop_data.Rds")
+#'     merged_dat <- merge(dat, pop, by = "id")
+#'     saveRDS(merged_dat, "data/merged_data.Rds")
+#'   },
+#'   targets = "data/merged_data.Rds",
+#'   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+#'   envir = globalenv()
 #' )
 #' }
 make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
-                             envir = parent.frame(),
+                             envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
   outdated <- out_of_date(targets, c(dependencies), packages = packages)
-  recipe_txt <- paste(deparse(substitute(recipe)), collapse = "<br>")
+  recipe <- substitute(recipe)
+  recipe_txt <- paste(deparse(recipe), collapse = "<br>")
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {

@@ -12,6 +12,10 @@ depend on}
 \item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 
+\item{envir}{The environment in which to execute the \code{source} or \code{recipe}. By
+default, execution will take place in a fresh environment whose parent is
+the calling environment.}
+
 \item{quiet}{A logical determining whether or not messages are signaled}
 }
 \description{
