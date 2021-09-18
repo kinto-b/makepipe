@@ -3,9 +3,9 @@
 #' Determine the datetimes for packages by checking the `DESCRIPTION` file
 #' modification time.
 #'
-#' @param package
+#' @param package A character vector containing the names of packages
 #'
-#' @return
+#' @return A `POSIXct` vector with names corresponding to `package`
 #' @noRd
 #' @keywords internal
 #'
@@ -23,27 +23,14 @@ package_datetime <- function(package) {
     )
   }
 
-  out <- as.POSIXct(c())
-  missing_package <- character(0)
-  for (i in seq_along(package)) {
-    out[i] <- package_description_mtime(package[i])
+  out <- vapply(
+    package,
+    function(pkg) as.numeric(package_description_mtime(pkg)),
+    FUN.VALUE = numeric(1)
+  )
 
-    if (is.na(out[i]) | is.null(out[i])) {
-      missing_package <- c(missing_package, package[i])
-    }
-  }
-
-  if (length(missing_package) > 0) {
-    stop(
-      "Cannot determine date for package: `",
-      paste(missing_package, sep = "`, `"), "`",
-      call. = FALSE
-    )
-  }
-
-  as.POSIXct(out)
+  as.POSIXct(out, origin = "1970-01-01")
 }
-
 
 package_description_mtime <- function(package) {
   stopifnot(is.character(package))
