@@ -195,28 +195,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     )
 
     # Propagate out-of-dateness
-    edges_i <- edges
-    for (i in seq_along(edges$from_mtime)) {
-      edges_i <- merge(
-        edges_i,
-        edges_i[, c("from", "to", "to_mtime")],
-        by.x = "to",
-        by.y = "from",
-        suffixes = c("", "2")
-      )
-
-      edges_i$to <- edges_i$to2
-      edges_i$to_mtime <- edges_i$to_mtime2
-      edges_i$out_of_date <-
-        ifelse(
-          is.na(edges_i$from_mtime > edges_i$to_mtime),
-          edges_i$out_of_date,
-          edges_i$out_of_date | edges_i$from_mtime > edges_i$to_mtime
-        )
-      outdated <- edges_i[edges_i$out_of_date, "to"]
-      edges$out_of_date <- (edges$to %in% outdated) | (edges$out_of_date)
-
-      edges_i <- edges_i[, names(edges)]
+    for (i in seq_along(edges$to)) {
+      edges$out_of_date[i] <- propagate_outofdateness(edges$to[i], edges)
     }
 
 
@@ -252,6 +232,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #'   `visNetwork::visNetwork()`
   #' @return `self`
   print = function(...) {
+    self$style_nodes()
     out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
     print(out)
     invisible(self)
@@ -268,6 +249,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #'   `visNetwork::visNetwork()`
   #' @return `self`
   save = function(file, selfcontained = TRUE, background = "white", ...) {
+    self$style_nodes()
     out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
     visNetwork::visSave(out, file, selfcontained, background)
     invisible(self)
@@ -385,6 +367,30 @@ save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labe
 
 
 # Internal ---------------------------------------------------------------------
+
+#' @noRd
+propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
+  outdated <- FALSE
+  target_mtime <- unique(edges[edges$to == initial_node, "to_mtime"])
+  if (is.null(next_node)) next_node <- initial_node
+
+  inputs <- edges[edges$to == next_node, ]
+  for (i in seq_along(inputs$from)) {
+    outdated <- inputs$from_mtime[i] > target_mtime
+
+    # Base case
+    if (is.na(outdated)) outdated <- FALSE
+    if (outdated) return(outdated)
+
+    # Recursive case
+    next_node <- inputs$from[i]
+    outdated <- propagate_outofdateness(initial_node, edges, next_node)
+  }
+
+  outdated
+}
+
+
 
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
