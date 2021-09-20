@@ -191,17 +191,74 @@ test_that("recipe evaluated in supplied environment", {
   }, target1, dependency, envir = my_env, quiet = TRUE)
 
   expect_equal(my_env$.res, 1000)
-  expect_equal(x, 1000)
+  expect_equal(x$result, 1000)
 })
 
 # Returns ----------------------------------------------------------------------
 
-test_that("make_with_recipe returns what's `return()`ed", {
+test_that("make_with_recipe returns what's returned", {
   order_filetimes(target1, dependency)
   x <- make_with_recipe({
     res <- 1+1
     res
   }, target1, dependency, quiet = TRUE)
 
-  expect_equal(x, 2)
+  expect_equal(x$result, 2)
+
+  order_filetimes(target1, dependency)
+  x <- make_with_recipe({
+    res <- 1+1
+    if (res == 2) return(5)
+    res
+  }, target1, dependency, quiet = TRUE)
+
+  expect_equal(x$result, 5)
+})
+
+test_that("make_with_source returns what's registered", {
+  order_filetimes(dependency, target1, source1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE)
+
+  expect_equal(res$result$five, 5)
+})
+
+test_that("make_with_recipe result prints nicely", {
+  order_filetimes(target1, dependency)
+  x <- make_with_recipe({
+    res <- 1+1
+    res
+  }, target1, dependency, quiet = TRUE)
+
+  expect_output(print(x), regexp = "# makepipe segment")
+  expect_output(print(x), regexp = "* Recipe: ")
+  expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
+  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars.Rds'")
+  expect_output(print(x), regexp = "* Executed: TRUE")
+  expect_output(print(x), regexp = "* Result: 1 object")
+  expect_output(print(x), regexp = "* Environment: ")
+
+  order_filetimes(dependency, target1)
+
+  x <- make_with_recipe({
+    res <- 1+1
+    res
+  }, target1, dependency, quiet = TRUE)
+  x
+  expect_output(print(x), regexp = "* Executed: FALSE")
+})
+
+test_that("make_with_source result prints nicely", {
+  order_filetimes(dependency, target1, source1)
+  x <- make_with_source(source1, target1, dependency, quiet = TRUE)
+
+  expect_output(print(x), regexp = "# makepipe segment")
+  expect_output(print(x), regexp = "* Source: '.*/mtcars1.R'")
+  expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
+  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars.Rds'")
+  expect_output(print(x), regexp = "* Executed: TRUE")
+  expect_output(print(x), regexp = "* Result: 1 object")
+  expect_output(print(x), regexp = "* Environment: ")
+
+  x <- make_with_source(source1, target1, dependency, quiet = TRUE)
+  expect_output(print(x), regexp = "* Executed: FALSE")
 })

@@ -45,8 +45,13 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
   stopifnot(is.character(source))
+  targets <- unique(targets)
+  dependencies <- unique(dependencies)
+  packages <- unique(packages)
   outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
 
+
+  # Update pipeline
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
@@ -59,6 +64,11 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
     packages = packages
   )
 
+  # Prepare register
+  register_env <- new.env(parent = emptyenv())
+  assign("__makepipe_register__", register_env, envir)
+
+  # Execute
   if (outdated) {
     if (!quiet) {
       cli::cli_process_start(
@@ -74,7 +84,18 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
     if (!quiet) cli::cli_alert_success("Targets are up to date")
   }
 
-  invisible(NULL)
+  out <- makepipe_result(
+    executed = outdated,
+    result = as.list(register_env),
+    instructions = source,
+    targets = targets,
+    dependencies = dependencies,
+    packages = packages,
+    envir = envir,
+    subclass = "source"
+  )
+
+  invisible(out)
 }
 
 
@@ -136,6 +157,9 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
+  targets <- unique(targets)
+  dependencies <- unique(dependencies)
+  packages <- unique(packages)
   outdated <- out_of_date(targets, c(dependencies), packages = packages)
   recipe <- substitute(recipe)
   recipe_txt <- paste(deparse(recipe), collapse = "<br>")
@@ -167,6 +191,17 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
     if (!quiet) cli::cli_alert_success("Targets are up to date")
     out <- NULL
   }
+
+  out <- makepipe_result(
+    executed = outdated,
+    result = out,
+    instructions = recipe,
+    targets = targets,
+    dependencies = dependencies,
+    packages = packages,
+    envir = envir,
+    subclass = "recipe"
+  )
 
   invisible(out)
 }
