@@ -24,6 +24,6 @@ Check if targets are out-of-date vis-a-vis their dependencies
 }
 \examples{
 \dontrun{
-  out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
+out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
 }
 }

@@ -1,6 +1,10 @@
-^piper\.Rproj$
+^makepipe\.Rproj$
 ^\.Rproj\.user$
 ^scratch
 ^LICENSE\.md$
 ^README\.Rmd$
 ^.github
+^cran-comments\.md$
+^codecov\.yml$
+^\.github$
+^\.covrignore$

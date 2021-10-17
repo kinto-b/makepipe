@@ -9,7 +9,8 @@ make_with_source(
   targets,
   dependencies,
   packages = NULL,
-  quiet = getOption("piper.quiet"),
+  envir = new.env(parent = parent.frame()),
+  quiet = getOption("makepipe.quiet"),
   ...
 )
 }
@@ -24,6 +25,10 @@ depend on}
 \item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 
+\item{envir}{The environment in which to execute the \code{source} or \code{recipe}. By
+default, execution will take place in a fresh environment whose parent is
+the calling environment.}
+
 \item{quiet}{A logical determining whether or not messages are signaled}
 
 \item{...}{Additional parameters to pass to \code{base::source()}}
@@ -35,15 +40,35 @@ depend on}
 Make targets out of dependencies using a source file
 }
 \examples{
-
 \dontrun{
-# Merge files in fresh environment if raw data has been updated
-# since last merged
+# Merge files in fresh environment if raw data has been updated since last
+# merged
+make_with_source(
+  source = "merge_data.R",
+  targets = "data/merged_data.Rds",
+  dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds")
+)
+
+
+# Merge files in current environment if raw data has been updated since last
+# merged. (If source executed, all objects bound in source will be available
+# in current env).
 make_with_source(
   source = "merge_data.R",
   targets = "data/merged_data.Rds",
   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
-  local = new.env()
+  envir = environment()
+)
+
+
+# Merge files in global environment if raw data has been updated since last
+# merged. (If source executed, all objects bound in source will be available
+# in global env).
+make_with_source(
+  source = "merge_data.R",
+  targets = "data/merged_data.Rds",
+  dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+  envir = globalenv()
 )
 }
 

@@ -4,9 +4,9 @@
 \alias{Pipeline}
 \title{Pipeline visualisations}
 \description{
-A Pipeline object is automatically constructed as calls to \verb{make_*()} are
-made. It stores the relationships between targets, dependencies, and
-sources.
+A Pipeline object is automatically constructed as calls to
+\verb{make_*()} are made. It stores the relationships between targets,
+dependencies, and sources.
 }
 \seealso{
 Other pipeline: 
@@ -77,11 +77,13 @@ call
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{recipe}}{A character vector containing a deparsed expression, which would make the \code{targets} if evaluated.}
+\item{\code{recipe}}{A character vector containing a deparsed expression, which
+would make the \code{targets} if evaluated.}
 
 \item{\code{targets}}{A character vector of paths to files}
 
-\item{\code{dependencies}}{A character vector of paths to files which the \code{targets} depend on}
+\item{\code{dependencies}}{A character vector of paths to files which the
+\code{targets} depend on}
 
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
@@ -144,7 +146,8 @@ Save pipeline
 file (with external resources base64 encoded) or a file with external
 resources placed in an adjacent directory.}
 
-\item{\code{background}}{Text string giving the html background color of the widget. Defaults to white.}
+\item{\code{background}}{Text string giving the html background color of the
+widget. Defaults to white.}
 
 \item{\code{...}}{Arguments (other than \code{nodes} and \code{edges}) to pass to
 \code{visNetwork::visNetwork()}}

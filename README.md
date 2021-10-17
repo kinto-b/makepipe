@@ -1,16 +1,20 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# piper <img src='man/figures/logo.png' align="right" height="139"/>
+# makepipe <img src='man/figures/logo.png' align="right" height="139"/>
 
 <!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://codecov.io/gh/kinto-b/makepipe?branch=master)
+[![R-CMD-check](https://github.com/kinto-b/makepipe/workflows/R-CMD-check/badge.svg)](https://github.com/kinto-b/makepipe/actions)
 <!-- badges: end -->
 
-The goal of `piper` is to allow for the construction of make-like
+The goal of `makepipe` is to allow for the construction of make-like
 pipelines in R with very minimal overheads. In contrast to `targets`
 (and its predecessor `drake`) which offers an opinionated pipeline
-framework that demands highly functionalised code, `piper` is catholic
-in approach, being adaptable to a wide range of data science workflows.
+framework that demands highly functionalised code, `makepipe` is
+easy-going, being adaptable to a wide range of data science workflows.
 
 ## Installation
 
@@ -19,7 +23,7 @@ You can install the development version from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("kinto-b/piper")
+devtools::install_github("kinto-b/makepipe")
 ```
 
 ## Building a pipeline
@@ -35,7 +39,7 @@ Pipeline object to produce a flow-chart visualisation of the pipeline.
 For example:
 
 ``` r
-library(piper)
+library(makepipe)
 make_with_source(
   dependencies = c("data/0_raw_data.csv", "lookup/concordance.csv"),
   source = c("1 data_prep.R"),

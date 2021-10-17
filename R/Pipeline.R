@@ -3,9 +3,9 @@
 
 #' Pipeline visualisations
 #'
-#' @description A Pipeline object is automatically constructed as calls to `make_*()` are
-#' made. It stores the relationships between targets, dependencies, and
-#' sources.
+#' @description A Pipeline object is automatically constructed as calls to
+#'   `make_*()` are made. It stores the relationships between targets,
+#'   dependencies, and sources.
 #'
 #' @keywords internal
 #' @family pipeline
@@ -70,6 +70,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
       )
     )
 
+
     if (length(packages) > 0) {
       new_edges <- rbind(
         expand.grid(
@@ -107,9 +108,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 
   #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
   #'   call
-  #' @param recipe A character vector containing a deparsed expression, which would make the `targets` if evaluated.
+  #' @param recipe A character vector containing a deparsed expression, which
+  #'   would make the `targets` if evaluated.
   #' @param targets A character vector of paths to files
-  #' @param dependencies A character vector of paths to files which the `targets` depend on
+  #' @param dependencies A character vector of paths to files which the
+  #'   `targets` depend on
   #' @param packages A character vector of names of packages which `targets`
   #'   depend on
   #' @return `self`
@@ -145,7 +148,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
       new_edges <- rbind(
         expand.grid(
           from = packages,
-          to = source,
+          to = recipe,
           arrows = "to",
           .source = TRUE,
           .recipe = FALSE,
@@ -185,44 +188,40 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     # Out of date?
     edges$from_mtime <- file.mtime(as.character(edges$from))
     edges$to_mtime <- file.mtime(as.character(edges$to))
-    edges$out_of_date <- ifelse(edges$.source, FALSE, edges$from_mtime > edges$to_mtime)
+    edges$out_of_date <- ifelse(
+      edges$.source,
+      FALSE,
+      edges$from_mtime > edges$to_mtime
+    )
 
     # Propagate out-of-dateness
-    edges_i <- edges
-    for (i in 1:nrow(edges)) {
-      edges_i <- merge(
-          edges_i,
-          edges_i[, c("from", "to", "to_mtime")],
-          by.x = "to",
-          by.y = "from",
-          suffixes = c("", "2")
-        )
-
-      edges_i$to <- edges_i$to2
-      edges_i$to_mtime <- edges_i$to_mtime2
-      edges_i$out_of_date <-
-        ifelse(
-          is.na(edges_i$from_mtime > edges_i$to_mtime),
-          edges_i$out_of_date,
-          edges_i$out_of_date | edges_i$from_mtime > edges_i$to_mtime
-        )
-      outdated <- edges_i[edges_i$out_of_date, "to"]
-      edges$out_of_date <- (edges$to %in% outdated) | (edges$out_of_date)
-
-      edges_i <- edges_i[, names(edges)]
+    for (i in seq_along(edges$to)) {
+      edges$out_of_date[i] <- propagate_outofdateness(edges$to[i], edges)
     }
 
 
     # Group
-    nodes$group <- ifelse(nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date")
-    nodes$group <- ifelse(nodes$id %in% edges[edges$.source, "to"], "Source", nodes$group)
+    nodes$group <- ifelse(
+      nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date"
+    )
+    nodes$group <- ifelse(
+      nodes$id %in% edges[edges$.source, "to"], "Source", nodes$group
+    )
 
     # Colour
-    nodes$shape <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "circle", "square")
-    nodes$shape <- ifelse(nodes$id %in% edges[edges$.pkg, "from"], "triangle", nodes$shape)
+    nodes$shape <- ifelse(
+      nodes$id %in% edges[edges$.recipe, "to"], "circle", "square"
+    )
+    nodes$shape <- ifelse(
+      nodes$id %in% edges[edges$.pkg, "from"], "triangle", nodes$shape
+    )
 
     # Label
-    nodes$label <- ifelse(nodes$id %in% edges[edges$.recipe, "to"], "Recipe", basename(as.character(nodes$id)))
+    nodes$label <- ifelse(
+      nodes$id %in% edges[edges$.recipe, "to"],
+      "Recipe",
+      basename(as.character(nodes$id))
+    )
 
     self$nodes <- nodes
     invisible(self)
@@ -233,11 +232,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #'   `visNetwork::visNetwork()`
   #' @return `self`
   print = function(...) {
-    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
-    out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
-    out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
-    out <- visNetwork::visLegend(out)
-    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
+    self$style_nodes()
+    out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
     print(out)
     invisible(self)
   },
@@ -247,22 +243,20 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
   #' @param selfcontained Whether to save the HTML as a single self-contained
   #'   file (with external resources base64 encoded) or a file with external
   #'   resources placed in an adjacent directory.
-  #' @param background Text string giving the html background color of the widget. Defaults to white.
+  #' @param background Text string giving the html background color of the
+  #'   widget. Defaults to white.
   #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
   #'   `visNetwork::visNetwork()`
   #' @return `self`
   save = function(file, selfcontained = TRUE, background = "white", ...) {
-    out <- visNetwork::visNetwork(nodes = self$nodes, edges = self$edges, ...)
-    out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
-    out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
-    out <- visNetwork::visLegend(out)
-    out <- visNetwork::visHierarchicalLayout(out, sortMethod = "directed", direction = "LR")
+    self$style_nodes()
+    out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
     visNetwork::visSave(out, file, selfcontained, background)
     invisible(self)
   }
 ))
 
-# Functions --------------------------------------------------------------------
+# Accessors --------------------------------------------------------------------
 
 #' Access and interface with Pipeline.
 #'
@@ -274,15 +268,14 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 #' @name pipeline-accessors
 #' @family pipeline
 #' @examples
-#'
 #' \dontrun{
-#'  # Build up a pipeline from scratch and save it out
-#'  set_pipeline(Pipeline$new())
-#'  # A series of `make_with_*()` blocks go here...
-#'  saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+#' # Build up a pipeline from scratch and save it out
+#' set_pipeline(Pipeline$new())
+#' # A series of `make_with_*()` blocks go here...
+#' saveRDS(get_pipeline(), "data/my_pipeline.Rds")
 #' }
 NULL
-piper_env <- new.env(parent = emptyenv())
+makepipe_env <- new.env(parent = emptyenv())
 
 #' @rdname pipeline-accessors
 #' @export
@@ -293,18 +286,23 @@ is_pipeline <- function(pipeline) {
 #' @rdname pipeline-accessors
 #' @export
 set_pipeline <- function(pipeline) {
-  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
-  old <- piper_env$pipeline
-  piper_env$pipeline <- pipeline
+  if (!is_pipeline(pipeline)) {
+    stop("`pipeline` must be a Pipeline object", call. = FALSE)
+  }
+
+  old <- makepipe_env$pipeline
+  makepipe_env$pipeline <- pipeline
   invisible(old)
 }
 
 #' @rdname pipeline-accessors
 #' @export
 get_pipeline <- function() {
-  piper_env$pipeline
+  makepipe_env$pipeline
 }
 
+
+# Visualisors ------------------------------------------------------------------
 
 #' Visualise the Pipeline.
 #'
@@ -323,34 +321,34 @@ get_pipeline <- function() {
 #' @param selfcontained Whether to save the HTML as a single self-contained
 #'   file (with external resources base64 encoded) or a file with external
 #'   resources placed in an adjacent directory.
-#' @param background Text string giving the html background color of the widget. Defaults to white.
+#' @param background Text string giving the html background color of the widget.
+#'   Defaults to white.
 #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
 #'   `visNetwork::visNetwork()`
+#'
 #' @name pipeline-vis
 #' @family pipeline
 #' @examples
-#'
 #' \dontrun{
-#'  # Run pipeline
-#'  make_with_source(
-#'    "recode.R",
-#'    "data/0 raw_data.R",
-#'    "data/1 data.R"
-#'  )
-#'  make_with_source(
-#'    "merge.R",
-#'    c("data/1 data.R", "data/0 raw_pop.R"),
-#'    "data/2 data.R"
-#'  )
+#' # Run pipeline
+#' make_with_source(
+#'   "recode.R",
+#'   "data/0 raw_data.R",
+#'   "data/1 data.R"
+#' )
+#' make_with_source(
+#'   "merge.R",
+#'   c("data/1 data.R", "data/0 raw_pop.R"),
+#'   "data/2 data.R"
+#' )
 #'
-#'  # Visualise pipeline with custom tooltips
-#'  show_pipeline(tooltips = c(
-#'    "data/0 raw_data.R" = "Raw survey data",
-#'    "data/0 raw_pop.R" = "Raw population data",
-#'    "data/1 data.R" = "Survey data with recodes applied",
-#'    "data/2 data.R" = "Survey data with demographic variables merged in"
-#'  ))
-#'
+#' # Visualise pipeline with custom tooltips
+#' show_pipeline(tooltips = c(
+#'   "data/0 raw_data.R" = "Raw survey data",
+#'   "data/0 raw_pop.R" = "Raw population data",
+#'   "data/1 data.R" = "Survey data with recodes applied",
+#'   "data/2 data.R" = "Survey data with demographic variables merged in"
+#' ))
 #' }
 NULL
 #' @rdname pipeline-vis
@@ -367,43 +365,100 @@ save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labe
   pipeline$save(file, ...)
 }
 
+
+# Internal ---------------------------------------------------------------------
+
+#' @noRd
+propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
+  outdated <- FALSE
+  target_mtime <- unique(edges[edges$to == initial_node, "to_mtime"])
+  if (is.null(next_node)) next_node <- initial_node
+
+  inputs <- edges[edges$to == next_node, ]
+  for (i in seq_along(inputs$from)) {
+    outdated <- inputs$from_mtime[i] > target_mtime
+    next_node <- inputs$from[i]
+
+    # Base case
+    if (is.na(outdated)) outdated <- FALSE
+    if (outdated) return(outdated)
+    if (next_node == initial_node) return(TRUE) # Loop detected.
+
+    # Recursive case
+    outdated <- propagate_outofdateness(initial_node, edges, next_node)
+  }
+
+  outdated
+}
+
+
+
+#' @noRd
+pipeline_network <- function(nodes, edges, ...) {
+  out <- visNetwork::visNetwork(nodes = nodes, edges = edges, ...)
+  out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
+  out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")
+  out <- visNetwork::visLegend(out)
+
+  visNetwork::visHierarchicalLayout(
+    out, sortMethod = "directed", direction = "LR"
+  )
+}
+
 #' @noRd
 annotate_pipeline <- function(pipeline, tooltips, labels) {
   if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
 
   if (!is.null(tooltips)) {
-    stopifnot(is.character(tooltips))
-    if (!identical(length(names(tooltips)), length(tooltips))) stop("`tooltips` must be named", call. = FALSE)
-    bad_nodes <- setdiff(names(tooltips), as.character(pipeline$nodes$id))
-    if (length(bad_nodes) > 0) stop("`", paste(bad_nodes, collapse = "`, "), "` are not nodes in `pipeline`", call. = FALSE)
-    if (any(duplicated(names(tooltips)))) stop("names of `tooltips` must not be duplicated")
-
+    validate_annotation(pipeline, tooltips, "tooltips")
     pipeline <- pipeline$clone(deep = TRUE)
-    old_nodes <- pipeline$nodes
-    old_nodes$node_id <- as.character(old_nodes$id)
-    tooltips <- data.frame(node_id = names(tooltips), new_title = tooltips)
-    new_nodes <- merge(old_nodes, tooltips, by = "node_id", all.x = TRUE)
-    new_nodes$title <- ifelse(is.na(new_nodes$new_title), new_nodes$title, new_nodes$new_title)
-    new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "new_title"))]
+    new_nodes <- apply_annotations(pipeline$nodes, tooltips, "title")
     pipeline$nodes <- new_nodes
   }
 
   if (!is.null(labels)) {
-    stopifnot(is.character(labels))
-    if (!identical(length(names(labels)), length(labels))) stop("`labels` must be named", call. = FALSE)
-    bad_nodes <- setdiff(names(labels), as.character(pipeline$nodes$id))
-    if (length(bad_nodes) > 0) stop("`", paste(bad_nodes, collapse = "`, "), "` are not nodes in `pipeline`", call. = FALSE)
-    if (any(duplicated(names(labels)))) stop("names of `labels` must not be duplicated")
-
+    validate_annotation(pipeline, labels, "labels")
     pipeline <- pipeline$clone(deep = TRUE)
-    old_nodes <- pipeline$nodes
-    old_nodes$node_id <- as.character(old_nodes$id)
-    labels <- data.frame(node_id = names(labels), new_label = labels)
-    new_nodes <- merge(old_nodes, labels, by = "node_id", all.x = TRUE)
-    new_nodes$label <- ifelse(is.na(new_nodes$new_label), new_nodes$label, new_nodes$new_label)
-    new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "new_label"))]
+    new_nodes <- apply_annotations(pipeline$nodes, labels, "label")
     pipeline$nodes <- new_nodes
   }
 
   pipeline
+}
+
+#' @noRd
+validate_annotation <- function(pipeline, x, x_name) {
+  stopifnot(is.character(x))
+  if (!identical(length(names(x)), length(x))) {
+    stop("`", x_name, "` must be named", call. = FALSE)
+  }
+
+  if (any(duplicated(names(x)))) {
+    stop("names of `", x_name, "` must not be duplicated")
+  }
+
+  bad_nodes <- setdiff(names(x), as.character(pipeline$nodes$id))
+  if (length(bad_nodes) > 0) {
+    stop(
+      "`", paste(bad_nodes, collapse = "`, "), "` ",
+      "are not nodes in `pipeline`", call. = FALSE
+    )
+  }
+
+  invisible(NULL)
+}
+
+#' @noRd
+apply_annotations <- function(nodes, annotations, at) {
+  nodes$node_id <- as.character(nodes$id)
+  annotations <- data.frame(node_id = names(annotations), ..annotation = annotations)
+
+  new_nodes <- merge(nodes, annotations, by = "node_id", all.x = TRUE)
+  new_nodes[[at]] <- ifelse(
+    is.na(new_nodes$..annotation),
+    new_nodes[[at]],
+    new_nodes$..annotation
+  )
+  new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "..annotation"))]
+  new_nodes
 }
