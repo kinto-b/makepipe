@@ -9,7 +9,7 @@ make_with_recipe(
   targets,
   dependencies,
   packages = NULL,
-  envir = parent.frame(),
+  envir = new.env(parent = parent.frame()),
   quiet = getOption("makepipe.quiet"),
   ...
 )
@@ -25,7 +25,9 @@ depend on}
 \item{packages}{A character vector of names of packages which \code{targets}
 depend on}
 
-\item{envir}{The environment in which to run \code{recipe}}
+\item{envir}{The environment in which to execute the \code{source} or \code{recipe}. By
+default, execution will take place in a fresh environment whose parent is
+the calling environment.}
 
 \item{quiet}{A logical determining whether or not messages are signaled}
 
@@ -40,8 +42,22 @@ Make targets out of dependencies using a recipe
 }
 \examples{
 \dontrun{
-# Merge files in fresh environment if raw data has been updated
-# since last merged
+# Merge files in fresh environment if raw data has been updated since last
+# merged
+make_with_recipe(
+  recipe = {
+    dat <- readRDS("data/raw_data.Rds")
+    pop <- readRDS("data/pop_data.Rds")
+    merged_dat <- merge(dat, pop, by = "id")
+    saveRDS(merged_dat, "data/merged_data.Rds")
+  },
+  targets = "data/merged_data.Rds",
+  dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds")
+)
+
+# Merge files in current environment if raw data has been updated since last
+# merged. (If recipe executed, all objects bound in source will be available
+# in current env).
 make_with_recipe(
   recipe = {
     dat <- readRDS("data/raw_data.Rds")
@@ -51,7 +67,22 @@ make_with_recipe(
   },
   targets = "data/merged_data.Rds",
   dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
-  envir = new.env()
+  envir = environment()
+)
+
+# Merge files in global environment if raw data has been updated since last
+# merged. (If source executed, all objects bound in source will be available
+# in global env).
+make_with_recipe(
+  recipe = {
+    dat <- readRDS("data/raw_data.Rds")
+    pop <- readRDS("data/pop_data.Rds")
+    merged_dat <- merge(dat, pop, by = "id")
+    saveRDS(merged_dat, "data/merged_data.Rds")
+  },
+  targets = "data/merged_data.Rds",
+  dependencies = c("data/raw_data.Rds", "data/raw_pop.Rds"),
+  envir = globalenv()
 )
 }
 }
