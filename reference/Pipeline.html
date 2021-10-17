@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pipeline visualisations — Pipeline • piper</title>
+<title>Pipeline visualisations — Pipeline • makepipe</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,9 +47,9 @@
 
 
 <meta property="og:title" content="Pipeline visualisations — Pipeline" />
-<meta property="og:description" content="A Pipeline object is automatically constructed as calls to make_*() are
-made. It stores the relationships between targets, dependencies, and
-sources." />
+<meta property="og:description" content="A Pipeline object is automatically constructed as calls to
+make_*() are made. It stores the relationships between targets,
+dependencies, and sources." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -81,8 +81,8 @@ sources." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">piper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <a class="navbar-link" href="../index.html">makepipe</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@ sources." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/kinto-b/piper/">
+  <a href="https://github.com/kinto-b/makepipe/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -122,14 +122,14 @@ sources." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Pipeline visualisations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/kinto-b/piper/blob/master/R/Pipeline.R'><code>R/Pipeline.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/kinto-b/makepipe/blob/master/R/Pipeline.R'><code>R/Pipeline.R</code></a></small>
     <div class="hidden name"><code>Pipeline.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A Pipeline object is automatically constructed as calls to <code>make_*()</code> are
-made. It stores the relationships between targets, dependencies, and
-sources.</p>
+    <p>A Pipeline object is automatically constructed as calls to
+<code>make_*()</code> are made. It stores the relationships between targets,
+dependencies, and sources.</p>
     </div>
 
 
@@ -189,11 +189,13 @@ call</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
-<dt><code>recipe</code></dt><dd><p>A character vector containing a deparsed expression, which would make the <code>targets</code> if evaluated.</p></dd>
+<dt><code>recipe</code></dt><dd><p>A character vector containing a deparsed expression, which
+would make the <code>targets</code> if evaluated.</p></dd>
 
 <dt><code>targets</code></dt><dd><p>A character vector of paths to files</p></dd>
 
-<dt><code>dependencies</code></dt><dd><p>A character vector of paths to files which the <code>targets</code> depend on</p></dd>
+<dt><code>dependencies</code></dt><dd><p>A character vector of paths to files which the
+<code>targets</code> depend on</p></dd>
 
 <dt><code>packages</code></dt><dd><p>A character vector of names of packages which <code>targets</code>
 depend on</p></dd>
@@ -234,7 +236,8 @@ depend on</p></dd>
 file (with external resources base64 encoded) or a file with external
 resources placed in an adjacent directory.</p></dd>
 
-<dt><code>background</code></dt><dd><p>Text string giving the html background color of the widget. Defaults to white.</p></dd>
+<dt><code>background</code></dt><dd><p>Text string giving the html background color of the
+widget. Defaults to white.</p></dd>
 
 <dt><code>...</code></dt><dd><p>Arguments (other than <code>nodes</code> and <code>edges</code>) to pass to
 <code><a href='https://rdrr.io/pkg/visNetwork/man/visNetwork.html'>visNetwork::visNetwork()</a></code></p></dd>

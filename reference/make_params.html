@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parameters for make-like functions — make_params • piper</title>
+<title>Parameters for make-like functions — make_params • makepipe</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -79,8 +79,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">piper</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <a class="navbar-link" href="../index.html">makepipe</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/kinto-b/piper/">
+  <a href="https://github.com/kinto-b/makepipe/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -120,7 +120,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Parameters for make-like functions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/kinto-b/piper/blob/master/R/params.R'><code>R/params.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/kinto-b/makepipe/blob/master/R/params.R'><code>R/params.R</code></a></small>
     <div class="hidden name"><code>make_params.Rd</code></div>
     </div>
 
@@ -145,6 +145,12 @@ depend on</p></td>
       <th>packages</th>
       <td><p>A character vector of names of packages which <code>targets</code>
 depend on</p></td>
+    </tr>
+    <tr>
+      <th>envir</th>
+      <td><p>The environment in which to execute the <code>source</code> or <code>recipe</code>. By
+default, execution will take place in a fresh environment whose parent is
+the calling environment.</p></td>
     </tr>
     <tr>
       <th>quiet</th>

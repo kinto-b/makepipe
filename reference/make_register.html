@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • makepipe</title>
+<title>Register objects to be returned from make_with_source — make_register • makepipe</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,11 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Register objects to be returned from make_with_source — make_register" />
+<meta property="og:description" content="It is sometimes useful to have access to certain objects which are generated as
+side-products in a source script which yields as a main-product one or more
+targets. Typically these objects are used for checking that the targets were
+produced as expected." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -66,7 +70,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -118,58 +122,70 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/kinto-b/makepipe/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Register objects to be returned from <code>make_with_source</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/kinto-b/makepipe/blob/master/R/make_register.R'><code>R/make_register.R</code></a></small>
+    <div class="hidden name"><code>make_register.Rd</code></div>
     </div>
 
-    <div id="makepipe-004" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.4">
-<a href="#makepipe-004" class="anchor"></a>makepipe 0.0.4</h1>
-<ul>
-<li><p>Renamed package from <code>piper</code> to <code>makepipe</code> (<a href='https://github.com/kinto-b/makepipe/issues/11'>#11</a>).</p></li>
-<li>
-<p>Both <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> and <code><a href="../reference/make_with_source.html">make_with_source()</a></code> now return an object of class <code>makepipe_result</code> (<a href='https://github.com/kinto-b/makepipe/issues/2'>#2</a>, <a href='https://github.com/kinto-b/makepipe/issues/14'>#14</a>). Along with metadata relating to the execution, this object contains a <code>result</code> element which:</p>
-<ul>
-<li>If using <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>, is identical with whatever the <code>recipe</code> returns</li>
-<li>If using <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, is a list containing any objects registered in the source script using <code><a href="../reference/make_register.html">make_register()</a></code>
-</li>
-</ul>
-</li>
-<li><p>The execution environment for <code>make_*()</code> is now, by default, a fresh environment whose parent is the calling environment. This can be overridden using the <code>envir</code> argument.</p></li>
-</ul>
-</div>
-    <div id="makepipe-003" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.3">
-<a href="#makepipe-003" class="anchor"></a>makepipe 0.0.3</h1>
-<ul>
-<li><p>Added arguments to <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code> and <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, allowing the user to specify e.g. height and width of output widgets.</p></li>
-<li><p>Added <code>packages</code> argument to <code>make_*()</code> functions, allowing the user to easily add packages as dependencies of their targets. If any of the <code>packages</code> specified have been updated since the <code>targets</code> were last produced, the <code>targets</code> will be registered as out-of-date when <code>make_*()</code> is run.</p></li>
-</ul>
-</div>
-    <div id="makepipe-002" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.2">
-<a href="#makepipe-002" class="anchor"></a>makepipe 0.0.2</h1>
-<ul>
-<li>Pipeline visualisations are now sorted hierarchically, from left to right across the screen.</li>
-<li>Fixed bug in pipeline invalidation (<a href='https://github.com/kinto-b/makepipe/issues/4'>#4</a>).</li>
-<li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
-</ul>
-</div>
-    <div id="makepipe-001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1">
-<a href="#makepipe-001" class="anchor"></a>makepipe 0.0.1</h1>
-<ul>
-<li>Initial release.</li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>It is sometimes useful to have access to certain objects which are generated as
+side-products in a source script which yields as a main-product one or more
+targets. Typically these objects are used for checking that the targets were
+produced as expected.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>make_register</span><span class='op'>(</span><span class='va'>value</span>, <span class='va'>name</span>, quiet <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>value</th>
+      <td><p>A value to be registered in a source script and returned as part
+of the <code>makepipe_result</code></p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>A variable name, given as a character string. No coercion is
+done, and the first element of a character vector of length greater than
+one will be used, with a warning.</p></td>
+    </tr>
+    <tr>
+      <th>quiet</th>
+      <td><p>A logical determining whether or not warnings are signaled when
+<code>make_register()</code> is called outside of a 'makepipe' pipeline</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>value</code> invisibly</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='co'># Imagine this is part of your source script:</span>
+  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"input.Rds"</span><span class='op'>)</span>
+  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>do_stuff</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+  <span class='va'>chk</span> <span class='op'>&lt;-</span> <span class='fu'>do_check</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+  <span class='fu'>make_register</span><span class='op'>(</span><span class='va'>chk</span>, <span class='st'>"x_check"</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"output.Rds"</span><span class='op'>)</span>
+
+  <span class='co'># You will have access to `chk` in your pipeline script:</span>
+  <span class='va'>step_one</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_with_source.html'>make_with_source</a></span><span class='op'>(</span>
+    <span class='st'>"source.R"</span>,
+    <span class='st'>"output.Rds"</span>,
+    <span class='st'>"input.Rds"</span>,
+  <span class='op'>)</span>
+  <span class='va'>step_one</span><span class='op'>$</span><span class='va'>result</span><span class='op'>$</span><span class='va'>chk</span>
+<span class='op'>}</span>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 
