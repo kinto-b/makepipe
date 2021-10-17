@@ -1,6 +1,17 @@
-# makepipe (development version)
+# makepipe 0.0.4
 
 * Renamed package from `piper` to `makepipe` (#11).
+
+* Both `make_with_recipe()` and `make_with_source()` now return an object of class `makepipe_result` (#2, #14). Along with metadata relating to the execution, this object contains a `result` element which:
+  * If using `make_with_recipe()`, is identical with whatever the `recipe`
+  returns
+  * If using `make_with_source()`, is a list containing any objects registered
+  in the source script using `make_register()`
+
+* The execution environment for `make_*()` is now, by default, a fresh
+environment whose parent is the calling environment. This can be overridden
+using the `envir` argument.
+
 
 # makepipe 0.0.3
 
