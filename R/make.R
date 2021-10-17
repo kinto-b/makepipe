@@ -49,7 +49,12 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
   dependencies <- unique(dependencies)
   packages <- unique(packages)
   outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
-
+  if (any(targets %in% source)) {
+    stop("`source` must not be among the `targets`", call. = FALSE)
+  }
+  if (any(targets %in% dependencies)) {
+    stop("`dependencies` must not be among the `targets`", call. = FALSE)
+  }
 
   # Update pipeline
   pipeline <- get_pipeline()
@@ -163,6 +168,10 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
   outdated <- out_of_date(targets, c(dependencies), packages = packages)
   recipe <- substitute(recipe)
   recipe_txt <- paste(deparse(recipe), collapse = "<br>")
+
+  if (any(targets %in% dependencies)) {
+    stop("`dependencies` must not be among the `targets`", call. = FALSE)
+  }
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {

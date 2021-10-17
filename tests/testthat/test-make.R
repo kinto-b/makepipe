@@ -121,6 +121,24 @@ test_that("error thrown if source doesn't exist", {
   ))
 })
 
+
+test_that("error thrown if make_*() contains loops", {
+  expect_error(
+    make_with_recipe(1+1, target1, target1),
+    "`dependencies` must not be among the `targets`"
+  )
+
+  expect_error(
+    make_with_source(source1, target1, target1),
+    "`dependencies` must not be among the `targets`"
+  )
+
+  expect_error(
+    make_with_source(source1, source1, target1),
+    "`source` must not be among the `targets`"
+  )
+})
+
 ## make_with_recipe ------------------------------------------------------------
 test_that("error thrown if dependency doesn't exist", {
   expect_error(make_with_recipe(

@@ -377,13 +377,14 @@ propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
   inputs <- edges[edges$to == next_node, ]
   for (i in seq_along(inputs$from)) {
     outdated <- inputs$from_mtime[i] > target_mtime
+    next_node <- inputs$from[i]
 
     # Base case
     if (is.na(outdated)) outdated <- FALSE
     if (outdated) return(outdated)
+    if (next_node == initial_node) return(TRUE) # Loop detected.
 
     # Recursive case
-    next_node <- inputs$from[i]
     outdated <- propagate_outofdateness(initial_node, edges, next_node)
   }
 
