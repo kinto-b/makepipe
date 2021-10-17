@@ -1,5 +1,5 @@
 # Test files -------------------------------------------------------------------
-dependency <- system.file("tests", "mtcars.Rds", package = "makepipe")
+dependency <- system.file("tests", "mtcars_src.csv", package = "makepipe")
 source1 <- system.file("tests", "mtcars1.R", package = "makepipe")
 source2 <- system.file("tests", "mtcars2.R", package = "makepipe")
 target1 <- system.file("tests", "mtcars.csv", package = "makepipe")
@@ -84,8 +84,8 @@ test_that("targets rebuilt if older than dependency", {
   set_pipeline(Pipeline$new())
   order_filetimes(target1, dependency)
   make_with_recipe({
-    mt <- readRDS(dependency)
-    write.csv(mt, target1)
+    mt <- read.csv(dependency, check.names = FALSE)
+    write.csv(mt, target1, row.names = FALSE)
   }, target1, dependency, quiet = TRUE)
   expect_outofdate(target1)
 })
@@ -95,8 +95,8 @@ test_that("out-of-dateness is passed along", {
 
   order_filetimes(target1, source1, dependency, source2, target2)
   make_with_recipe({
-    mt <- readRDS(dependency)
-    write.csv(mt, target1)
+    mt <- read.csv(dependency, check.names = FALSE)
+    write.csv(mt, target1, row.names = FALSE)
   }, target1, dependency, quiet = TRUE)
   expect_outofdate(target1)
 

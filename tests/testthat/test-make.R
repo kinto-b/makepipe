@@ -1,5 +1,5 @@
 # Test files -------------------------------------------------------------------
-dependency <- system.file("tests", "mtcars.Rds", package = "makepipe")
+dependency <- system.file("tests", "mtcars_src.csv", package = "makepipe")
 source1 <- system.file("tests", "mtcars1.R", package = "makepipe")
 source2 <- system.file("tests", "mtcars2.R", package = "makepipe")
 target1 <- system.file("tests", "mtcars.csv", package = "makepipe")
@@ -77,8 +77,8 @@ test_that("targets rebuilt if older than dependency", {
   order_filetimes(target1, dependency)
   expect_outofdate(quote(
     make_with_recipe({
-      mt <- readRDS(dependency)
-      write.csv(mt, target1)
+      mt <- read.csv(dependency, check.names = FALSE)
+      write.csv(mt, target1, row.names = FALSE)
     }, target1, dependency)
   ))
 })
@@ -87,8 +87,8 @@ test_that("targets not rebuilt if newer than dependency", {
   order_filetimes(dependency, target1)
   expect_uptodate(quote(
     make_with_recipe({
-      mt <- readRDS(dependency)
-      write.csv(mt, target1)
+      mt <- read.csv(dependency, check.names = FALSE)
+      write.csv(mt, target1, row.names = FALSE)
     }, target1, dependency)
   ))
 })
@@ -232,7 +232,7 @@ test_that("make_with_recipe result prints nicely", {
   expect_output(print(x), regexp = "# makepipe segment")
   expect_output(print(x), regexp = "* Recipe: ")
   expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
-  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars.Rds'")
+  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars_src.csv'")
   expect_output(print(x), regexp = "* Executed: TRUE")
   expect_output(print(x), regexp = "* Result: 1 object")
   expect_output(print(x), regexp = "* Environment: ")
@@ -254,7 +254,7 @@ test_that("make_with_source result prints nicely", {
   expect_output(print(x), regexp = "# makepipe segment")
   expect_output(print(x), regexp = "* Source: '.*/mtcars1.R'")
   expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
-  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars.Rds'")
+  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars_src.csv'")
   expect_output(print(x), regexp = "* Executed: TRUE")
   expect_output(print(x), regexp = "* Result: 1 object")
   expect_output(print(x), regexp = "* Environment: ")
@@ -262,3 +262,7 @@ test_that("make_with_source result prints nicely", {
   x <- make_with_source(source1, target1, dependency, quiet = TRUE)
   expect_output(print(x), regexp = "* Executed: FALSE")
 })
+
+
+
+
