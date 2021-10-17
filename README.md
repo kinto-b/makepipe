@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Codecov test
-coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://codecov.io/gh/kinto-b/makepipe?branch=master)
+coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://app.codecov.io/gh/kinto-b/makepipe?branch=master)
 [![R-CMD-check](https://github.com/kinto-b/makepipe/workflows/R-CMD-check/badge.svg)](https://github.com/kinto-b/makepipe/actions)
 <!-- badges: end -->
 
