@@ -1,3 +1,9 @@
+## Resubmission
+This is a resubmission (thank you for taking the time to read my last
+submission). In this version I have:
+
+* Removed package name and all backticks from Description text. 
+
 ## Test environments
 * local R installation, R 4.1.0
 * ubuntu 16.04 (on travis-ci), R 4.1.0
