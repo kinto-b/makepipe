@@ -14,15 +14,6 @@
 #' package_datetime(c("utils", "makepipe"))
 package_datetime <- function(package) {
   stopifnot(is.character(package))
-  missing_package <- setdiff(package, utils::installed.packages()[, 1])
-  if (length(missing_package) > 0) {
-    stop(
-      "Package not installed: `",
-      paste(missing_package, sep = "`, `"), "`",
-      call. = FALSE
-    )
-  }
-
   out <- vapply(
     package,
     function(pkg) as.numeric(package_description_mtime(pkg)),
