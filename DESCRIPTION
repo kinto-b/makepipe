@@ -6,8 +6,14 @@ Authors@R:
            family = "Behr",
            role = c("aut", "cre", "cph"),
            email = "kinto.behr@gmail.com")
-Description: Tools for constructing simple make-like pipelines with
-    minimal overheads.
+Description: The `makepipe` package provides tools for transforming an
+    existing workflow into a self-documenting pipeline with very minimal
+    upfront costs.  Segments of the pipeline are specified in much the
+    same way a `Make` rule is, by declaring an executable recipe (which
+    might be an R script), along with the corresponding targets and
+    dependencies. When the entire pipeline is run through, only those
+    recipes that need to be executed will be. Meanwhile, execution
+    metadata is captured behind the scenes for later inspection.
 License: GPL (>= 3)
 URL: https://kinto-b.github.io/makepipe/,
     https://github.com/kinto-b/makepipe
