@@ -20,8 +20,14 @@ easy-going, being adaptable to a wide range of data science workflows.
 
 ## Installation
 
-You can install the development version from
-[GitHub](https://github.com/) with:
+You can install the released version of `makepipe` from
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("makepipe")
+```
+
+And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -44,8 +50,8 @@ For example:
 library(makepipe)
 make_with_source(
   dependencies = c("data/0_raw_data.csv", "lookup/concordance.csv"),
-  source = c("1 data_prep.R"),
-  targets = c("data/1_data.Rds")
+  source = "1 data_prep.R",
+  targets = "data/1_data.Rds"
 )
 make_with_recipe(
     dependencies = c("data/1_data.Rds", "data/0_pop.Rds"),
