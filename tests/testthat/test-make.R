@@ -1,9 +1,18 @@
 # Test files -------------------------------------------------------------------
-dependency <- system.file("tests", "mtcars_src.csv", package = "makepipe")
-source1 <- system.file("tests", "mtcars1.R", package = "makepipe")
-source2 <- system.file("tests", "mtcars2.R", package = "makepipe")
-target1 <- system.file("tests", "mtcars.csv", package = "makepipe")
-target2 <- system.file("tests", "mtcars.txt", package = "makepipe")
+dependency <- tempfile(fileext=".csv")
+write.csv(mtcars, dependency)
+
+target1 <- tempfile(fileext=".csv")
+write.csv(mtcars, target1)
+
+target2 <- tempfile(fileext=".txt")
+write.table(mtcars, target2)
+
+source1 <- tempfile(fileext=".R")
+file.copy(system.file("tests", "source1.R", package = "makepipe"), source1)
+
+source2 <- tempfile(fileext=".R")
+file.copy(system.file("tests", "source2.R", package = "makepipe"), source2)
 
 # Functions --------------------------------------------------------------------
 order_filetimes <- function(...) {
@@ -240,6 +249,8 @@ test_that("make_with_source returns what's registered", {
   expect_equal(res$result$five, 5)
 })
 
+
+# Printing ---------------------------------------------------------------------
 test_that("make_with_recipe result prints nicely", {
   order_filetimes(target1, dependency)
   x <- make_with_recipe({
@@ -249,8 +260,8 @@ test_that("make_with_recipe result prints nicely", {
 
   expect_output(print(x), regexp = "# makepipe segment")
   expect_output(print(x), regexp = "* Recipe: ")
-  expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
-  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars_src.csv'")
+  expect_output(print(x), regexp = "* Targets: '.*'")
+  expect_output(print(x), regexp = "* File dependencies: '.*'")
   expect_output(print(x), regexp = "* Executed: TRUE")
   expect_output(print(x), regexp = "* Result: 1 object")
   expect_output(print(x), regexp = "* Environment: ")
@@ -270,17 +281,21 @@ test_that("make_with_source result prints nicely", {
   x <- make_with_source(source1, target1, dependency, quiet = TRUE)
 
   expect_output(print(x), regexp = "# makepipe segment")
-  expect_output(print(x), regexp = "* Source: '.*/mtcars1.R'")
-  expect_output(print(x), regexp = "* Targets: '.*/mtcars.csv'")
-  expect_output(print(x), regexp = "* File dependencies: '.*/mtcars_src.csv'")
+  expect_output(print(x), regexp = "* Source: '.*'")
+  expect_output(print(x), regexp = "* Targets: '.*'")
+  expect_output(print(x), regexp = "* File dependencies: '.*'")
   expect_output(print(x), regexp = "* Executed: TRUE")
   expect_output(print(x), regexp = "* Result: 1 object")
   expect_output(print(x), regexp = "* Environment: ")
 
+  order_filetimes(dependency, source1, target1)
   x <- make_with_source(source1, target1, dependency, quiet = TRUE)
   expect_output(print(x), regexp = "* Executed: FALSE")
 })
 
 
+# Unlink ------------------------------------------------------------------
+
+unlink(c("dependency", "target1", "target2", "source1", "source2"))
 
 

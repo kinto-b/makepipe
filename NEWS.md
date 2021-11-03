@@ -1,3 +1,8 @@
+# makepipe 0.0.5
+
+* Fixed minor bug having to do with the propagation of out-of-dateness in
+Pipeline visualizations.
+
 # makepipe 0.0.4
 
 * Renamed package from `piper` to `makepipe` (#11).

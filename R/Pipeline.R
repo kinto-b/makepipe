@@ -196,6 +196,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
 
     # Propagate out-of-dateness
     for (i in seq_along(edges$to)) {
+      if (edges$.source[i]) next
       edges$out_of_date[i] <- propagate_outofdateness(edges$to[i], edges)
     }
 
@@ -376,7 +377,7 @@ propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
 
   inputs <- edges[edges$to == next_node, ]
   for (i in seq_along(inputs$from)) {
-    outdated <- inputs$from_mtime[i] > target_mtime
+    outdated <- inputs$out_of_date[i] | inputs$from_mtime[i] > target_mtime
     next_node <- inputs$from[i]
 
     # Base case
