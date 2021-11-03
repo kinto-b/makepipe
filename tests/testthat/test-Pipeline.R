@@ -1,9 +1,19 @@
 # Test files -------------------------------------------------------------------
-dependency <- system.file("tests", "mtcars_src.csv", package = "makepipe")
-source1 <- system.file("tests", "mtcars1.R", package = "makepipe")
-source2 <- system.file("tests", "mtcars2.R", package = "makepipe")
-target1 <- system.file("tests", "mtcars.csv", package = "makepipe")
-target2 <- system.file("tests", "mtcars.txt", package = "makepipe")
+dependency <- tempfile(fileext=".csv")
+write.csv(mtcars, dependency)
+
+target1 <- tempfile(fileext=".csv")
+write.csv(mtcars, target1)
+
+target2 <- tempfile(fileext=".txt")
+write.table(mtcars, target2)
+
+source1 <- tempfile(fileext=".R")
+file.copy(system.file("tests", "source1.R", package = "makepipe"), source1)
+
+source2 <- tempfile(fileext=".R")
+file.copy(system.file("tests", "source2.R", package = "makepipe"), source2)
+
 
 # Functions --------------------------------------------------------------------
 order_filetimes <- function(...) {
@@ -166,3 +176,6 @@ test_that("annotations cannot must be character", {
 })
 
 
+# Unlink ------------------------------------------------------------------
+
+unlink(c("dependency", "target1", "target2", "source1", "source2"))
