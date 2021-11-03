@@ -1,8 +1,8 @@
 ## Resubmission
-This is a resubmission (thank you for taking the time to read my last
-submission). In this version I have:
+This is a re-submission. In this version I have:
 
-* Removed package name and all backticks from Description text. 
+* Replaced installed test files with tempfiles so that the tests only write to
+the temporary directory
 
 ## Test environments
 * local R installation, R 4.1.0
