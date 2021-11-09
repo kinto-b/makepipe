@@ -18,6 +18,9 @@ pipelines in R with very minimal overheads. In contrast to `targets`
 framework that demands highly functionalised code, `makepipe` is
 easy-going, being adaptable to a wide range of data science workflows.
 
+A minimal example can be found here:
+<https://github.com/kinto-b/makepipe_example>
+
 ## Installation
 
 You can install the released version of `makepipe` from

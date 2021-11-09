@@ -1,5 +1,6 @@
 # makepipe (development version)
 
+* Updated README with a link to a minimal example of a `makepipe` pipeline. 
 * Fixed a minor bug in `make_register()` (#22). Previously, an error would be thrown
 when using `make_register()` outside of a `makepipe` segment if the user set 
 `quiet=TRUE`. This is no longer the case.
