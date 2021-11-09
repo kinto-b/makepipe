@@ -35,15 +35,13 @@
 #'   step_one$result$chk
 #' }
 make_register <- function(value, name, quiet = FALSE) {
-  if (!quiet) {
-    msg <- "`make_register()` called outside of a 'makepipe' pipeline"
-    if (exists("__makepipe_register__", parent.frame())) {
-      register_env <- get("__makepipe_register__", parent.frame())
-      if (!is.environment(register_env)) warning(msg, call. = FALSE)
-    } else {
-      warning(msg, call. = FALSE)
-      return(invisible(value))
-    }
+  msg <- "`make_register()` called outside of a 'makepipe' pipeline"
+  if (exists("__makepipe_register__", parent.frame())) {
+    register_env <- get("__makepipe_register__", parent.frame())
+    if (!is.environment(register_env) & !quiet) warning(msg, call. = FALSE)
+  } else {
+    if (!quiet) warning(msg, call. = FALSE)
+    return(invisible(value))
   }
 
   assign(name, value, register_env)

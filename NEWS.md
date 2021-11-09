@@ -1,5 +1,9 @@
 # makepipe (development version)
 
+* Fixed a minor bug in `make_register()` (#22). Previously, an error would be thrown
+when using `make_register()` outside of a `makepipe` segment if the user set 
+`quiet=TRUE`. This is no longer the case.
+
 # makepipe 0.0.5
 
 * Fixed minor bug having to do with the propagation of out-of-dateness in
