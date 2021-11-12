@@ -218,11 +218,14 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     )
 
     # Label
-    nodes$label <- ifelse(
-      nodes$id %in% edges[edges$.recipe, "to"],
-      "Recipe",
-      basename(as.character(nodes$id))
-    )
+    if (is.null(nodes$label)) {
+      nodes$label <- ifelse(
+        nodes$id %in% edges[edges$.recipe, "to"],
+        "Recipe",
+        basename(as.character(nodes$id))
+      )
+    }
+
 
     self$nodes <- nodes
     invisible(self)

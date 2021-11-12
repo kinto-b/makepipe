@@ -137,6 +137,26 @@ order_filetimes(dependency, target1, source1)
 make_with_source(source1, target1, dependency, quiet = TRUE)
 pipe <- get_pipeline()
 
+test_that("annotations aren't overwritten by print method", {
+  annotation <- c("one", "two", "three")
+  names(annotation) <- c(dependency, source1, target1)
+  pipe <- annotate_pipeline(pipe, labels = annotation, tooltips = annotation)
+
+  print(pipe)
+  expect_identical(sort(pipe$nodes$title), sort(c("one", "two", "three")))
+  expect_identical(sort(pipe$nodes$label), sort(c("one", "two", "three")))
+
+  # Change annotations
+  annotation <- c("1", "2", "3")
+  names(annotation) <- c(dependency, source1, target1)
+  pipe <- annotate_pipeline(pipe, labels = annotation, tooltips = annotation)
+
+  print(pipe)
+  expect_identical(sort(pipe$nodes$title), sort(c("1", "2", "3")))
+  expect_identical(sort(pipe$nodes$label), sort(c("1", "2", "3")))
+})
+
+# Duplicates
 test_that("duplicate annotations are disallowed", {
   annotation <- c("one", "two")
   names(annotation) <- rep(dependency, 2)
