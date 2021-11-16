@@ -21,6 +21,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     .source = logical(0),
     .recipe = logical(0),
     .pkg = logical(0),
+    .outdated = logical(0),
     stringsAsFactors = FALSE
   ),
 
@@ -61,6 +62,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
         .source = TRUE,
         .recipe = FALSE,
         .pkg = FALSE,
+        .outdated = FALSE,
         stringsAsFactors = FALSE
       ),
       expand.grid(
@@ -70,6 +72,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
         .source = FALSE,
         .recipe = FALSE,
         .pkg = FALSE,
+        .outdated = FALSE,
         stringsAsFactors = FALSE
       )
     )
@@ -84,6 +87,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
           .source = TRUE,
           .recipe = FALSE,
           .pkg = TRUE,
+          .outdated = FALSE,
           stringsAsFactors = FALSE
         ),
         new_edges
@@ -110,6 +114,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
     self$edges$to <- factor(self$edges$to, levels = levels(self$nodes$id))
 
+    self$out_of_date()
 
     invisible(self)
   },
@@ -139,6 +144,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
         .source = TRUE,
         .recipe = TRUE,
         .pkg = FALSE,
+        .outdated = FALSE,
         stringsAsFactors = FALSE
       ),
       expand.grid(
@@ -148,6 +154,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
         .source = FALSE,
         .recipe = FALSE,
         .pkg = FALSE,
+        .outdated = FALSE,
         stringsAsFactors = FALSE
       )
     )
@@ -161,6 +168,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
           .source = TRUE,
           .recipe = FALSE,
           .pkg = TRUE,
+          .outdated = FALSE,
           stringsAsFactors = FALSE
         ),
         new_edges
@@ -186,8 +194,33 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     # Convert edges back to factor
     self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
     self$edges$to <- factor(self$edges$to, levels = levels(self$nodes$id))
+    self$out_of_date()
 
+    invisible(self)
+  },
 
+  #' @description Style pipeline nodes
+  #' @return `self`
+  out_of_date = function() {
+    edges <- self$edges
+
+    # Out of date?
+    edges$from_mtime <- file.mtime(as.character(edges$from))
+    edges$to_mtime <- file.mtime(as.character(edges$to))
+    edges$.outdated <- ifelse(
+      edges$.source,
+      FALSE,
+      edges$from_mtime > edges$to_mtime
+    )
+
+    # Propagate out-of-dateness
+    for (i in seq_along(edges$to)) {
+      if (edges$.source[i]) next
+      edges$.outdated[i] <- propagate_outofdateness(edges$to[i], edges)
+    }
+
+    edges <- edges[, c("from", "to", "arrows", ".source", ".recipe", ".pkg", ".outdated")]
+    self$edges <- edges
     invisible(self)
   },
 
@@ -197,25 +230,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     nodes <- self$nodes
     edges <- self$edges
 
-    # Out of date?
-    edges$from_mtime <- file.mtime(as.character(edges$from))
-    edges$to_mtime <- file.mtime(as.character(edges$to))
-    edges$out_of_date <- ifelse(
-      edges$.source,
-      FALSE,
-      edges$from_mtime > edges$to_mtime
-    )
-
-    # Propagate out-of-dateness
-    for (i in seq_along(edges$to)) {
-      if (edges$.source[i]) next
-      edges$out_of_date[i] <- propagate_outofdateness(edges$to[i], edges)
-    }
-
+    # Update out-of-dateness
+    self$out_of_date()
 
     # Group
     nodes$group <- ifelse(
-      nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date"
+      nodes$id %in% edges[edges$.outdated, "to"], "Out-of-date", "Up-to-date"
     )
     nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
 
@@ -384,7 +404,7 @@ propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
 
   inputs <- edges[edges$to == next_node, ]
   for (i in seq_along(inputs$from)) {
-    outdated <- inputs$out_of_date[i] | inputs$from_mtime[i] > target_mtime
+    outdated <- inputs$.outdated[i] | inputs$from_mtime[i] > target_mtime
     next_node <- inputs$from[i]
 
     # Base case
