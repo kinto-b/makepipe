@@ -4,7 +4,7 @@
 #' @param source The path to an R script which makes the `targets`
 #' @param ... Additional parameters to pass to `base::source()`
 #'
-#' @return `NULL` invisibly.
+#' @return A `makepipe_result` object containing execution metadata.
 #' @export
 #' @family make
 #'
@@ -48,13 +48,14 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
   targets <- unique(targets)
   dependencies <- unique(dependencies)
   packages <- unique(packages)
-  outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
   if (any(targets %in% source)) {
     stop("`source` must not be among the `targets`", call. = FALSE)
   }
   if (any(targets %in% dependencies)) {
     stop("`dependencies` must not be among the `targets`", call. = FALSE)
   }
+
+  outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
 
   # Update pipeline
   pipeline <- get_pipeline()
@@ -83,9 +84,14 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
       )
       cli::cat_line()
     }
+
+    execution_time <- Sys.time()
     source(source, local = envir, ...)
+    execution_time <- format(Sys.time() - execution_time)
+
     if (!quiet) cli::cli_process_done()
   } else {
+    execution_time <- NULL
     if (!quiet) cli::cli_alert_success("Targets are up to date")
   }
 
@@ -93,6 +99,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
     executed = outdated,
     result = as.list(register_env),
     instructions = source,
+    execution_time = execution_time,
     targets = targets,
     dependencies = dependencies,
     packages = packages,
@@ -109,8 +116,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #' @inheritParams make_params
 #' @param recipe A chunk of R code which makes the `targets`
 #' @param ... Additional parameters to pass to `base::eval()`
-#' @return The result of evaluating the `recipe` if the `targets` are out of
-#'   date otherwise `NULL``
+#' @return A `makepipe_result` object containing execution metadata.
 #' @export
 #' @family make
 #'
@@ -165,13 +171,20 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
   targets <- unique(targets)
   dependencies <- unique(dependencies)
   packages <- unique(packages)
-  outdated <- out_of_date(targets, c(dependencies), packages = packages)
   recipe <- substitute(recipe)
   recipe_txt <- paste(deparse(recipe), collapse = "<br>")
 
   if (any(targets %in% dependencies)) {
     stop("`dependencies` must not be among the `targets`", call. = FALSE)
   }
+
+  .make_with_recipe(recipe, recipe_txt, targets, dependencies, packages, envir, quiet, ...)
+}
+
+#' @noRd
+.make_with_recipe <- function(recipe, recipe_txt, targets, dependencies,
+                              packages, envir, quiet, ...) {
+  outdated <- out_of_date(targets, c(dependencies), packages = packages)
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
@@ -194,9 +207,14 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
       )
       cli::cat_line()
     }
+
+    execution_time <- Sys.time()
     out <- eval(recipe, envir = envir, ...)
+    execution_time <- format(Sys.time() - execution_time)
+
     if (!quiet) cli::cli_process_done()
   } else {
+    execution_time <- NULL
     if (!quiet) cli::cli_alert_success("Targets are up to date")
     out <- NULL
   }
@@ -205,6 +223,7 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
     executed = outdated,
     result = out,
     instructions = recipe,
+    execution_time = execution_time,
     targets = targets,
     dependencies = dependencies,
     packages = packages,

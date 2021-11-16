@@ -9,8 +9,8 @@
 #'
 #' @return An object of class `makepipe_result`
 #' @noRd
-makepipe_result <- function(executed, result, instructions, targets,
-                            dependencies, packages, envir, subclass) {
+makepipe_result <- function(executed, result, instructions, execution_time,
+                            targets, dependencies, packages, envir, subclass) {
   stopifnot(subclass %in% c("source", "recipe"))
   subclass <- paste0("makepipe_result_", subclass)
   x <-
@@ -20,6 +20,7 @@ makepipe_result <- function(executed, result, instructions, targets,
       result = result,
       executed = executed,
       instructions = instructions,
+      execution_time = execution_time,
       targets = targets,
       dependencies = dependencies,
       packages = packages,
@@ -63,6 +64,7 @@ print.makepipe_result <- function(x, ...) {
   cli::cat_bullet("File dependencies: ", dependencies)
   if (length(x$packages) > 0) cli::cat_bullet("Package dependencies: ", x$packages)
   cli::cat_bullet("Executed: ", x$executed)
+  if (x$executed) cli::cat_bullet("Execution time: ", x$execution_time)
   if (x$executed) cli::cat_bullet(x$result)
   cli::cat_bullet("Environment: ", env_name(x$env))
 }
