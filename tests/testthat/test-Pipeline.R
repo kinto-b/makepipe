@@ -47,22 +47,22 @@ expect_uptodate <- function(node_id, pipeline = get_pipeline()) {
 test_that("targets rebuilt if older than source", {
   set_pipeline(Pipeline$new())
   order_filetimes(dependency, target1, source1)
-  make_with_source(source1, target1, dependency, quiet = TRUE)
-  expect_outofdate(target1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE)
+  expect_true(res$executed)
 })
 
 test_that("targets rebuilt if older than dependency", {
   set_pipeline(Pipeline$new())
   order_filetimes(source1, target1, dependency)
-  make_with_source(source1, target1, dependency, quiet = TRUE)
-  expect_outofdate(target1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE)
+  expect_true(res$executed)
 })
 
 test_that("targets rebuilt if older than dependency and source", {
   set_pipeline(Pipeline$new())
   order_filetimes(target1, source1, dependency)
-  make_with_source(source1, target1, dependency, quiet = TRUE)
-  expect_outofdate(target1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE)
+  expect_true(res$executed)
 })
 
 test_that("out-of-dateness is passed along", {
@@ -77,8 +77,8 @@ test_that("out-of-dateness is passed along", {
 test_that("targets not rebuilt if newer than dependency and source", {
   set_pipeline(Pipeline$new())
   order_filetimes(source1, dependency, target1)
-  make_with_source(source1, target1, dependency, quiet = TRUE)
-  expect_uptodate(target1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE)
+  expect_false(res$executed)
 })
 
 
@@ -93,11 +93,11 @@ test_that("source never out-of-dated", {
 test_that("targets rebuilt if older than dependency", {
   set_pipeline(Pipeline$new())
   order_filetimes(target1, dependency)
-  make_with_recipe({
+  res <- make_with_recipe({
     mt <- read.csv(dependency, check.names = FALSE)
     write.csv(mt, target1, row.names = FALSE)
   }, target1, dependency, quiet = TRUE)
-  expect_outofdate(target1)
+  expect_true(res$executed)
 })
 
 test_that("out-of-dateness is passed along", {

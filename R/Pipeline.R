@@ -30,7 +30,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     label = character(0),
     title = character(0),
     shape = character(0),
-    colour = character(0)
+    colour = character(0),
+    .source = logical(0),
+    .recipe = logical(0),
+    .pkg = logical(0),
+    stringsAsFactors = FALSE
   ),
 
   #' @description Add a pipeline segment corresponding to a `make_with_source()`
@@ -96,6 +100,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
       id = factor(unique(c(self$edges$from, self$edges$to))),
       title = unique(c(self$edges$from, self$edges$to))
     )
+
+    self$nodes$.source <- self$nodes$id %in% self$edges[self$edges$.source, "to"]
+    self$nodes$.recipe <- self$nodes$id %in% self$edges[self$edges$.recipe, "to"]
+    self$nodes$.pkg <- self$nodes$id %in% self$edges[self$edges$.pkg, "from"]
     self$style_nodes()
 
     # Convert edges back to factor
@@ -169,6 +177,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
       id = factor(unique(c(self$edges$from, self$edges$to))),
       title = unique(c(self$edges$from, self$edges$to))
     )
+
+    self$nodes$.source <- self$nodes$id %in% self$edges[self$edges$.source, "to"]
+    self$nodes$.recipe <- self$nodes$id %in% self$edges[self$edges$.recipe, "to"]
+    self$nodes$.pkg <- self$nodes$id %in% self$edges[self$edges$.pkg, "from"]
     self$style_nodes()
 
     # Convert edges back to factor
@@ -205,27 +217,17 @@ Pipeline <- R6::R6Class(classname = "Pipeline", list(
     nodes$group <- ifelse(
       nodes$id %in% edges[edges$out_of_date, "to"], "Out-of-date", "Up-to-date"
     )
-    nodes$group <- ifelse(
-      nodes$id %in% edges[edges$.source, "to"], "Source", nodes$group
-    )
+    nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
 
-    # Colour
-    nodes$shape <- ifelse(
-      nodes$id %in% edges[edges$.recipe, "to"], "circle", "square"
-    )
-    nodes$shape <- ifelse(
-      nodes$id %in% edges[edges$.pkg, "from"], "triangle", nodes$shape
-    )
+    # Aesthetics
+    nodes$shape <- ifelse(nodes$.recipe, "circle", "square")
+    nodes$shape <- ifelse(nodes$.pkg, "triangle", nodes$shape)
 
     # Label
     if (is.null(nodes$label)) {
-      nodes$label <- ifelse(
-        nodes$id %in% edges[edges$.recipe, "to"],
-        "Recipe",
-        basename(as.character(nodes$id))
-      )
+      lbl <- basename(as.character(nodes$id))
+      nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
     }
-
 
     self$nodes <- nodes
     invisible(self)
@@ -302,7 +304,9 @@ set_pipeline <- function(pipeline) {
 #' @rdname pipeline-accessors
 #' @export
 get_pipeline <- function() {
-  makepipe_env$pipeline
+  pipe <- makepipe_env$pipeline
+  if (!is.null(pipe)) pipe$style_nodes() # Refresh
+  pipe
 }
 
 
