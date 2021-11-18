@@ -4,7 +4,7 @@
 #' @param source The path to an R script which makes the `targets`
 #' @param ... Additional parameters to pass to `base::source()`
 #'
-#' @return A `makepipe_result` object containing execution metadata.
+#' @return A `Segment` object containing execution metadata.
 #' @export
 #' @family make
 #'
@@ -63,12 +63,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
-  pipeline$add_source_segment(
-    source = source,
-    targets = targets,
-    dependencies = dependencies,
-    packages = packages
-  )
+  segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir)
 
   # Prepare register
   register_env <- new.env(parent = emptyenv())
@@ -87,7 +82,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 
     execution_time <- Sys.time()
     source(source, local = envir, ...)
-    execution_time <- format(Sys.time() - execution_time)
+    execution_time <- Sys.time() - execution_time
 
     if (!quiet) cli::cli_process_done()
   } else {
@@ -95,17 +90,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
     if (!quiet) cli::cli_alert_success("Targets are up to date")
   }
 
-  out <- makepipe_result(
-    executed = outdated,
-    result = as.list(register_env),
-    instructions = source,
-    execution_time = execution_time,
-    targets = targets,
-    dependencies = dependencies,
-    packages = packages,
-    envir = envir,
-    subclass = "source"
-  )
+  out <- segment$update_result(outdated, execution_time, register_env)
 
   invisible(out)
 }
@@ -116,7 +101,7 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #' @inheritParams make_params
 #' @param recipe A chunk of R code which makes the `targets`
 #' @param ... Additional parameters to pass to `base::eval()`
-#' @return A `makepipe_result` object containing execution metadata.
+#' @return A `Segment` object containing execution metadata.
 #' @export
 #' @family make
 #'
@@ -171,19 +156,18 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
   targets <- unique(targets)
   dependencies <- unique(dependencies)
   packages <- unique(packages)
-  recipe <- substitute(recipe)
-  recipe_txt <- paste(deparse(recipe), collapse = "<br>")
+  recipe <- rlang::enexpr(recipe)
 
   if (any(targets %in% dependencies)) {
     stop("`dependencies` must not be among the `targets`", call. = FALSE)
   }
 
-  .make_with_recipe(recipe, recipe_txt, targets, dependencies, packages, envir, quiet, ...)
+  .make_with_recipe(recipe, targets, dependencies, packages, envir, quiet, ...)
 }
 
 #' @noRd
-.make_with_recipe <- function(recipe, recipe_txt, targets, dependencies,
-                              packages, envir, quiet, ...) {
+.make_with_recipe <- function(recipe, targets, dependencies, packages,
+                              envir, quiet, ...) {
   outdated <- out_of_date(targets, c(dependencies), packages = packages)
 
   pipeline <- get_pipeline()
@@ -191,12 +175,7 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
-  pipeline$add_recipe_segment(
-    recipe = recipe_txt,
-    targets = targets,
-    dependencies = dependencies,
-    packages = packages
-  )
+  segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir)
 
   if (outdated) {
     if (!quiet) {
@@ -210,7 +189,7 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
 
     execution_time <- Sys.time()
     out <- eval(recipe, envir = envir, ...)
-    execution_time <- format(Sys.time() - execution_time)
+    execution_time <- Sys.time() - execution_time
 
     if (!quiet) cli::cli_process_done()
   } else {
@@ -219,17 +198,7 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
     out <- NULL
   }
 
-  out <- makepipe_result(
-    executed = outdated,
-    result = out,
-    instructions = recipe,
-    execution_time = execution_time,
-    targets = targets,
-    dependencies = dependencies,
-    packages = packages,
-    envir = envir,
-    subclass = "recipe"
-  )
+  out <- segment$update_result(outdated, execution_time, out)
 
   invisible(out)
 }

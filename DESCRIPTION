@@ -21,6 +21,7 @@ BugReports: https://github.com/kinto-b/makepipe/issues
 Imports: 
     cli,
     R6,
+    rlang,
     utils,
     visNetwork
 Suggests: 

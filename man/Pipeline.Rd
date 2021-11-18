@@ -18,6 +18,8 @@ Other pipeline:
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
+\item{\code{segments}}{A list of \code{Segment} objects}
+
 \item{\code{edges}}{A data frame}
 
 \item{\code{nodes}}{A data frame}
@@ -29,7 +31,7 @@ Other pipeline:
 \itemize{
 \item \href{#method-add_source_segment}{\code{Pipeline$add_source_segment()}}
 \item \href{#method-add_recipe_segment}{\code{Pipeline$add_recipe_segment()}}
-\item \href{#method-style_nodes}{\code{Pipeline$style_nodes()}}
+\item \href{#method-out_of_date}{\code{Pipeline$out_of_date()}}
 \item \href{#method-print}{\code{Pipeline$print()}}
 \item \href{#method-save}{\code{Pipeline$save()}}
 \item \href{#method-clone}{\code{Pipeline$clone()}}
@@ -39,10 +41,17 @@ Other pipeline:
 \if{html}{\out{<a id="method-add_source_segment"></a>}}
 \if{latex}{\out{\hypertarget{method-add_source_segment}{}}}
 \subsection{Method \code{add_source_segment()}}{
+Add an edge to \code{edges}
+
+
+Add any nodes in \code{self$edges} that are missing from
+\code{self$nodes} into \code{self$nodes}
+
+
 Add a pipeline segment corresponding to a \code{make_with_source()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages, envir)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -57,11 +66,15 @@ call
 
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
+
+\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
+
+\item{\code{new_edge}}{An data.frame constructed with \code{new_edge()}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\code{self}
+The \code{SegmentSource} added to the \code{Pipeline}
 }
 }
 \if{html}{\out{<hr>}}
@@ -71,7 +84,7 @@ depend on}
 Add a pipeline segment corresponding to a \code{make_with_recipe()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -87,20 +100,22 @@ would make the \code{targets} if evaluated.}
 
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
+
+\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\code{self}
+The \code{SegmentRecipe} added to the \code{Pipeline}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-style_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-style_nodes}{}}}
-\subsection{Method \code{style_nodes()}}{
-Style pipeline nodes
+\if{html}{\out{<a id="method-out_of_date"></a>}}
+\if{latex}{\out{\hypertarget{method-out_of_date}{}}}
+\subsection{Method \code{out_of_date()}}{
+Update out-of-dateness
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$style_nodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$out_of_date()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

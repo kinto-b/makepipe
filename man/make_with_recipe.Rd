@@ -34,8 +34,7 @@ the calling environment.}
 \item{...}{Additional parameters to pass to \code{base::eval()}}
 }
 \value{
-The result of evaluating the \code{recipe} if the \code{targets} are out of
-date otherwise `NULL``
+A \code{Segment} object containing execution metadata.
 }
 \description{
 Make targets out of dependencies using a recipe

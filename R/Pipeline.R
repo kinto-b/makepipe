@@ -12,275 +12,209 @@
 #' @export Pipeline
 #' @aliases Pipeline
 #' @importFrom R6 R6Class
-Pipeline <- R6::R6Class(classname = "Pipeline", list(
-  #' @field edges A data frame
-  edges = data.frame(
-    from = character(0),
-    to = character(0),
-    arrows = character(0),
-    .source = logical(0),
-    .recipe = logical(0),
-    .pkg = logical(0),
-    .outdated = logical(0),
-    stringsAsFactors = FALSE
+Pipeline <- R6::R6Class(classname = "Pipeline",
+  private = list(
+    #' @description Add an edge to `edges`
+    #' @param new_edge An data.frame constructed with `new_edge()`
+    add_edge = function(new_edge) {
+      edges <- self$edges
+
+      # Relevel
+      lvls <- levels(c(edges$from, edges$to, new_edge$from, new_edge$to))
+      edges$from <- factor(edges$from, lvls)
+      edges$to <- factor(edges$to, lvls)
+      new_edge$from <- factor(new_edge$from, lvls)
+      new_edge$to <- factor(new_edge$to, lvls)
+
+      # Combine
+      self$edges <- rbind(edges, new_edge)
+
+      invisible(self)
+    },
+
+    #' @description Add any nodes in `self$edges` that are missing from
+    #'   `self$nodes` into `self$nodes`
+    refresh_nodes = function() {
+      edges <- self$edges
+      nodes <- self$nodes
+
+      # Relevel
+      lvls <- levels(c(edges$from, edges$to))
+      nodes$id <- factor(nodes$id, lvls)
+
+      # Build new nodes
+      all_ids <- c(edges$from, edges$to)
+      new_ids <- factor(setdiff(all_ids, nodes$id), lvls)
+      if (length(new_ids) == 0) return(invisible(self))
+
+      new_nodes <- data.frame(
+        id = new_ids,
+        label = "",
+        title = as.character(new_ids),
+        shape = "",
+        group = "",
+        .source = new_ids %in% edges[edges$.source, "to"],
+        .recipe = new_ids %in% edges[edges$.recipe, "to"],
+        .pkg = new_ids %in% edges[edges$.pkg, "to"]
+      )
+
+      # Aesthetics
+      new_nodes$shape <- ifelse(new_nodes$.recipe, "circle", "square")
+      new_nodes$shape <- ifelse(new_nodes$.pkg, "triangle", new_nodes$shape)
+
+      lbl <- basename(as.character(new_nodes$id))
+      new_nodes$label <- ifelse(new_nodes$.recipe, "Recipe", lbl)
+
+      # Combine
+      self$nodes <- rbind(nodes, new_nodes)
+
+      invisible(self)
+    }
   ),
+  public = list(
+    #' @field segments A list of `Segment` objects
+    segments = NULL,
 
-  #' @field nodes A data frame
-  nodes = data.frame(
-    id = integer(0),
-    label = character(0),
-    title = character(0),
-    shape = character(0),
-    colour = character(0),
-    .source = logical(0),
-    .recipe = logical(0),
-    .pkg = logical(0),
-    stringsAsFactors = FALSE
-  ),
+    #' @field edges A data frame
+    edges = data.frame(
+      from = factor(),
+      to = factor(),
+      arrows = character(0),
+      .source = logical(0),
+      .recipe = logical(0),
+      .pkg = logical(0),
+      .outdated = logical(0),
+      stringsAsFactors = FALSE
+    ),
 
-  #' @description Add a pipeline segment corresponding to a `make_with_source()`
-  #'   call
-  #' @param source The path to an R script which makes the `targets`
-  #' @param targets A character vector of paths to files
-  #' @param dependencies A character vector of paths to files which the
-  #'   `targets` depend on
-  #' @param packages A character vector of names of packages which `targets`
-  #'   depend on
-  #' @return `self`
-  add_source_segment = function(source, targets, dependencies, packages) {
-    stopifnot(is.character(dependencies))
-    stopifnot(is.character(source))
-    stopifnot(is.character(targets))
-    stopifnot(is.character(packages) | is.null(packages))
+    #' @field nodes A data frame
+    nodes = data.frame(
+      id = factor(),
+      label = character(0),
+      title = character(0),
+      shape = character(0),
+      group = character(0),
+      .source = logical(0),
+      .recipe = logical(0),
+      .pkg = logical(0),
+      stringsAsFactors = FALSE
+    ),
 
-    # Construct new edges
-    new_edges <- rbind(
-      expand.grid(
-        from = dependencies,
-        to = source,
-        arrows = "to",
-        .source = TRUE,
-        .recipe = FALSE,
-        .pkg = FALSE,
-        .outdated = FALSE,
-        stringsAsFactors = FALSE
-      ),
-      expand.grid(
-        from = source,
-        to = targets,
-        arrows = "to",
-        .source = FALSE,
-        .recipe = FALSE,
-        .pkg = FALSE,
-        .outdated = FALSE,
-        stringsAsFactors = FALSE
+    #' @description Add a pipeline segment corresponding to a `make_with_source()`
+    #'   call
+    #' @param source The path to an R script which makes the `targets`
+    #' @param targets A character vector of paths to files
+    #' @param dependencies A character vector of paths to files which the
+    #'   `targets` depend on
+    #' @param packages A character vector of names of packages which `targets`
+    #'   depend on
+    #' @param envir The environment in which to execute the `source` or `recipe`.
+    #' @return The `SegmentSource` added to the `Pipeline`
+    add_source_segment = function(source, targets, dependencies, packages, envir) {
+      id <- as.integer(length(self$segments) + 1)
+      new_segment <- SegmentSource$new(
+        id, source, targets, dependencies, packages, envir,
+        FALSE, NULL, NULL
       )
-    )
 
+      self$segments <- c(self$segments, new_segment)
+      private$add_edge(new_segment$edges)
+      private$refresh_nodes()
+      self$out_of_date()
 
-    if (length(packages) > 0) {
-      new_edges <- rbind(
-        expand.grid(
-          from = packages,
-          to = source,
-          arrows = "to",
-          .source = TRUE,
-          .recipe = FALSE,
-          .pkg = TRUE,
-          .outdated = FALSE,
-          stringsAsFactors = FALSE
-        ),
-        new_edges
+      new_segment
+    },
+
+    #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
+    #'   call
+    #' @param recipe A character vector containing a deparsed expression, which
+    #'   would make the `targets` if evaluated.
+    #' @param targets A character vector of paths to files
+    #' @param dependencies A character vector of paths to files which the
+    #'   `targets` depend on
+    #' @param packages A character vector of names of packages which `targets`
+    #'   depend on
+    #' @param envir The environment in which to execute the `source` or `recipe`.
+    #' @return The `SegmentRecipe` added to the `Pipeline`
+    add_recipe_segment = function(recipe, targets, dependencies, packages, envir) {
+      id <- length(self$segments) + 1
+      new_segment <- SegmentRecipe$new(
+        id, recipe, targets, dependencies, packages, envir,
+        FALSE, NULL, NULL
       )
-    }
 
-    # Convert old edges to character and bind
-    self$edges$from <- as.character(self$edges$from)
-    self$edges$to <- as.character(self$edges$to)
-    self$edges <- rbind(self$edges, new_edges)
+      self$segments <- c(self$segments, new_segment)
+      private$add_edge(new_segment$edges)
+      private$refresh_nodes()
+      self$out_of_date()
 
-    # Regenerate nodes using edges
-    self$nodes <- data.frame(
-      id = factor(unique(c(self$edges$from, self$edges$to))),
-      title = unique(c(self$edges$from, self$edges$to))
-    )
+      new_segment
+    },
 
-    self$nodes$.source <- self$nodes$id %in% self$edges[self$edges$.source, "to"]
-    self$nodes$.recipe <- self$nodes$id %in% self$edges[self$edges$.recipe, "to"]
-    self$nodes$.pkg <- self$nodes$id %in% self$edges[self$edges$.pkg, "from"]
-    self$style_nodes()
+    #' @description Update out-of-dateness
+    #' @return `self`
+    out_of_date = function() {
+      edges <- self$edges
+      nodes <- self$nodes
 
-    # Convert edges back to factor
-    self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
-    self$edges$to <- factor(self$edges$to, levels = levels(self$nodes$id))
-
-    self$out_of_date()
-
-    invisible(self)
-  },
-
-  #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
-  #'   call
-  #' @param recipe A character vector containing a deparsed expression, which
-  #'   would make the `targets` if evaluated.
-  #' @param targets A character vector of paths to files
-  #' @param dependencies A character vector of paths to files which the
-  #'   `targets` depend on
-  #' @param packages A character vector of names of packages which `targets`
-  #'   depend on
-  #' @return `self`
-  add_recipe_segment = function(recipe, targets, dependencies, packages) {
-    stopifnot(is.character(dependencies))
-    stopifnot(is.character(recipe))
-    stopifnot(is.character(targets))
-    stopifnot(is.character(packages) | is.null(packages))
-
-    # Construct new edges
-    new_edges <- rbind(
-      expand.grid(
-        from = dependencies,
-        to = recipe,
-        arrows = "to",
-        .source = TRUE,
-        .recipe = TRUE,
-        .pkg = FALSE,
-        .outdated = FALSE,
-        stringsAsFactors = FALSE
-      ),
-      expand.grid(
-        from = recipe,
-        to = targets,
-        arrows = "to",
-        .source = FALSE,
-        .recipe = FALSE,
-        .pkg = FALSE,
-        .outdated = FALSE,
-        stringsAsFactors = FALSE
+      # Out of date?
+      edges$from_mtime <- file.mtime(as.character(edges$from))
+      edges$to_mtime <- file.mtime(as.character(edges$to))
+      edges$.outdated <- ifelse(
+        edges$.source,
+        FALSE,
+        edges$from_mtime > edges$to_mtime
       )
-    )
 
-    if (length(packages) > 0) {
-      new_edges <- rbind(
-        expand.grid(
-          from = packages,
-          to = recipe,
-          arrows = "to",
-          .source = TRUE,
-          .recipe = FALSE,
-          .pkg = TRUE,
-          .outdated = FALSE,
-          stringsAsFactors = FALSE
-        ),
-        new_edges
+      # Propagate out-of-dateness
+      for (i in seq_along(edges$to)) {
+        if (edges$.source[i]) next
+        edges$.outdated[i] <- propagate_outofdateness(edges$to[i], edges)
+      }
+
+      edges <- edges[, c("from", "to", "arrows", ".source", ".recipe", ".pkg", ".outdated")]
+
+      nodes$group <- ifelse(
+        nodes$id %in% edges[edges$.outdated, "to"],
+        "Out-of-date",
+        "Up-to-date"
       )
+      nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
+
+      self$nodes <- nodes
+      self$edges <- edges
+      invisible(self)
+    },
+
+    #' @description Display pipeline
+    #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+    #'   `visNetwork::visNetwork()`
+    #' @return `self`
+    print = function(...) {
+      self$out_of_date()
+      out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
+      print(out)
+      invisible(self)
+    },
+
+    #' @description Save pipeline
+    #' @param file File to save HTML into
+    #' @param selfcontained Whether to save the HTML as a single self-contained
+    #'   file (with external resources base64 encoded) or a file with external
+    #'   resources placed in an adjacent directory.
+    #' @param background Text string giving the html background color of the
+    #'   widget. Defaults to white.
+    #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+    #'   `visNetwork::visNetwork()`
+    #' @return `self`
+    save = function(file, selfcontained = TRUE, background = "white", ...) {
+      self$out_of_date()
+      out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
+      visNetwork::visSave(out, file, selfcontained, background)
+      invisible(self)
     }
-
-    # Convert old edges to character and bind
-    self$edges$from <- as.character(self$edges$from)
-    self$edges$to <- as.character(self$edges$to)
-    self$edges <- rbind(self$edges, new_edges)
-
-    # Regenerate nodes using edges
-    self$nodes <- data.frame(
-      id = factor(unique(c(self$edges$from, self$edges$to))),
-      title = unique(c(self$edges$from, self$edges$to))
-    )
-
-    self$nodes$.source <- self$nodes$id %in% self$edges[self$edges$.source, "to"]
-    self$nodes$.recipe <- self$nodes$id %in% self$edges[self$edges$.recipe, "to"]
-    self$nodes$.pkg <- self$nodes$id %in% self$edges[self$edges$.pkg, "from"]
-    self$style_nodes()
-
-    # Convert edges back to factor
-    self$edges$from <- factor(self$edges$from, levels = levels(self$nodes$id))
-    self$edges$to <- factor(self$edges$to, levels = levels(self$nodes$id))
-    self$out_of_date()
-
-    invisible(self)
-  },
-
-  #' @description Style pipeline nodes
-  #' @return `self`
-  out_of_date = function() {
-    edges <- self$edges
-
-    # Out of date?
-    edges$from_mtime <- file.mtime(as.character(edges$from))
-    edges$to_mtime <- file.mtime(as.character(edges$to))
-    edges$.outdated <- ifelse(
-      edges$.source,
-      FALSE,
-      edges$from_mtime > edges$to_mtime
-    )
-
-    # Propagate out-of-dateness
-    for (i in seq_along(edges$to)) {
-      if (edges$.source[i]) next
-      edges$.outdated[i] <- propagate_outofdateness(edges$to[i], edges)
-    }
-
-    edges <- edges[, c("from", "to", "arrows", ".source", ".recipe", ".pkg", ".outdated")]
-    self$edges <- edges
-    invisible(self)
-  },
-
-  #' @description Style pipeline nodes
-  #' @return `self`
-  style_nodes = function() {
-    nodes <- self$nodes
-    edges <- self$edges
-
-    # Update out-of-dateness
-    self$out_of_date()
-
-    # Group
-    nodes$group <- ifelse(
-      nodes$id %in% edges[edges$.outdated, "to"], "Out-of-date", "Up-to-date"
-    )
-    nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
-
-    # Aesthetics
-    nodes$shape <- ifelse(nodes$.recipe, "circle", "square")
-    nodes$shape <- ifelse(nodes$.pkg, "triangle", nodes$shape)
-
-    # Label
-    if (is.null(nodes$label)) {
-      lbl <- basename(as.character(nodes$id))
-      nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
-    }
-
-    self$nodes <- nodes
-    invisible(self)
-  },
-
-  #' @description Display pipeline
-  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
-  #'   `visNetwork::visNetwork()`
-  #' @return `self`
-  print = function(...) {
-    self$style_nodes()
-    out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
-    print(out)
-    invisible(self)
-  },
-
-  #' @description Save pipeline
-  #' @param file File to save HTML into
-  #' @param selfcontained Whether to save the HTML as a single self-contained
-  #'   file (with external resources base64 encoded) or a file with external
-  #'   resources placed in an adjacent directory.
-  #' @param background Text string giving the html background color of the
-  #'   widget. Defaults to white.
-  #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
-  #'   `visNetwork::visNetwork()`
-  #' @return `self`
-  save = function(file, selfcontained = TRUE, background = "white", ...) {
-    self$style_nodes()
-    out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
-    visNetwork::visSave(out, file, selfcontained, background)
-    invisible(self)
-  }
-))
+  )
+)
 
 # Accessors --------------------------------------------------------------------
 
@@ -325,7 +259,6 @@ set_pipeline <- function(pipeline) {
 #' @export
 get_pipeline <- function() {
   pipe <- makepipe_env$pipeline
-  if (!is.null(pipe)) pipe$style_nodes() # Refresh
   pipe
 }
 
@@ -420,7 +353,7 @@ propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
 }
 
 
-
+## Network ---------------------------------------------------------------------
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
   out <- visNetwork::visNetwork(nodes = nodes, edges = edges, ...)
