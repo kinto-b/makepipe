@@ -77,7 +77,7 @@ Segment <- R6::R6Class("Segment",
       self$targets <- targets
       self$dependencies <- dependencies
       self$packages <- packages
-      self$envir <- rlang::env_clone(envir)
+      self$envir <- envir
       self$executed <- executed
       self$result <- result
       self$execution_time <- execution_time
@@ -101,7 +101,7 @@ Segment <- R6::R6Class("Segment",
       cli::cat_bullet("Executed: ", self$executed)
       if (self$executed) cli::cat_bullet("Execution time: ", format(self$execution_time))
       if (self$executed) cli::cat_bullet(private$result_txt)
-      cli::cat_bullet("Environment: ", tolower(rlang::env_label(self$envir)))
+      cli::cat_bullet("Environment: ", env_name(self$envir))
     },
 
     #' @description Update the Segment with new execution information
@@ -173,7 +173,7 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, recipe, targets, dependencies, packages, envir,
                           executed, result, execution_time) {
-      if (!rlang::is_expression(recipe)) stop("`recipe` must be an expression", call. = FALSE)
+      if (!is.language(recipe)) stop("`recipe` must be an expression", call. = FALSE)
       super$initialize(id, targets, dependencies, packages, envir, executed, result, execution_time)
 
       instructions_txt <- paste(deparse(recipe), collapse = "\n")
@@ -211,9 +211,6 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
       }
       outdated <- out_of_date(self$targets, self$dependencies, self$packages)
 
-      # Prepare fresh execution environment so we don't clutter existing environment
-      envir <- rlang::env_clone(self$envir)
-
       if (outdated) {
         if (!quiet) {
           cli::cli_process_start(
@@ -225,7 +222,7 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
         }
 
         execution_time <- Sys.time()
-        out <- eval(self$recipe, envir = envir, ...)
+        out <- eval(self$recipe, envir = self$envir, ...)
         execution_time <- Sys.time() - execution_time
 
         if (!quiet) cli::cli_process_done()
@@ -320,9 +317,8 @@ SegmentSource <- R6::R6Class("SegmentSource",
        outdated <- out_of_date(self$targets, c(self$dependencies, self$source), self$packages)
 
        # Prepare fresh execution environment so we don't clutter existing environment
-       envir <- rlang::env_clone(self$envir)
        register_env <- new.env(parent = emptyenv())
-       assign("__makepipe_register__", register_env, envir)
+       assign("__makepipe_register__", register_env, self$envir)
 
        if (outdated) {
          if (!quiet) {
@@ -335,7 +331,7 @@ SegmentSource <- R6::R6Class("SegmentSource",
          }
 
          execution_time <- Sys.time()
-         source(self$source, local = envir, ...)
+         source(self$source, local = self$envir, ...)
          execution_time <- Sys.time() - execution_time
 
          if (!quiet) cli::cli_process_done()
@@ -361,6 +357,16 @@ SegmentSource <- R6::R6Class("SegmentSource",
 
 # Internal ---------------------------------------------------------------------
 
+#' Create edges
+#'
+#' @param from A character vector of nodes
+#' @param to A character vector of nodes
+#' @param .source Either TRUE or FALSE
+#' @param .recipe Either TRUE or FALSE
+#' @param .pkg Either TRUE or FALSE
+#'
+#' @return A data.frame defining edges from all nodes in `from` to all nodes in
+#'   `to`.
 #' @noRd
 new_edge <- function(from, to, .source, .recipe, .pkg) {
   lvls <- levels(factor(c(from, to)))
@@ -374,4 +380,27 @@ new_edge <- function(from, to, .source, .recipe, .pkg) {
     .outdated = FALSE,
     stringsAsFactors = FALSE
   )
+}
+
+
+#' Get an environment's name
+#'
+#' @param x An environment
+#'
+#' @return A character vector
+#' @noRd
+env_name <- function(x) {
+  stopifnot(is.environment(x))
+  env_name <- environmentName(x)
+  if (env_name == "") {
+    env_name <- utils::capture.output(print(x))
+    env_name <- regmatches(
+      env_name,
+      regexec("<environment: (.*)>", text = env_name)
+    )
+
+    env_name <- env_name[[1]][2]
+  }
+
+  env_name
 }

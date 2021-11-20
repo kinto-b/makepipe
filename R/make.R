@@ -124,7 +124,7 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
   targets <- unique(targets)
   dependencies <- unique(dependencies)
   packages <- unique(packages)
-  recipe <- rlang::enexpr(recipe)
+  recipe <- substitute(recipe)
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
