@@ -1,3 +1,6 @@
+
+# Source -----------------------------------------------------------------------
+
 #' Make targets out of dependencies using a source file
 #'
 #' @inheritParams make_params
@@ -44,56 +47,21 @@
 make_with_source <- function(source, targets, dependencies, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
-  stopifnot(is.character(source))
-  targets <- unique(targets)
-  dependencies <- unique(dependencies)
-  packages <- unique(packages)
-  if (any(targets %in% source)) {
-    stop("`source` must not be among the `targets`", call. = FALSE)
-  }
-  if (any(targets %in% dependencies)) {
-    stop("`dependencies` must not be among the `targets`", call. = FALSE)
-  }
-
-  outdated <- out_of_date(targets, c(dependencies, source), packages = packages)
-
-  # Update pipeline
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
   segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir)
-
-  # Prepare register
-  register_env <- new.env(parent = emptyenv())
-  assign("__makepipe_register__", register_env, envir)
-
-  # Execute
-  if (outdated) {
-    if (!quiet) {
-      cli::cli_process_start(
-        "Targets are out of date. Updating...",
-        msg_done = "Finished updating",
-        msg_failed = "Something went wrong"
-      )
-      cli::cat_line()
-    }
-
-    execution_time <- Sys.time()
-    source(source, local = envir, ...)
-    execution_time <- Sys.time() - execution_time
-
-    if (!quiet) cli::cli_process_done()
-  } else {
-    execution_time <- NULL
-    if (!quiet) cli::cli_alert_success("Targets are up to date")
-  }
-
-  out <- segment$update_result(outdated, execution_time, register_env)
+  out <- segment$execute(quiet = quiet)
 
   invisible(out)
 }
+
+
+
+
+# Recipe -----------------------------------------------------------------------
 
 
 #' Make targets out of dependencies using a recipe
@@ -158,47 +126,13 @@ make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
   packages <- unique(packages)
   recipe <- rlang::enexpr(recipe)
 
-  if (any(targets %in% dependencies)) {
-    stop("`dependencies` must not be among the `targets`", call. = FALSE)
-  }
-
-  .make_with_recipe(recipe, targets, dependencies, packages, envir, quiet, ...)
-}
-
-#' @noRd
-.make_with_recipe <- function(recipe, targets, dependencies, packages,
-                              envir, quiet, ...) {
-  outdated <- out_of_date(targets, c(dependencies), packages = packages)
-
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
   segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir)
-
-  if (outdated) {
-    if (!quiet) {
-      cli::cli_process_start(
-        "Targets are out of date. Updating...",
-        msg_done = "Finished updating",
-        msg_failed = "Something went wrong"
-      )
-      cli::cat_line()
-    }
-
-    execution_time <- Sys.time()
-    out <- eval(recipe, envir = envir, ...)
-    execution_time <- Sys.time() - execution_time
-
-    if (!quiet) cli::cli_process_done()
-  } else {
-    execution_time <- NULL
-    if (!quiet) cli::cli_alert_success("Targets are up to date")
-    out <- NULL
-  }
-
-  out <- segment$update_result(outdated, execution_time, out)
+  out <- segment$execute(quiet = quiet)
 
   invisible(out)
 }

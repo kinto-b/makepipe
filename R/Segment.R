@@ -55,6 +55,20 @@ Segment <- R6::R6Class("Segment",
       stopifnot("`envir` must be an environment" = is.environment(envir))
       stopifnot("`executed` must be logical" = is.logical(executed))
       stopifnot("`execution_time` must be difftime" = inherits(execution_time, "difftime") | is.null(execution_time))
+      find.package(packages) # Error if package cannot be found
+
+      miss_deps <- !file.exists(dependencies)
+      if (any(miss_deps)) {
+        stop('One or more `dependencies` do not exist: ', dependencies[miss_deps])
+      }
+
+      if (any(targets %in% dependencies)) {
+        stop("`dependencies` must not be among the `targets`", call. = FALSE)
+      }
+
+      targets <- unique(targets)
+      dependencies <- unique(dependencies)
+      packages <- unique(packages)
 
       private$id <- as.integer(id)
 
@@ -186,6 +200,42 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     update_result = function(executed, execution_time, result) {
       private$result_txt <- ifelse(is.null(result), "Result: 0 object(s)", "Result: 1 object(s)")
       super$update_result(executed, execution_time, result)
+    },
+
+    execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
+      if (!is.null(envir)) {
+        stopifnot("`envir` must be an environment" = is.environment(envir))
+        self$envir <- envir
+      }
+      outdated <- out_of_date(self$targets, self$dependencies, self$packages)
+
+      # Prepare fresh execution environment so we don't clutter existing environment
+      envir <- rlang::env_clone(self$envir)
+
+      if (outdated) {
+        if (!quiet) {
+          cli::cli_process_start(
+            "Targets are out of date. Updating...",
+            msg_done = "Finished updating",
+            msg_failed = "Something went wrong"
+          )
+          cli::cat_line()
+        }
+
+        execution_time <- Sys.time()
+        out <- eval(self$recipe, envir = envir, ...)
+        execution_time <- Sys.time() - execution_time
+
+        if (!quiet) cli::cli_process_done()
+      } else {
+        execution_time <- NULL
+        if (!quiet) cli::cli_alert_success("Targets are up to date")
+        out <- NULL
+      }
+
+      self$update_result(outdated, execution_time, out)
+
+      invisible(self)
     }
   ),
   active = list(
@@ -231,6 +281,11 @@ SegmentSource <- R6::R6Class("SegmentSource",
      initialize = function(id, source, targets, dependencies, packages, envir,
                            executed, result, execution_time) {
        stopifnot("`source` must be character" = is.character(source))
+       stopifnot("`source` does not exist" = file.exists(source))
+       if (any(targets %in% source)) {
+         stop("`source` must not be among the `targets`", call. = FALSE)
+       }
+
        super$initialize(id, targets, dependencies, packages, envir, executed, result, execution_time)
 
        private$instructions_txt <- paste0("Source: '", source, "'")
@@ -253,6 +308,43 @@ SegmentSource <- R6::R6Class("SegmentSource",
      update_result = function(executed, execution_time, result) {
        private$result_txt <- paste0("Result: ", length(result), " object(s)")
        super$update_result(executed, execution_time, result)
+     },
+
+     execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
+       if (!is.null(envir)) {
+         stopifnot("`envir` must be an environment" = is.environment(envir))
+         self$envir <- envir
+       }
+       outdated <- out_of_date(self$targets, c(self$dependencies, self$source), self$packages)
+
+       # Prepare fresh execution environment so we don't clutter existing environment
+       envir <- rlang::env_clone(self$envir)
+       register_env <- new.env(parent = emptyenv())
+       assign("__makepipe_register__", register_env, envir)
+
+       if (outdated) {
+         if (!quiet) {
+           cli::cli_process_start(
+             "Targets are out of date. Updating...",
+             msg_done = "Finished updating",
+             msg_failed = "Something went wrong"
+           )
+           cli::cat_line()
+         }
+
+         execution_time <- Sys.time()
+         source(self$source, local = envir, ...)
+         execution_time <- Sys.time() - execution_time
+
+         if (!quiet) cli::cli_process_done()
+       } else {
+         execution_time <- NULL
+         if (!quiet) cli::cli_alert_success("Targets are up to date")
+       }
+
+       self$update_result(outdated, execution_time, register_env)
+
+       invisible(self)
      }
    ),
    active = list(
