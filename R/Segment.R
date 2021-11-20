@@ -48,18 +48,20 @@ Segment <- R6::R6Class("Segment",
     #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, targets, dependencies, packages, envir,
                           executed, result, execution_time) {
-      stopifnot("`id` must be numeric" = is.numeric(id))
-      stopifnot("`targets` must be character" = is.character(targets))
-      stopifnot("`dependencies` must be character" = is.character(dependencies))
-      stopifnot("`packages` must be character" = is.character(packages) | is.null(packages))
-      stopifnot("`envir` must be an environment" = is.environment(envir))
-      stopifnot("`executed` must be logical" = is.logical(executed))
-      stopifnot("`execution_time` must be difftime" = inherits(execution_time, "difftime") | is.null(execution_time))
+      if (!is.integer(id)) stopifnot_class(id, "numeric")
+      stopifnot_class(targets, "character")
+      stopifnot_class(dependencies, "character")
+      if (!is.null(packages)) stopifnot_class(packages, "character")
+      stopifnot_class(envir, "environment")
+      stopifnot_class(executed, "logical")
+      if (!is.null(execution_time)) stopifnot_class(execution_time, "difftime")
+
       find.package(packages) # Error if package cannot be found
 
       miss_deps <- !file.exists(dependencies)
       if (any(miss_deps)) {
-        stop('One or more `dependencies` do not exist: ', dependencies[miss_deps])
+        stop('One or more `dependencies` do not exist: ', dependencies[miss_deps],
+             call. = FALSE)
       }
 
       if (any(targets %in% dependencies)) {
@@ -107,8 +109,8 @@ Segment <- R6::R6Class("Segment",
     #' @param execution_time A difftime, the time taken to execute the instructions
     #' @param result An object, whatever is returned by executing the instructions
     update_result = function(executed, execution_time, result) {
-      stopifnot("`executed` must be logical" = is.logical(executed))
-      stopifnot("`execution_time` must be difftime" = inherits(execution_time, "difftime") | is.null(execution_time))
+      stopifnot_class(executed, "logical")
+      if (!is.null(execution_time)) stopifnot_class(execution_time, "difftime")
       self$executed <- executed
       self$result <- result
       self$execution_time <- execution_time
@@ -171,7 +173,7 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, recipe, targets, dependencies, packages, envir,
                           executed, result, execution_time) {
-      stopifnot("`recipe` must be an expression" = rlang::is_expression(recipe))
+      if (!rlang::is_expression(recipe)) stop("`recipe` must be an expression", call. = FALSE)
       super$initialize(id, targets, dependencies, packages, envir, executed, result, execution_time)
 
       instructions_txt <- paste(deparse(recipe), collapse = "\n")
@@ -204,7 +206,7 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
 
     execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
       if (!is.null(envir)) {
-        stopifnot("`envir` must be an environment" = is.environment(envir))
+        stopifnot_class(envir, "environment")
         self$envir <- envir
       }
       outdated <- out_of_date(self$targets, self$dependencies, self$packages)
@@ -280,8 +282,8 @@ SegmentSource <- R6::R6Class("SegmentSource",
      #' @param execution_time A difftime, the time taken to execute the instructions
      initialize = function(id, source, targets, dependencies, packages, envir,
                            executed, result, execution_time) {
-       stopifnot("`source` must be character" = is.character(source))
-       stopifnot("`source` does not exist" = file.exists(source))
+       stopifnot_class(source, "character")
+       if (!file.exists(source)) stop("`source` does not exist", call. = FALSE)
        if (any(targets %in% source)) {
          stop("`source` must not be among the `targets`", call. = FALSE)
        }
@@ -312,7 +314,7 @@ SegmentSource <- R6::R6Class("SegmentSource",
 
      execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
        if (!is.null(envir)) {
-         stopifnot("`envir` must be an environment" = is.environment(envir))
+         stopifnot_class(envir, "environment")
          self$envir <- envir
        }
        outdated <- out_of_date(self$targets, c(self$dependencies, self$source), self$packages)

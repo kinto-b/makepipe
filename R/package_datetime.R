@@ -13,7 +13,7 @@
 #'
 #' package_datetime(c("utils", "makepipe"))
 package_datetime <- function(package) {
-  stopifnot(is.character(package))
+  stopifnot_class(package, "character")
   out <- vapply(
     package,
     function(pkg) as.numeric(package_description_mtime(pkg)),
@@ -24,7 +24,7 @@ package_datetime <- function(package) {
 }
 
 package_description_mtime <- function(package) {
-  stopifnot(is.character(package))
+  stopifnot_class(package, "character")
   desc_loc <- paste0(find.package(package), "/DESCRIPTION")
   file.mtime(desc_loc)
 }

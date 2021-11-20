@@ -206,7 +206,7 @@ test_that("annotations cannot must be character", {
   expect_error(pipe$annotate(
     tooltips = tooltips,
     labels = NULL
-  ), regexp = "is.character")
+  ), regexp = "must be of class character")
 })
 
 

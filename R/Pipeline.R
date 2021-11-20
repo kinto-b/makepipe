@@ -389,13 +389,13 @@ pipeline_network <- function(nodes, edges, ...) {
 
 #' @noRd
 validate_annotation <- function(x, x_name, nodes) {
-  stopifnot(is.character(x))
+  stopifnot_class(x, "character")
   if (!identical(length(names(x)), length(x))) {
     stop("`", x_name, "` must be named", call. = FALSE)
   }
 
   if (any(duplicated(names(x)))) {
-    stop("names of `", x_name, "` must not be duplicated")
+    stop("names of `", x_name, "` must not be duplicated", call. = FALSE)
   }
 
   bad_nodes <- setdiff(names(x), as.character(nodes$id))
