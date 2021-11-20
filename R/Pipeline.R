@@ -14,10 +14,35 @@
 #' @importFrom R6 R6Class
 Pipeline <- R6::R6Class(classname = "Pipeline",
   private = list(
+    #' @field edges A data frame
+    edges = data.frame(
+      from = factor(),
+      to = factor(),
+      arrows = character(0),
+      .source = logical(0),
+      .recipe = logical(0),
+      .pkg = logical(0),
+      .outdated = logical(0),
+      stringsAsFactors = FALSE
+    ),
+
+    #' @field nodes A data frame
+    nodes = data.frame(
+      id = factor(),
+      label = character(0),
+      title = character(0),
+      shape = character(0),
+      group = character(0),
+      .source = logical(0),
+      .recipe = logical(0),
+      .pkg = logical(0),
+      stringsAsFactors = FALSE
+    ),
+
     #' @description Add an edge to `edges`
     #' @param new_edge An data.frame constructed with `new_edge()`
     add_edge = function(new_edge) {
-      edges <- self$edges
+      edges <- private$edges
 
       # Relevel
       lvls <- levels(c(edges$from, edges$to, new_edge$from, new_edge$to))
@@ -27,16 +52,16 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       new_edge$to <- factor(new_edge$to, lvls)
 
       # Combine
-      self$edges <- rbind(edges, new_edge)
+      private$edges <- rbind(edges, new_edge)
 
       invisible(self)
     },
 
-    #' @description Add any nodes in `self$edges` that are missing from
-    #'   `self$nodes` into `self$nodes`
+    #' @description Add any nodes in `private$edges` that are missing from
+    #'   `private$nodes` into `private$nodes`
     refresh_nodes = function() {
-      edges <- self$edges
-      nodes <- self$nodes
+      edges <- private$edges
+      nodes <- private$nodes
 
       # Relevel
       lvls <- levels(c(edges$from, edges$to))
@@ -66,7 +91,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       new_nodes$label <- ifelse(new_nodes$.recipe, "Recipe", lbl)
 
       # Combine
-      self$nodes <- rbind(nodes, new_nodes)
+      private$nodes <- rbind(nodes, new_nodes)
 
       invisible(self)
     }
@@ -74,31 +99,6 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
   public = list(
     #' @field segments A list of `Segment` objects
     segments = NULL,
-
-    #' @field edges A data frame
-    edges = data.frame(
-      from = factor(),
-      to = factor(),
-      arrows = character(0),
-      .source = logical(0),
-      .recipe = logical(0),
-      .pkg = logical(0),
-      .outdated = logical(0),
-      stringsAsFactors = FALSE
-    ),
-
-    #' @field nodes A data frame
-    nodes = data.frame(
-      id = factor(),
-      label = character(0),
-      title = character(0),
-      shape = character(0),
-      group = character(0),
-      .source = logical(0),
-      .recipe = logical(0),
-      .pkg = logical(0),
-      stringsAsFactors = FALSE
-    ),
 
     #' @description Add a pipeline segment corresponding to a `make_with_source()`
     #'   call
@@ -154,8 +154,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @description Update out-of-dateness
     #' @return `self`
     out_of_date = function() {
-      edges <- self$edges
-      nodes <- self$nodes
+      edges <- private$edges
+      nodes <- private$nodes
 
       # Out of date?
       edges$from_mtime <- file.mtime(as.character(edges$from))
@@ -181,8 +181,29 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       )
       nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
 
-      self$nodes <- nodes
-      self$edges <- edges
+      private$nodes <- nodes
+      private$edges <- edges
+      invisible(self)
+    },
+
+    #' @description Apply annotations to Pipeline
+    #' @param tooltips A named character vector mapping nodes in the `Pipeline` onto
+    #'   tooltips to display on hover-over.
+    #' @param labels A named character vector mapping nodes in the `Pipeline` onto
+    #'   labels to display beside them.
+    annotate = function(tooltips, labels) {
+      if (!is.null(tooltips)) {
+        validate_annotation(tooltips, "tooltips", private$nodes)
+        new_nodes <- apply_annotations(private$nodes, tooltips, "title")
+        private$nodes <- new_nodes
+      }
+
+      if (!is.null(labels)) {
+        validate_annotation(labels, "labels", private$nodes)
+        new_nodes <- apply_annotations(private$nodes, labels, "label")
+        private$nodes <- new_nodes
+      }
+
       invisible(self)
     },
 
@@ -192,7 +213,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @return `self`
     print = function(...) {
       self$out_of_date()
-      out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
+      out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
       invisible(self)
     },
@@ -209,7 +230,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @return `self`
     save = function(file, selfcontained = TRUE, background = "white", ...) {
       self$out_of_date()
-      out <- pipeline_network(nodes = self$nodes, edges = self$edges, ...)
+      out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
       invisible(self)
     }
@@ -315,14 +336,14 @@ NULL
 #' @rdname pipeline-vis
 #' @export
 show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
-  pipeline <- annotate_pipeline(pipeline, tooltips, labels)
+  pipeline$annotate(tooltips, labels)
   pipeline$print()
 }
 
 #' @rdname pipeline-vis
 #' @export
 save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, selfcontained = TRUE, background = "white", ...) {
-  pipeline <- annotate_pipeline(pipeline, tooltips, labels)
+  pipeline$annotate(tooltips, labels)
   pipeline$save(file, ...)
 }
 
@@ -367,28 +388,7 @@ pipeline_network <- function(nodes, edges, ...) {
 }
 
 #' @noRd
-annotate_pipeline <- function(pipeline, tooltips, labels) {
-  if (!is_pipeline(pipeline)) stop("`pipeline` must be a Pipeline object", call. = FALSE)
-
-  if (!is.null(tooltips)) {
-    validate_annotation(pipeline, tooltips, "tooltips")
-    pipeline <- pipeline$clone(deep = TRUE)
-    new_nodes <- apply_annotations(pipeline$nodes, tooltips, "title")
-    pipeline$nodes <- new_nodes
-  }
-
-  if (!is.null(labels)) {
-    validate_annotation(pipeline, labels, "labels")
-    pipeline <- pipeline$clone(deep = TRUE)
-    new_nodes <- apply_annotations(pipeline$nodes, labels, "label")
-    pipeline$nodes <- new_nodes
-  }
-
-  pipeline
-}
-
-#' @noRd
-validate_annotation <- function(pipeline, x, x_name) {
+validate_annotation <- function(x, x_name, nodes) {
   stopifnot(is.character(x))
   if (!identical(length(names(x)), length(x))) {
     stop("`", x_name, "` must be named", call. = FALSE)
@@ -398,11 +398,11 @@ validate_annotation <- function(pipeline, x, x_name) {
     stop("names of `", x_name, "` must not be duplicated")
   }
 
-  bad_nodes <- setdiff(names(x), as.character(pipeline$nodes$id))
+  bad_nodes <- setdiff(names(x), as.character(nodes$id))
   if (length(bad_nodes) > 0) {
     stop(
       "`", paste(bad_nodes, collapse = "`, "), "` ",
-      "are not nodes in `pipeline`", call. = FALSE
+      "are not nodes in `Pipeline`", call. = FALSE
     )
   }
 
