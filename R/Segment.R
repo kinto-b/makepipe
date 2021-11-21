@@ -134,7 +134,20 @@ Segment <- R6::R6Class("Segment",
         )
       }
 
-      edges$id <- self$id
+      edges$.segment_id <- private$id
+
+      dependencies <- self$dependencies
+      if (!is_recipe) dependencies <- c(dependencies, self$source)
+      if (any(!file.exists(dependencies))) {
+        # Sometimes the dependencies of one segment of the pipeline are the
+        # targets are the targets of a previous segment. In this case, if the
+        # dependency doesn't exist, it will be rebuilt and hence be newer than
+        # the existing targets therefore making the targets out-of-date
+        edges$.outdated <- TRUE
+      } else {
+        edges$.outdated <- out_of_date(self$targets, dependencies, self$packages)
+      }
+      edges$.outdated[edges$.source] <- FALSE # If not a target, then up to date
 
       edges
     }
@@ -204,6 +217,12 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
       super$update_result(executed, execution_time, result)
     },
 
+    #' @description Execute the Segment
+    #' @param envir The environment in which to execute the `source` or `recipe`. By
+    #'   default, execution will take place in a fresh environment whose parent is
+    #'   the calling environment.
+    #' @param quiet A logical determining whether or not messages are signaled
+    #' @param ... Additional parameters to pass to `base::eval()`
     execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
       if (!is.null(envir)) {
         stopifnot_class(envir, "environment")
@@ -309,6 +328,12 @@ SegmentSource <- R6::R6Class("SegmentSource",
        super$update_result(executed, execution_time, result)
      },
 
+     #' @description Execute the Segment
+     #' @param envir The environment in which to execute the `source` or `recipe`. By
+     #'   default, execution will take place in a fresh environment whose parent is
+     #'   the calling environment.
+     #' @param quiet A logical determining whether or not messages are signaled
+     #' @param ... Additional parameters to pass to `base::source()`
      execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
        if (!is.null(envir)) {
          stopifnot_class(envir, "environment")

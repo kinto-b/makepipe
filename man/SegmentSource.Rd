@@ -38,6 +38,7 @@ Other segment:
 \item \href{#method-new}{\code{SegmentSource$new()}}
 \item \href{#method-print}{\code{SegmentSource$print()}}
 \item \href{#method-update_result}{\code{SegmentSource$update_result()}}
+\item \href{#method-execute}{\code{SegmentSource$execute()}}
 \item \href{#method-clone}{\code{SegmentSource$clone()}}
 }
 }
@@ -119,6 +120,29 @@ Update the Segment with new execution information
 \item{\code{execution_time}}{A difftime, the time taken to execute the instructions}
 
 \item{\code{result}}{An object, whatever is returned by executing the instructions}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-execute"></a>}}
+\if{latex}{\out{\hypertarget{method-execute}{}}}
+\subsection{Method \code{execute()}}{
+Execute the Segment
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SegmentSource$execute(envir = NULL, quiet = getOption("makepipe.quiet"), ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}. By
+default, execution will take place in a fresh environment whose parent is
+the calling environment.}
+
+\item{\code{quiet}}{A logical determining whether or not messages are signaled}
+
+\item{\code{...}}{Additional parameters to pass to \code{base::source()}}
 }
 \if{html}{\out{</div>}}
 }

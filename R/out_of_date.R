@@ -16,7 +16,7 @@ out_of_date <- function(targets, dependencies, packages = NULL) {
   outdated <- any(unlist(lapply(targets, function(fp_x) {
     unlist(lapply(dependencies, function(fp_y) {
       # Target x older than dependency y?
-      if (!file.exists(fp_y)) stop("{fp_y} does not exist", call. = FALSE)
+      if (!file.exists(fp_y)) stop('One or more `dependencies` do not exist: ', fp_y, call. = FALSE)
       if (!file.exists(fp_x)) {
         return(TRUE)
       }

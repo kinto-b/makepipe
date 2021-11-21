@@ -25,7 +25,7 @@ PipelineTest <- R6::R6Class(
       private$nodes
     },
     is_outdated = function(node) {
-      self$out_of_date()
+      self$refresh()
       node %in% private$edges[private$edges$.outdated, "to"]
     }
   )
@@ -209,6 +209,26 @@ test_that("annotations cannot must be character", {
   ), regexp = "must be of class character")
 })
 
+
+# Clean and build --------------------------------------------------------------
+
+test_that("cleaning triggers rebuild", {
+  set_pipeline(PipelineTest$new())
+
+  make_with_recipe({
+    mt <- read.csv(dependency, check.names = FALSE)
+    write.csv(mt, target1, row.names = FALSE)
+  }, target1, dependency, quiet = TRUE)
+
+  make_with_recipe({
+    mt <- read.csv(target1)
+    write.table(mt, target2, sep = "|")
+  }, target2, target1, quiet = TRUE)
+
+  pipe <- get_pipeline()
+  pipe$clean()
+  expect_snapshot(pipe$build())
+})
 
 # Unlink ------------------------------------------------------------------
 

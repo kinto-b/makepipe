@@ -14,19 +14,17 @@
 #' @importFrom R6 R6Class
 Pipeline <- R6::R6Class(classname = "Pipeline",
   private = list(
-    #' @field edges A data frame
     edges = data.frame(
       from = factor(),
       to = factor(),
       arrows = character(0),
+      .segment_id = integer(0),
       .source = logical(0),
       .recipe = logical(0),
       .pkg = logical(0),
       .outdated = logical(0),
       stringsAsFactors = FALSE
     ),
-
-    #' @field nodes A data frame
     nodes = data.frame(
       id = factor(),
       label = character(0),
@@ -70,29 +68,54 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       # Build new nodes
       all_ids <- c(edges$from, edges$to)
       new_ids <- factor(setdiff(all_ids, nodes$id), lvls)
-      if (length(new_ids) == 0) return(invisible(self))
+      if (length(new_ids) > 0) {
+        new_nodes <- data.frame(
+          id = new_ids,
+          label = "",
+          title = as.character(new_ids),
+          shape = "",
+          group = "",
+          .source = new_ids %in% edges[edges$.source, "to"],
+          .recipe = new_ids %in% edges[edges$.recipe, "to"],
+          .pkg = new_ids %in% edges[edges$.pkg, "from"]
+        )
 
-      new_nodes <- data.frame(
-        id = new_ids,
-        label = "",
-        title = as.character(new_ids),
-        shape = "",
-        group = "",
-        .source = new_ids %in% edges[edges$.source, "to"],
-        .recipe = new_ids %in% edges[edges$.recipe, "to"],
-        .pkg = new_ids %in% edges[edges$.pkg, "to"]
+        # Aesthetics
+        new_nodes$shape <- ifelse(new_nodes$.recipe, "circle", "square")
+        new_nodes$shape <- ifelse(new_nodes$.pkg, "triangle", new_nodes$shape)
+
+        lbl <- basename(as.character(new_nodes$id))
+        new_nodes$label <- ifelse(new_nodes$.recipe, "Recipe", lbl)
+
+        # Combine
+        nodes <- rbind(nodes, new_nodes)
+      }
+
+      # Update out-of-dateness
+      nodes$group <- ifelse(
+        nodes$id %in% edges[edges$.outdated, "to"],
+        "Out-of-date",
+        "Up-to-date"
       )
+      nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
 
-      # Aesthetics
-      new_nodes$shape <- ifelse(new_nodes$.recipe, "circle", "square")
-      new_nodes$shape <- ifelse(new_nodes$.pkg, "triangle", new_nodes$shape)
 
-      lbl <- basename(as.character(new_nodes$id))
-      new_nodes$label <- ifelse(new_nodes$.recipe, "Recipe", lbl)
+      private$nodes <- nodes
+      invisible(self)
+    },
 
-      # Combine
-      private$nodes <- rbind(nodes, new_nodes)
+    #' @description Reconstruct Pipeline edges from Segment edges. Called
+    #'   primarily to update outofdateness
+    refresh_edges = function() {
+      edges <- lapply(self$segments, function(x) x$edges)
+      if (length(edges) == 1) {
+        edges <- edges[[1]]
+      } else {
+        edges <- do.call(rbind, edges)
+      }
+      edges <- propagate_outofdateness(edges)
 
+      private$edges <- edges
       invisible(self)
     }
   ),
@@ -120,15 +143,13 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       self$segments <- c(self$segments, new_segment)
       private$add_edge(new_segment$edges)
       private$refresh_nodes()
-      self$out_of_date()
 
       new_segment
     },
 
     #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
     #'   call
-    #' @param recipe A character vector containing a deparsed expression, which
-    #'   would make the `targets` if evaluated.
+    #' @param recipe A language object which, when evaluated, makes the `targets`
     #' @param targets A character vector of paths to files
     #' @param dependencies A character vector of paths to files which the
     #'   `targets` depend on
@@ -146,43 +167,38 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       self$segments <- c(self$segments, new_segment)
       private$add_edge(new_segment$edges)
       private$refresh_nodes()
-      self$out_of_date()
 
       new_segment
     },
 
-    #' @description Update out-of-dateness
+    #' @description Build all targets
+    #' @param quiet A logical determining whether or not messages are signaled
     #' @return `self`
-    out_of_date = function() {
-      edges <- private$edges
-      nodes <- private$nodes
-
-      # Out of date?
-      edges$from_mtime <- file.mtime(as.character(edges$from))
-      edges$to_mtime <- file.mtime(as.character(edges$to))
-      edges$.outdated <- ifelse(
-        edges$.source,
-        FALSE,
-        edges$from_mtime > edges$to_mtime
+    build = function(quiet = getOption("makepipe.quiet")) {
+      edges <- sort_topologically(private$edges)
+      executables <- edges[edges$.source, ]
+      execution_order <- vapply(
+        split(executables, executables$.segment_id),
+        function(x) max(x$level),
+        numeric(1)
       )
+      execution_order <- sort(execution_order)
 
-      # Propagate out-of-dateness
-      for (i in seq_along(edges$to)) {
-        if (edges$.source[i]) next
-        edges$.outdated[i] <- propagate_outofdateness(edges$to[i], edges)
+      for (segment_id in names(execution_order)) {
+        segment_id <- as.integer(segment_id)
+        self$segments[[segment_id]]$execute()
       }
 
-      edges <- edges[, c("from", "to", "arrows", ".source", ".recipe", ".pkg", ".outdated")]
+      invisible(self)
+    },
 
-      nodes$group <- ifelse(
-        nodes$id %in% edges[edges$.outdated, "to"],
-        "Out-of-date",
-        "Up-to-date"
-      )
-      nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
+    #' @description Clean all targets
+    #' @return `self`
+    clean = function() {
+      for (segment in self$segments) {
+        file.remove(segment$targets)
+      }
 
-      private$nodes <- nodes
-      private$edges <- edges
       invisible(self)
     },
 
@@ -207,12 +223,19 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       invisible(self)
     },
 
+    #' @description Refresh Pipeline to check outofdateness
+    refresh = function() {
+      private$refresh_edges()
+      private$refresh_nodes()
+      invisible(self)
+    },
+
     #' @description Display pipeline
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
     #' @return `self`
     print = function(...) {
-      self$out_of_date()
+      self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
       invisible(self)
@@ -229,7 +252,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #'   `visNetwork::visNetwork()`
     #' @return `self`
     save = function(file, selfcontained = TRUE, background = "white", ...) {
-      self$out_of_date()
+      self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
       invisible(self)
@@ -351,28 +374,71 @@ save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labe
 # Internal ---------------------------------------------------------------------
 
 #' @noRd
-propagate_outofdateness <- function(initial_node, edges, next_node = NULL) {
-  outdated <- FALSE
-  target_mtime <- unique(edges[edges$to == initial_node, "to_mtime"])
-  if (is.null(next_node)) next_node <- initial_node
+propagate_outofdateness <- function(edges) {
+  nodes <- c(edges$from, edges$to)
+  nodes_left <- nodes
+  edges_left <- edges
+  while(length(nodes_left)){
+    # Targets with no dependencies
+    next_targets <- setdiff(nodes_left, edges_left$to)
+    next_targets <- factor(next_targets, levels = levels(nodes))
 
-  inputs <- edges[edges$to == next_node, ]
-  for (i in seq_along(inputs$from)) {
-    outdated <- inputs$.outdated[i] | inputs$from_mtime[i] > target_mtime
-    next_node <- inputs$from[i]
+    # Step outofdateness forward
+    for (i in next_targets) {
+      dependencies <- edges[edges$to %in% i, "from"]
+      if (length(dependencies) == 0) next
+      dependency_outdated <- any((edges$to %in% dependencies) & edges$.outdated)
+      outdated <- edges[edges$to %in% i, ".outdated"] | dependency_outdated
+      edges[edges$to %in% i, ".outdated"] <- outdated
+    }
 
-    # Base case
-    if (is.na(outdated)) outdated <- FALSE
-    if (outdated) return(outdated)
-    if (next_node == initial_node) return(TRUE) # Loop detected.
-
-    # Recursive case
-    outdated <- propagate_outofdateness(initial_node, edges, next_node)
+    # Prune the graph.
+    nodes_left <- setdiff(nodes_left, next_targets)
+    edges_left <- edges_left[!(edges_left$from %in% next_targets),]
   }
 
-  outdated
+  edges[edges$.source, ".outdated"] <- FALSE
+
+  edges
 }
 
+#' Sort edges topologically
+#'
+#' This algorithm sorts edges topologically by starting with nodes without
+#' dependencies, assigning them to first level, removing them from the graph and
+#' then repeating the process. Once again, we take nodes without any
+#' dependencies left in the graph, assign them to second level. We keep going
+#' until there are no nodes left in the graph.
+#'
+#' @param edges A data.frame defining the edges
+#'
+#' @return A data.frame defining edges from all nodes in `from` to all nodes in
+#'   `to`.
+#' @noRd
+sort_topologically <- function(edges) {
+  level <- 1
+  edges$level <- NA
+  nodes <- c(edges$from, edges$to)
+
+  nodes_left <- nodes
+  edges_left <- edges
+  while(length(nodes_left)){
+    # Targets with no dependencies
+    next_targets <- setdiff(nodes_left, edges_left$to)
+    next_targets <- factor(next_targets, levels = levels(nodes))
+
+    # Assign to level
+    edges[edges$from %in% next_targets, "level"] <- level
+
+    # Prune the graph.
+    nodes_left <- setdiff(nodes_left, next_targets)
+    edges_left <- edges_left[!(edges_left$from %in% next_targets),]
+
+    level <- level + 1
+  }
+
+  edges
+}
 
 ## Network ---------------------------------------------------------------------
 #' @noRd
