@@ -43,7 +43,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       edges <- private$edges
 
       # Relevel
-      lvls <- levels(c(edges$from, edges$to, new_edge$from, new_edge$to))
+      all_ids <- unlist(list(edges$from, edges$to, new_edge$from, new_edge$to))
+      lvls <- levels(all_ids)
       edges$from <- factor(edges$from, lvls)
       edges$to <- factor(edges$to, lvls)
       new_edge$from <- factor(new_edge$from, lvls)
@@ -62,11 +63,11 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       nodes <- private$nodes
 
       # Relevel
-      lvls <- levels(c(edges$from, edges$to))
+      all_ids <- unlist(list(edges$from, edges$to))
+      lvls <- levels(all_ids)
       nodes$id <- factor(nodes$id, lvls)
 
       # Build new nodes
-      all_ids <- c(edges$from, edges$to)
       new_ids <- factor(setdiff(all_ids, nodes$id), lvls)
       if (length(new_ids) > 0) {
         new_nodes <- data.frame(
@@ -375,7 +376,7 @@ save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labe
 
 #' @noRd
 propagate_outofdateness <- function(edges) {
-  nodes <- c(edges$from, edges$to)
+  nodes <- unlist(list(edges$from, edges$to))
   nodes_left <- nodes
   edges_left <- edges
   while(length(nodes_left)){
@@ -418,7 +419,7 @@ propagate_outofdateness <- function(edges) {
 sort_topologically <- function(edges) {
   level <- 1
   edges$level <- NA
-  nodes <- c(edges$from, edges$to)
+  nodes <- unlist(list(edges$from, edges$to))
 
   nodes_left <- nodes
   edges_left <- edges
@@ -478,7 +479,11 @@ validate_annotation <- function(x, x_name, nodes) {
 #' @noRd
 apply_annotations <- function(nodes, annotations, at) {
   nodes$node_id <- as.character(nodes$id)
-  annotations <- data.frame(node_id = names(annotations), ..annotation = annotations)
+  annotations <- data.frame(
+    node_id = names(annotations),
+    ..annotation = annotations,
+    stringsAsFactors = FALSE
+  )
 
   new_nodes <- merge(nodes, annotations, by = "node_id", all.x = TRUE)
   new_nodes[[at]] <- ifelse(
