@@ -1,0 +1,290 @@
+---
+title: "Introduction to makepipe"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to makepipe}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+Broadly, `makepipe` does two things: 
+
++ It automates code execution using a logic similar to GNU Make. In particular,
+makepipe ensures that a given piece of code is executed if and only if the
+`targets` associated that piece of code are out-of-date with respect to its
+`dependencies`. More on this below. 
+
++ It makes code self-documenting in a double sense. Firstly, it forces data
+scientists to make the relationships between the different parts of their code
+base explicit **within** the code base itself. Secondly, it exhibits those
+relationships as a directed acyclical graph (i.e. a flowchart) which can be 
+separated from the code base and shared.
+
+It does these things without requiring major upfront investments in the way
+of code functionalisation or the like. Indeed, one will not ordinarily need to 
+modify one's existing code at all in order to implement a makepipe pipeline. 
+
+
+# Converting an existing workflow
+
+Assuming your workflow consists of a series of R scripts -- `one.R`, `two.R`, 
+etc. -- you can construct a makepipe `Pipeline` simply by sourcing them
+using `make_with_source()`. 
+
+You'll just need to supply, along with the path to the `source` script, a set of
+`targets` (i.e. paths to files that the script is supposed to make) and
+optionally a set of `dependencies` (i.e. paths to files that the script needs so
+as to make the `targets`).
+
+For example, you'll create a `pipeline.R` script containing the following:
+
+```r
+library(makepipe)
+
+make_with_source(
+  source = "one.R", 
+  targets = "data/1 data.Rds", 
+  dependencies = "data/raw.Rds"
+)
+
+make_with_source(
+  source = "two.R", 
+  targets = "data/2 data.Rds", 
+  dependencies = c("data/1 data.Rds", "lookup/concordance.csv")
+)
+
+# etc.
+```
+
+Then, when this code is run through, each `source` file will be executed if and
+only if its `targets` are out-of-date with respect to its `dependencies` (and
+`source` file itself). This means that only those scripts which *need* to be
+run will be. So, without requiring you to think about it, you'll be able to 
+skip unnecessary computations. 
+
+Meanwhile, behind the scenes, each call to `make_with_source()` will add a 
+`Segment` onto the `Pipeline`. These `Segment` objects keep track of the
+relationships between `targets`, `dependencies` and `source` files and they 
+also log metadata relating to the execution of the `source` file such as
+whether it was executed on the last run and how long it took to execute. 
+
+You can inspect this metadata by getting ahold of the `Pipeline`. For example,
+you might see something like this:
+
+```r
+pipe <- get_pipeline()
+pipe$segments
+
+#> [[1]]
+#> # makepipe segment
+#> * Source: 'one.R'
+#> * Targets: 'data/1 data.Rds'
+#> * File dependencies: 'data/raw.Rds'
+#> * Executed: TRUE
+#> * Execution time: 22.5 secs
+#> * Result: 0 object(s)
+#> * Environment: 0x00000253c8573268
+#> 
+#> [[2]]
+#> # makepipe segment
+#> * Source: 'two.R'
+#> * Targets: 'data/2 data.Rds'
+#> * File dependencies: 'data/1 data.Rds', 'lookup/concordance.csv'
+#> * Executed: TRUE
+#> * Execution time: 38.2 secs
+#> * Result: 0 object(s)
+#> * Environment: 0x00000253c8738660
+
+```
+
+Additionally, you can visualise the relationships between the various files 
+by viewing the `Pipeline` itself:
+
+```r
+show_pipeline()
+```
+
+This will display a flow chart exhibiting the relationships between the `targets`,
+`dependencies`, and code. 
+
+## `make_*()`
+
+We used `make_with_source()` above since, in most cases, that will be the simplest
+way to convert an existing workflow. In some cases, however, your pipeline
+may include short pieces of code that don't need to reside in their own script.
+In such cases, you can use `make_with_recipe()`:
+
+```r
+make_with_recipe(
+  recipe = rmarkdown::render(
+		"report.Rmd",
+		output_file = "output/report.html"
+	),
+	targets = "output/report.html",
+	dependencies = c("report.Rmd", "data/2 data.Rds")
+)
+```
+
+As with `make_with_source()`, when a `make_with_recipe()` block is run the 
+code (this time the `recipe`) will only be executed if the relevant `targets`
+are out-of-date with respect to their `dependencies`
+
+# Clean and build
+
+Once you've constructed a `Pipeline` by calling `make_*()`, you can re-run the
+entire pipeline using the `build()` method. As when using `make_*()` directly,
+only code that needs to be run will be when `build()` is called.
+
+For example, if you've just executed the Pipeline and nothing has changed,
+then nothing will be re-executed and you'll be told has much:
+
+```r
+pipe <- get_pipeline()
+pipe$build() 
+#> √ Targets are up to date
+#> √ Targets are up to date
+```
+
+If you want to start from scratch and 'rebuild' all targets, you can use the
+`build()` method together with the `clean()` method.
+
+```r
+pipe$clean()
+pipe$build()
+
+#> i Targets are out of date. Updating...
+#> √ Finished updating                   
+#> i Targets are out of date. Updating...
+#> √ Finished updating   
+```
+
+The `clean()` and `build()` methods are especially useful when used with
+a `Pipeline` that has previously been saved out. In particular, if you've
+already created your `Pipeline` by stringing `make_*()` calls together and
+you've saved your `Pipeline` object out as `pipeline.Rds` you can re-run the
+whole Pipeline to ensure everything is up-to-date simply by calling:
+
+```r
+pipe <- readRDS("pipeline.Rds")
+pipe$build()
+```
+
+# Return values and registration
+Each `Segment` on the `Pipeline` is associated with a `result`. This is akin
+to a return value. Indeed, in the case of `make_with_recipe()` it *is* the
+return value of the `recipe`. For example:
+
+```r
+res <- make_with_recipe(
+    recipe = {
+        saveRDS(mtcars, "data/mtcars.Rds")
+        nrow(mtcars)
+    },
+    targets = "data/mtcars.Rds"
+)
+#> i Targets are out of date. Updating...
+#> √ Finished updating                   
+
+res$result
+#> [1] 32
+```
+
+Note, however, that the `result` is captured when the `recipe` is executed. If
+your `recipe` is never executed, then there will be no `result` available. Thus, for instance:
+
+```r
+res <- make_with_recipe(
+    recipe = {
+        saveRDS(mtcars, "data/mtcars.Rds")
+        nrow(mtcars)
+    },
+    targets = "data/mtcars.Rds"
+)
+#> √ Targets are up to date
+
+res$result
+#> NULL
+
+```
+
+Things are a little more complicated in the case of `make_with_source()`, as
+you can imagine. Given that source scripts do not really have return values, 
+the `result` cannot be what `source` returns when run. So what is it? 
+
+The `result` associated with a source `Segment` is an environment containing objects
+'registered' in the `source` script. Objects are registered using
+`make_register()`, which has a similar API to `base::assign()`. Thus, imagine
+that `three.R` contains the following code:
+
+```r
+# ...
+makepipe::make_register(nrow(dat), "num_rows")
+# ...
+```
+
+Then we will have:
+
+```r
+res <- make_with_source(
+    source = "three.R",
+    targets = "data/3 data.Rds",
+    dependencies = "data/2 data.Rds"
+)
+#> i Targets are out of date. Updating...
+#> √ Finished updating 
+
+res$result
+#> <environment: 0x0000029f6840f610>
+
+res$result$num_rows
+#> [1] 32
+```
+
+As with `make_with_recipe()`, a `result` will only be captured if the `source`
+script is executed. 
+
+# Execution details
+
+So when does a `source` file or a `recipe` get executed? The answer is: when and
+only when the relevant `targets` are out-of-date with respect to the
+`dependencies`. But what does that mean? Specifically, the `targets` are
+out-of-date if and only if:
+
++ One or more of the `targets` do not exist, OR
+  
++ One or more of the `dependencies` is *newer* (i.e. has a more recent file
+modification time) than one or more of the `targets`. In other words, the
+`dependencies` have been updated since the `targets` were last made.
+
+By default the execution will take place in a fresh environment which is a 
+child of the calling environment. So if you're calling `make_*()` in a top-level
+script then the execution will take place in a fresh environment whose parent is 
+the global environment.
+
+There are a number of less commonly used arguments to `make_*()` which alter this
+behaviour. In particular:
+
++ `packages` can be used to supply the names of packages which serve as
+dependencies for the `targets`. If any of these packages have been updated since
+the `targets` were last made, the `targets` will be remade. This is particularly 
+useful when you're relying on a package for lookups which are liable to change.
+
++ `envir` can be used to supply an environment in which the execution of the
+`source` or `recipe` will take place. Supplying `envir = base::globalenv()`, for
+example, will mean that all execution takes place in the global environment. If 
+you do this, then all the objects bound in the `recipe`/`source` will be available
+in the global environment.
+
++ `force` can be used to ensure that the `recipe`/`source` is executed no matter
+what. This is useful, e.g., when you are pulling in some data from an external
+database.
+
+

@@ -9,3 +9,5 @@
 ^\.github$
 ^\.covrignore$
 ^CRAN-RELEASE$
+^doc$
+^Meta$

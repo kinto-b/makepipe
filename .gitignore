@@ -5,3 +5,6 @@
 .DS_Store
 scratch
 man/figures/archive
+inst/doc
+/doc/
+/Meta/
