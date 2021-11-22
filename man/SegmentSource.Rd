@@ -61,6 +61,7 @@ Initialise a new Segment
   dependencies,
   packages,
   envir,
+  force,
   executed,
   result,
   execution_time
@@ -83,6 +84,10 @@ depend on}
 depend on}
 
 \item{\code{envir}}{The environment in which to execute the instructions.}
+
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
 
 \item{\code{executed}}{A logical, whether or not the instructions were executed}
 

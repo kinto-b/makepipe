@@ -54,7 +54,14 @@ primarily to update outofdateness
 Add a pipeline segment corresponding to a \code{make_with_source()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages, envir)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(
+  source,
+  targets,
+  dependencies,
+  packages,
+  envir,
+  force
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -72,6 +79,10 @@ depend on}
 
 \item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
 
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
+
 \item{\code{new_edge}}{An data.frame constructed with \code{new_edge()}}
 }
 \if{html}{\out{</div>}}
@@ -87,7 +98,14 @@ The \code{SegmentSource} added to the \code{Pipeline}
 Add a pipeline segment corresponding to a \code{make_with_recipe()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(
+  recipe,
+  targets,
+  dependencies,
+  packages,
+  envir,
+  force
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -104,6 +122,10 @@ call
 depend on}
 
 \item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
+
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
 }
 \if{html}{\out{</div>}}
 }

@@ -46,13 +46,14 @@
 #'
 make_with_source <- function(source, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
-                             quiet = getOption("makepipe.quiet"), ...) {
+                             quiet = getOption("makepipe.quiet"),
+                             force = FALSE, ...) {
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
-  segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir)
+  segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir, force)
   out <- segment$execute(quiet = quiet)
 
   invisible(out)
@@ -120,14 +121,15 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
 #' }
 make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
-                             quiet = getOption("makepipe.quiet"), ...) {
+                             quiet = getOption("makepipe.quiet"),
+                             force = FALSE, ...) {
   recipe <- substitute(recipe)
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
-  segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir)
+  segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir, force)
   out <- segment$execute(quiet = quiet)
 
   invisible(out)

@@ -26,6 +26,10 @@ depend on}
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
 
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
+
 \item{\code{envir}}{The environment in which to execute the instructions.}
 
 \item{\code{result}}{An object, whatever is returned by executing the instructions}
@@ -39,7 +43,9 @@ depend on}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{edges}}{Construct edges connecting the dependencies, instructions, and targets}
+\item{\code{edges}}{Get edges connecting the dependencies, instructions, and targets}
+
+\item{\code{nodes}}{Get nodes corresponding to  dependencies, instructions, and targets}
 }
 \if{html}{\out{</div>}}
 }
@@ -64,6 +70,7 @@ Initialise a new Segment
   dependencies,
   packages,
   envir,
+  force,
   executed,
   result,
   execution_time
@@ -84,6 +91,10 @@ depend on}
 depend on}
 
 \item{\code{envir}}{The environment in which to execute the instructions.}
+
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
 
 \item{\code{executed}}{A logical, whether or not the instructions were executed}
 

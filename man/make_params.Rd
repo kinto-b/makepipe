@@ -17,6 +17,10 @@ default, execution will take place in a fresh environment whose parent is
 the calling environment.}
 
 \item{quiet}{A logical determining whether or not messages are signaled}
+
+\item{force}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
 }
 \description{
 Parameters for make-like functions

@@ -26,6 +26,10 @@ Segment <- R6::R6Class("Segment",
     #' @field packages A character vector of names of packages which `targets`
     #'   depend on
     packages = NULL,
+    #' @field force A logical determining whether or not execution of the `source`
+    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+    #'   out-of-date)
+    force = NULL,
     #' @field envir The environment in which to execute the instructions.
     envir = NULL,
     #' @field result An object, whatever is returned by executing the instructions
@@ -43,17 +47,21 @@ Segment <- R6::R6Class("Segment",
     #' @param packages A character vector of names of packages which `targets`
     #'   depend on
     #' @param envir The environment in which to execute the instructions.
+    #' @param force A logical determining whether or not execution of the `source`
+    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+    #'   out-of-date)
     #' @param result An object, whatever is returned by executing the instructions
     #' @param executed A logical, whether or not the instructions were executed
     #' @param execution_time A difftime, the time taken to execute the instructions
-    initialize = function(id, targets, dependencies, packages, envir,
+    initialize = function(id, targets, dependencies, packages, envir, force,
                           executed, result, execution_time) {
       if (!is.integer(id)) stopifnot_class(id, "numeric")
       stopifnot_class(targets, "character")
       if (!is.null(dependencies)) stopifnot_class(dependencies, "character")
       if (!is.null(packages)) stopifnot_class(packages, "character")
       stopifnot_class(envir, "environment")
-      stopifnot_class(executed, "logical")
+      stopifnot("`executed` must be either `TRUE` or `FALSE`" = isTRUE(executed) | isFALSE(executed))
+      stopifnot("`force` must be either `TRUE` or `FALSE`" = isTRUE(force) | isFALSE(force))
       if (!is.null(execution_time)) stopifnot_class(execution_time, "difftime")
 
       find.package(packages) # Error if package cannot be found
@@ -79,6 +87,7 @@ Segment <- R6::R6Class("Segment",
       self$dependencies <- dependencies
       self$packages <- packages
       self$envir <- envir
+      self$force <- force
       self$executed <- executed
       self$result <- result
       self$execution_time <- execution_time
@@ -197,13 +206,16 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     #' @param packages A character vector of names of packages which `targets`
     #'   depend on
     #' @param envir The environment in which to execute the instructions.
+    #' @param force A logical determining whether or not execution of the `source`
+    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+    #'   out-of-date)
     #' @param result An object, whatever is returned by executing the instructions
     #' @param executed A logical, whether or not the instructions were executed
     #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, recipe, targets, dependencies, packages, envir,
-                          executed, result, execution_time) {
+                          force, executed, result, execution_time) {
       if (!is.language(recipe)) stop("`recipe` must be an expression", call. = FALSE)
-      super$initialize(id, targets, dependencies, packages, envir, executed, result, execution_time)
+      super$initialize(id, targets, dependencies, packages, envir, force, executed, result, execution_time)
 
       instructions_txt <- paste(deparse(recipe), collapse = "\n")
       instructions_txt <- paste0("Recipe: \n\n", instructions_txt, "\n")
@@ -244,7 +256,9 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
         stopifnot_class(envir, "environment")
         self$envir <- envir
       }
-      outdated <- out_of_date(self$targets, self$dependencies, self$packages)
+
+      outdated <- TRUE
+      if (!self$force) outdated <- out_of_date(self$targets, self$dependencies, self$packages)
 
       if (outdated) {
         if (!quiet) {
@@ -309,18 +323,21 @@ SegmentSource <- R6::R6Class("SegmentSource",
      #' @param packages A character vector of names of packages which `targets`
      #'   depend on
      #' @param envir The environment in which to execute the instructions.
+     #' @param force A logical determining whether or not execution of the `source`
+     #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+     #'   out-of-date)
      #' @param result An object, whatever is returned by executing the instructions
      #' @param executed A logical, whether or not the instructions were executed
      #' @param execution_time A difftime, the time taken to execute the instructions
      initialize = function(id, source, targets, dependencies, packages, envir,
-                           executed, result, execution_time) {
+                           force, executed, result, execution_time) {
        stopifnot_class(source, "character")
        if (!file.exists(source)) stop("`source` does not exist", call. = FALSE)
        if (any(targets %in% source)) {
          stop("`source` must not be among the `targets`", call. = FALSE)
        }
 
-       super$initialize(id, targets, dependencies, packages, envir, executed, result, execution_time)
+       super$initialize(id, targets, dependencies, packages, envir, force, executed, result, execution_time)
 
        private$instructions_txt <- paste0("Source: '", source, "'")
        private$result_txt <- paste0("Result: ", length(result), " object(s)")
@@ -355,7 +372,9 @@ SegmentSource <- R6::R6Class("SegmentSource",
          stopifnot_class(envir, "environment")
          self$envir <- envir
        }
-       outdated <- out_of_date(self$targets, c(self$dependencies, self$source), self$packages)
+
+       outdated <- TRUE
+       if (!self$force) outdated <- out_of_date(self$targets, c(self$dependencies, self$source), self$packages)
 
        # Prepare fresh execution environment so we don't clutter existing environment
        register_env <- new.env(parent = emptyenv())

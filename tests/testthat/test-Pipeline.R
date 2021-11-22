@@ -95,6 +95,17 @@ test_that("targets not rebuilt if newer than dependency and source", {
   expect_false(res$executed)
 })
 
+test_that("targets rebuilt if forced", {
+  set_pipeline(PipelineTest$new())
+  order_filetimes(source1, dependency, target1)
+  res <- make_with_source(source1, target1, dependency, quiet = TRUE, force = TRUE)
+  expect_true(res$executed)
+
+  set_pipeline(PipelineTest$new())
+  order_filetimes(dependency, target1)
+  res <- make_with_recipe(2+2, target1, dependency, quiet = TRUE, force = TRUE)
+  expect_true(res$executed)
+})
 
 test_that("source never out-of-dated", {
   set_pipeline(PipelineTest$new())

@@ -113,11 +113,14 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param packages A character vector of names of packages which `targets`
     #'   depend on
     #' @param envir The environment in which to execute the `source` or `recipe`.
+    #' @param force A logical determining whether or not execution of the `source`
+    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+    #'   out-of-date)
     #' @return The `SegmentSource` added to the `Pipeline`
-    add_source_segment = function(source, targets, dependencies, packages, envir) {
+    add_source_segment = function(source, targets, dependencies, packages, envir, force) {
       id <- as.integer(length(self$segments) + 1)
       new_segment <- SegmentSource$new(
-        id, source, targets, dependencies, packages, envir,
+        id, source, targets, dependencies, packages, envir, force,
         FALSE, NULL, NULL
       )
 
@@ -137,11 +140,14 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param packages A character vector of names of packages which `targets`
     #'   depend on
     #' @param envir The environment in which to execute the `source` or `recipe`.
+    #' @param force A logical determining whether or not execution of the `source`
+    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
+    #'   out-of-date)
     #' @return The `SegmentRecipe` added to the `Pipeline`
-    add_recipe_segment = function(recipe, targets, dependencies, packages, envir) {
+    add_recipe_segment = function(recipe, targets, dependencies, packages, envir, force) {
       id <- length(self$segments) + 1
       new_segment <- SegmentRecipe$new(
-        id, recipe, targets, dependencies, packages, envir,
+        id, recipe, targets, dependencies, packages, envir, force,
         FALSE, NULL, NULL
       )
 
