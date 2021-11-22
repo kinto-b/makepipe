@@ -44,7 +44,7 @@
 #' )
 #' }
 #'
-make_with_source <- function(source, targets, dependencies, packages = NULL,
+make_with_source <- function(source, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
   pipeline <- get_pipeline()
@@ -118,14 +118,10 @@ make_with_source <- function(source, targets, dependencies, packages = NULL,
 #'   envir = globalenv()
 #' )
 #' }
-make_with_recipe <- function(recipe, targets, dependencies, packages = NULL,
+make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"), ...) {
-  targets <- unique(targets)
-  dependencies <- unique(dependencies)
-  packages <- unique(packages)
   recipe <- substitute(recipe)
-
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()

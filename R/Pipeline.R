@@ -29,8 +29,6 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       id = factor(),
       label = character(0),
       title = character(0),
-      shape = character(0),
-      group = character(0),
       .source = logical(0),
       .recipe = logical(0),
       .pkg = logical(0),
@@ -60,46 +58,28 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #'   `private$nodes` into `private$nodes`
     refresh_nodes = function() {
       edges <- private$edges
-      nodes <- private$nodes
+      old_nodes <- private$nodes
 
-      # Relevel
-      all_ids <- unlist(list(edges$from, edges$to))
-      lvls <- levels(all_ids)
-      nodes$id <- factor(nodes$id, lvls)
-
-      # Build new nodes
-      new_ids <- factor(setdiff(all_ids, nodes$id), lvls)
-      if (length(new_ids) > 0) {
-        new_nodes <- data.frame(
-          id = new_ids,
-          label = "",
-          title = as.character(new_ids),
-          shape = "",
-          group = "",
-          .source = new_ids %in% edges[edges$.source, "to"],
-          .recipe = new_ids %in% edges[edges$.recipe, "to"],
-          .pkg = new_ids %in% edges[edges$.pkg, "from"]
-        )
-
-        # Aesthetics
-        new_nodes$shape <- ifelse(new_nodes$.recipe, "circle", "square")
-        new_nodes$shape <- ifelse(new_nodes$.pkg, "triangle", new_nodes$shape)
-
-        lbl <- basename(as.character(new_nodes$id))
-        new_nodes$label <- ifelse(new_nodes$.recipe, "Recipe", lbl)
-
-        # Combine
-        nodes <- rbind(nodes, new_nodes)
+      nodes <- lapply(self$segments, function(x) x$nodes)
+      if (length(nodes) == 1) {
+        nodes <- nodes[[1]]
+      } else {
+        nodes <- unique(do.call(rbind, nodes))
       }
 
-      # Update out-of-dateness
-      nodes$group <- ifelse(
-        nodes$id %in% edges[edges$.outdated, "to"],
-        "Out-of-date",
-        "Up-to-date"
-      )
-      nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
+      # Add titles/labels
+      lbl <- basename(as.character(nodes$id))
+      nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
+      nodes$title <- ""
 
+      # Restore old titles/labels
+      labels <- old_nodes$label
+      names(labels) <- as.character(old_nodes$id)
+      nodes <- apply_annotations(nodes, labels, "label")
+
+      titles <- old_nodes$title
+      names(titles) <- as.character(old_nodes$id)
+      nodes <- apply_annotations(nodes, labels, "title")
 
       private$nodes <- nodes
       invisible(self)
@@ -444,6 +424,16 @@ sort_topologically <- function(edges) {
 ## Network ---------------------------------------------------------------------
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
+
+  # Add aesthetics to nodes
+  nodes$shape <- ifelse(nodes$.recipe, "circle", "square")
+  nodes$shape <- ifelse(nodes$.pkg, "triangle", nodes$shape)
+
+  outdated <- nodes$id %in% edges[edges$.outdated, "to"]
+  nodes$group <- ifelse(outdated, "Out-of-date", "Up-to-date")
+  nodes$group <- ifelse(nodes$.source, "Source", nodes$group)
+
+  # Visualise
   out <- visNetwork::visNetwork(nodes = nodes, edges = edges, ...)
   out <- visNetwork::visGroups(out, groupname = "Out-of-date", color = "#ffcaef")
   out <- visNetwork::visGroups(out, groupname = "Up-to-date", color = "#caffda")

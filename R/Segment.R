@@ -50,7 +50,7 @@ Segment <- R6::R6Class("Segment",
                           executed, result, execution_time) {
       if (!is.integer(id)) stopifnot_class(id, "numeric")
       stopifnot_class(targets, "character")
-      stopifnot_class(dependencies, "character")
+      if (!is.null(dependencies)) stopifnot_class(dependencies, "character")
       if (!is.null(packages)) stopifnot_class(packages, "character")
       stopifnot_class(envir, "environment")
       stopifnot_class(executed, "logical")
@@ -58,7 +58,8 @@ Segment <- R6::R6Class("Segment",
 
       find.package(packages) # Error if package cannot be found
 
-      miss_deps <- !file.exists(dependencies)
+      miss_deps <- FALSE
+      if (!is.null(dependencies)) miss_deps <- !file.exists(dependencies)
       if (any(miss_deps)) {
         stop('One or more `dependencies` do not exist: ', dependencies[miss_deps],
              call. = FALSE)
@@ -96,7 +97,7 @@ Segment <- R6::R6Class("Segment",
       cli::cat_line(cli::col_grey("# makepipe segment"))
       cli::cat_bullet(private$instructions_txt)
       cli::cat_bullet("Targets: ", targets)
-      cli::cat_bullet("File dependencies: ", dependencies)
+      if (length(self$dependencies) > 0) cli::cat_bullet("File dependencies: ", dependencies)
       if (length(self$packages) > 0) cli::cat_bullet("Package dependencies: ", packages)
       cli::cat_bullet("Executed: ", self$executed)
       if (self$executed) cli::cat_bullet("Execution time: ", format(self$execution_time))
@@ -119,7 +120,7 @@ Segment <- R6::R6Class("Segment",
     }
   ),
   active = list(
-    #' @field edges Construct edges connecting the dependencies, instructions, and targets
+    #' @field edges Get edges connecting the dependencies, instructions, and targets
     edges = function() {
       is_recipe <- inherits(self, "SegmentRecipe")
       edges <- rbind(
@@ -138,7 +139,9 @@ Segment <- R6::R6Class("Segment",
 
       dependencies <- self$dependencies
       if (!is_recipe) dependencies <- c(dependencies, self$source)
-      if (any(!file.exists(dependencies))) {
+      missing_deps <- FALSE
+      if (!is.null(dependencies)) missing_deps <- any(!file.exists(dependencies))
+      if (missing_deps) {
         # Sometimes the dependencies of one segment of the pipeline are the
         # targets are the targets of a previous segment. In this case, if the
         # dependency doesn't exist, it will be rebuilt and hence be newer than
@@ -150,6 +153,19 @@ Segment <- R6::R6Class("Segment",
       edges$.outdated[edges$.source] <- FALSE # If not a target, then up to date
 
       edges
+    },
+
+    #' @field nodes Get nodes corresponding to  dependencies, instructions, and targets
+    nodes = function() {
+      is_recipe <- inherits(self, "SegmentRecipe")
+      nodes <- rbind(
+        new_node(private$instructions_txt, TRUE, is_recipe, FALSE),
+        new_node(self$targets, FALSE, FALSE, FALSE),
+        new_node(self$dependencies, FALSE, FALSE, FALSE),
+        new_node(self$packages, FALSE, FALSE, TRUE)
+      )
+
+      nodes
     }
   )
 )
@@ -407,6 +423,27 @@ new_edge <- function(from, to, .source, .recipe, .pkg) {
   )
 }
 
+#' Create nodes
+#'
+#' @param id A character vector of nodes
+#' @param .source Either TRUE or FALSE
+#' @param .recipe Either TRUE or FALSE
+#' @param .pkg Either TRUE or FALSE
+#'
+#' @return A data.frame defining nodes
+#' @noRd
+new_node <- function(id, .source, .recipe, .pkg) {
+  if (is.null(id)) return(NULL)
+  nodes <- data.frame(
+    id = factor(id),
+    .source = .source,
+    .recipe = .recipe,
+    .pkg = .pkg,
+    stringsAsFactors = FALSE
+  )
+
+  nodes
+}
 
 #' Get an environment's name
 #'
