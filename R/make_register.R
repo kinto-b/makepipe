@@ -6,7 +6,7 @@
 #' produced as expected.
 #'
 #' @param value A value to be registered in a source script and returned as part
-#'   of the `makepipe_result`
+#'   of the `Segment`
 #' @param name A variable name, given as a character string. No coercion is
 #'   done, and the first element of a character vector of length greater than
 #'   one will be used, with a warning.

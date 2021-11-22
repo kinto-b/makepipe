@@ -34,7 +34,7 @@ the calling environment.}
 \item{...}{Additional parameters to pass to \code{base::source()}}
 }
 \value{
-\code{NULL} invisibly.
+A \code{Segment} object containing execution metadata.
 }
 \description{
 Make targets out of dependencies using a source file

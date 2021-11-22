@@ -10,13 +10,13 @@
 #' out_of_date("data/processed_data.Rds", "data/raw_data.Rds")
 #' }
 out_of_date <- function(targets, dependencies, packages = NULL) {
-  stopifnot(is.character(targets))
-  stopifnot(is.character(dependencies))
+  stopifnot_class(targets, "character")
+  stopifnot_class(dependencies, "character")
 
   outdated <- any(unlist(lapply(targets, function(fp_x) {
     unlist(lapply(dependencies, function(fp_y) {
       # Target x older than dependency y?
-      if (!file.exists(fp_y)) stop("{fp_y} does not exist", call. = FALSE)
+      if (!file.exists(fp_y)) stop('One or more `dependencies` do not exist: ', fp_y, call. = FALSE)
       if (!file.exists(fp_x)) {
         return(TRUE)
       }
@@ -28,7 +28,7 @@ out_of_date <- function(targets, dependencies, packages = NULL) {
   }
 
   if (!is.null(packages)) {
-    stopifnot(is.character(packages))
+    stopifnot_class(packages, "character")
     outdated <- outdated | any(unlist(lapply(targets, function(fp_x) {
       unlist(lapply(packages, function(fp_y) {
         # Target x older than package y?
