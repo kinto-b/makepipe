@@ -7,6 +7,18 @@
 #'   `make_*()` are made. It stores the relationships between targets,
 #'   dependencies, and sources.
 #'
+#' @param recipe A language object which, when evaluated, makes the `targets`
+#' @param source The path to an R script which makes the `targets`
+#' @param targets A character vector of paths to files
+#' @param dependencies A character vector of paths to files which the
+#'   `targets` depend on
+#' @param packages A character vector of names of packages which `targets`
+#'   depend on
+#' @param envir The environment in which to execute the `source` or `recipe`.
+#' @param force A logical determining whether or not execution of the `source`
+#'   or `recipe` will be forced (i.e. happen whether or not the targets are
+#'   out-of-date)
+#'
 #' @keywords internal
 #' @family pipeline
 #' @export Pipeline
@@ -106,16 +118,6 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
     #' @description Add a pipeline segment corresponding to a `make_with_source()`
     #'   call
-    #' @param source The path to an R script which makes the `targets`
-    #' @param targets A character vector of paths to files
-    #' @param dependencies A character vector of paths to files which the
-    #'   `targets` depend on
-    #' @param packages A character vector of names of packages which `targets`
-    #'   depend on
-    #' @param envir The environment in which to execute the `source` or `recipe`.
-    #' @param force A logical determining whether or not execution of the `source`
-    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
-    #'   out-of-date)
     #' @return The `SegmentSource` added to the `Pipeline`
     add_source_segment = function(source, targets, dependencies, packages, envir, force) {
       id <- as.integer(length(self$segments) + 1)
@@ -133,16 +135,6 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
     #' @description Add a pipeline segment corresponding to a `make_with_recipe()`
     #'   call
-    #' @param recipe A language object which, when evaluated, makes the `targets`
-    #' @param targets A character vector of paths to files
-    #' @param dependencies A character vector of paths to files which the
-    #'   `targets` depend on
-    #' @param packages A character vector of names of packages which `targets`
-    #'   depend on
-    #' @param envir The environment in which to execute the `source` or `recipe`.
-    #' @param force A logical determining whether or not execution of the `source`
-    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
-    #'   out-of-date)
     #' @return The `SegmentRecipe` added to the `Pipeline`
     add_recipe_segment = function(recipe, targets, dependencies, packages, envir, force) {
       id <- length(self$segments) + 1
@@ -360,6 +352,16 @@ save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labe
 
 # Internal ---------------------------------------------------------------------
 
+#' Propagate out-of-dateness
+#'
+#' Any target that is downstream of an out-of-date target is itself out-of-date.
+#' This algorithm ensures the `edges` data.frame reflects this fact by
+#' propagating out-of-dateness along network edges.
+#'
+#' @param edges A data.frame defining the edges
+#'
+#' @return A data.frame defining edges from all nodes in `from` to all nodes in
+#'   `to`.
 #' @noRd
 propagate_outofdateness <- function(edges) {
   nodes <- unlist(list(edges$from, edges$to))
@@ -428,6 +430,13 @@ sort_topologically <- function(edges) {
 }
 
 ## Network ---------------------------------------------------------------------
+#' Create a network visualisation of the Pipeline
+#'
+#' @param nodes A data.frame defining the nodes
+#' @param edges A data.frame defining the edges
+#' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+#'   `visNetwork::visNetwork()`
+#' @return A visNetwork
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
 
@@ -450,6 +459,15 @@ pipeline_network <- function(nodes, edges, ...) {
   )
 }
 
+
+#' Validate annotations
+#'
+#' @param x An annotation
+#' @param x_name A string, the kind of annotation
+#' @param nodes A data.frame defining the nodes
+#'
+#' @return A data.frame defining edges from all nodes in `from` to all nodes in
+#'   `to`.
 #' @noRd
 validate_annotation <- function(x, x_name, nodes) {
   stopifnot_class(x, "character")
@@ -472,6 +490,13 @@ validate_annotation <- function(x, x_name, nodes) {
   invisible(NULL)
 }
 
+#' Validate annotations
+#'
+#' @param nodes A data.frame defining the nodes
+#' @param annotations A named character vector of annotations to apply
+#' @param at A string, the kind of annotation to apply
+#'
+#' @return A data.frame defining the nodes with annotations applied
 #' @noRd
 apply_annotations <- function(nodes, annotations, at) {
   nodes$node_id <- as.character(nodes$id)

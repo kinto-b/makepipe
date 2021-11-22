@@ -141,9 +141,7 @@ Execute the Segment
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}. By
-default, execution will take place in a fresh environment whose parent is
-the calling environment.}
+\item{\code{envir}}{The environment in which to execute the instructions.}
 
 \item{\code{quiet}}{A logical determining whether or not messages are signaled}
 

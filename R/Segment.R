@@ -6,6 +6,20 @@
 #'   the Pipeline when a call to `make_*()` is made. It stores the relationships
 #'   between targets, dependencies, and sources.
 #'
+#' @param id An integer that uniquely identifies the segment
+#' @param targets A character vector of paths to files
+#' @param dependencies A character vector of paths to files which the `targets`
+#'   depend on
+#' @param packages A character vector of names of packages which `targets`
+#'   depend on
+#' @param envir The environment in which to execute the instructions.
+#' @param force A logical determining whether or not execution of the `source`
+#'   or `recipe` will be forced (i.e. happen whether or not the targets are
+#'   out-of-date)
+#' @param result An object, whatever is returned by executing the instructions
+#' @param executed A logical, whether or not the instructions were executed
+#' @param execution_time A difftime, the time taken to execute the instructions
+#'
 #' @keywords internal
 #' @family segment
 #' @export Segment
@@ -40,19 +54,6 @@ Segment <- R6::R6Class("Segment",
     execution_time = NULL,
 
     #' @description Initialise a new Segment
-    #' @param id An integer that uniquely identifies the segment
-    #' @param targets A character vector of paths to files
-    #' @param dependencies A character vector of paths to files which the `targets`
-    #'   depend on
-    #' @param packages A character vector of names of packages which `targets`
-    #'   depend on
-    #' @param envir The environment in which to execute the instructions.
-    #' @param force A logical determining whether or not execution of the `source`
-    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
-    #'   out-of-date)
-    #' @param result An object, whatever is returned by executing the instructions
-    #' @param executed A logical, whether or not the instructions were executed
-    #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, targets, dependencies, packages, envir, force,
                           executed, result, execution_time) {
       if (!is.integer(id)) stopifnot_class(id, "numeric")
@@ -115,9 +116,6 @@ Segment <- R6::R6Class("Segment",
     },
 
     #' @description Update the Segment with new execution information
-    #' @param executed A logical, whether or not the instructions were executed
-    #' @param execution_time A difftime, the time taken to execute the instructions
-    #' @param result An object, whatever is returned by executing the instructions
     update_result = function(executed, execution_time, result) {
       stopifnot_class(executed, "logical")
       if (!is.null(execution_time)) stopifnot_class(execution_time, "difftime")
@@ -186,6 +184,22 @@ Segment <- R6::R6Class("Segment",
 #'   the Pipeline when a call to `make_*()` is made. It stores the relationships
 #'   between targets, dependencies, and sources.
 #'
+#' @param id An integer that uniquely identifies the segment
+#' @param recipe A chunk of R code which makes the `targets`
+#' @param targets A character vector of paths to files
+#' @param dependencies A character vector of paths to files which the `targets`
+#'   depend on
+#' @param packages A character vector of names of packages which `targets`
+#'   depend on
+#' @param envir The environment in which to execute the instructions.
+#' @param force A logical determining whether or not execution of the `source`
+#'   or `recipe` will be forced (i.e. happen whether or not the targets are
+#'   out-of-date)
+#' @param result An object, whatever is returned by executing the instructions
+#' @param executed A logical, whether or not the instructions were executed
+#' @param execution_time A difftime, the time taken to execute the instructions
+#' @param quiet A logical determining whether or not messages are signaled
+#'
 #' @keywords internal
 #' @family segment
 #' @export SegmentRecipe
@@ -198,20 +212,6 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     recipe = expression(),
 
     #' @description Initialise a new Segment
-    #' @param id An integer that uniquely identifies the segment
-    #' @param recipe A chunk of R code which makes the `targets`
-    #' @param targets A character vector of paths to files
-    #' @param dependencies A character vector of paths to files which the `targets`
-    #'   depend on
-    #' @param packages A character vector of names of packages which `targets`
-    #'   depend on
-    #' @param envir The environment in which to execute the instructions.
-    #' @param force A logical determining whether or not execution of the `source`
-    #'   or `recipe` will be forced (i.e. happen whether or not the targets are
-    #'   out-of-date)
-    #' @param result An object, whatever is returned by executing the instructions
-    #' @param executed A logical, whether or not the instructions were executed
-    #' @param execution_time A difftime, the time taken to execute the instructions
     initialize = function(id, recipe, targets, dependencies, packages, envir,
                           force, executed, result, execution_time) {
       if (!is.language(recipe)) stop("`recipe` must be an expression", call. = FALSE)
@@ -237,19 +237,12 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
     },
 
     #' @description Update the Segment with new execution information
-    #' @param executed A logical, whether or not the instructions were executed
-    #' @param execution_time A difftime, the time taken to execute the instructions
-    #' @param result An object, whatever is returned by executing the instructions
     update_result = function(executed, execution_time, result) {
       private$result_txt <- ifelse(is.null(result), "Result: 0 object(s)", "Result: 1 object(s)")
       super$update_result(executed, execution_time, result)
     },
 
     #' @description Execute the Segment
-    #' @param envir The environment in which to execute the `source` or `recipe`. By
-    #'   default, execution will take place in a fresh environment whose parent is
-    #'   the calling environment.
-    #' @param quiet A logical determining whether or not messages are signaled
     #' @param ... Additional parameters to pass to `base::eval()`
     execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
       if (!is.null(envir)) {
@@ -303,6 +296,22 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
 #'   the Pipeline when a call to `make_*()` is made. It stores the relationships
 #'   between targets, dependencies, and sources.
 #'
+#' @param id An integer that uniquely identifies the segment
+#' @param source The path to an R script which makes the `targets`
+#' @param targets A character vector of paths to files
+#' @param dependencies A character vector of paths to files which the `targets`
+#'   depend on
+#' @param packages A character vector of names of packages which `targets`
+#'   depend on
+#' @param envir The environment in which to execute the instructions.
+#' @param force A logical determining whether or not execution of the `source`
+#'   or `recipe` will be forced (i.e. happen whether or not the targets are
+#'   out-of-date)
+#' @param result An object, whatever is returned by executing the instructions
+#' @param executed A logical, whether or not the instructions were executed
+#' @param execution_time A difftime, the time taken to execute the instructions
+#' @param quiet A logical determining whether or not messages are signaled
+
 #' @keywords internal
 #' @family segment
 #' @export SegmentSource
@@ -315,20 +324,6 @@ SegmentSource <- R6::R6Class("SegmentSource",
      source = character(),
 
      #' @description Initialise a new Segment
-     #' @param id An integer that uniquely identifies the segment
-     #' @param source The path to an R script which makes the `targets`
-     #' @param targets A character vector of paths to files
-     #' @param dependencies A character vector of paths to files which the `targets`
-     #'   depend on
-     #' @param packages A character vector of names of packages which `targets`
-     #'   depend on
-     #' @param envir The environment in which to execute the instructions.
-     #' @param force A logical determining whether or not execution of the `source`
-     #'   or `recipe` will be forced (i.e. happen whether or not the targets are
-     #'   out-of-date)
-     #' @param result An object, whatever is returned by executing the instructions
-     #' @param executed A logical, whether or not the instructions were executed
-     #' @param execution_time A difftime, the time taken to execute the instructions
      initialize = function(id, source, targets, dependencies, packages, envir,
                            force, executed, result, execution_time) {
        stopifnot_class(source, "character")
@@ -353,19 +348,12 @@ SegmentSource <- R6::R6Class("SegmentSource",
      },
 
      #' @description Update the Segment with new execution information
-     #' @param executed A logical, whether or not the instructions were executed
-     #' @param execution_time A difftime, the time taken to execute the instructions
-     #' @param result An object, whatever is returned by executing the instructions
      update_result = function(executed, execution_time, result) {
        private$result_txt <- paste0("Result: ", length(result), " object(s)")
        super$update_result(executed, execution_time, result)
      },
 
      #' @description Execute the Segment
-     #' @param envir The environment in which to execute the `source` or `recipe`. By
-     #'   default, execution will take place in a fresh environment whose parent is
-     #'   the calling environment.
-     #' @param quiet A logical determining whether or not messages are signaled
      #' @param ... Additional parameters to pass to `base::source()`
      execute = function(envir = NULL, quiet = getOption("makepipe.quiet"), ...) {
        if (!is.null(envir)) {
