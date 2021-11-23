@@ -1,9 +1,3 @@
-## Resubmission
-This is a re-submission. In this version I have:
-
-* Replaced installed test files with tempfiles so that the tests only write to
-the temporary directory
-
 ## Test environments
 * local R installation, R 4.1.0
 * ubuntu 16.04 (on travis-ci), R 4.1.0
@@ -11,6 +5,8 @@ the temporary directory
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 notes
 
-* This is a new release.
+## Downstream dependencies
+
+There are currently no downstream dependencies for this package
