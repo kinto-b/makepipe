@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -90,6 +90,9 @@
     <span class="fas fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/makepipe.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -122,14 +125,46 @@
       <small>Source: <a href='https://github.com/kinto-b/makepipe/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="makepipe-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#makepipe-development-version" class="anchor"></a>makepipe (development version)<small> Unreleased </small>
+    <div id="makepipe-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#makepipe-010" class="anchor"></a>makepipe 0.1.0<small> Unreleased </small>
 </h1>
+<div id="make_" class="section level2">
+<h2 class="hasAnchor">
+<a href="#make_" class="anchor"></a><code>make_*()</code>
+</h2>
 <ul>
-<li>Updated README with a link to a minimal example of a <code>makepipe</code> pipeline.</li>
-<li>Fixed a minor bug in <code><a href="../reference/make_register.html">make_register()</a></code> (<a href='https://github.com/kinto-b/makepipe/issues/22'>#22</a>). Previously, an error would be thrown when using <code><a href="../reference/make_register.html">make_register()</a></code> outside of a <code>makepipe</code> segment if the user set <code>quiet=TRUE</code>. This is no longer the case.</li>
+<li><p>Made <code>dependencies</code> argument to <code>make_*()</code> optional (<a href='https://github.com/kinto-b/makepipe/issues/25'>#25</a>).</p></li>
+<li><p>Added a <code>force</code> argument to <code>make_*()</code> (<a href='https://github.com/kinto-b/makepipe/issues/26'>#26</a>). This allows the user to override the default conditional execution logic to ensure that a given segment of the pipeline is run no matter what.</p></li>
 </ul>
+</div>
+<div id="segment" class="section level2">
+<h2 class="hasAnchor">
+<a href="#segment" class="anchor"></a>Segment</h2>
+<ul>
+<li><p>Implemented <code>Segment</code> class to serve as the basic building block for the <code>Pipeline</code> (<a href='https://github.com/kinto-b/makepipe/issues/28'>#28</a>). This clarifies the link between the fundamental <code>make_*()</code> functions and the <code>Pipeline</code> object. In particular, each <code>make_*()</code> call constructs a <code>Segment</code> which is appended to the <code>Pipeline</code>.</p></li>
+<li><p>The <code>Segment</code> class has an <code>execute()</code> method, which replicates the execution behaviour of the <code>make_*()</code> functions. Hence <code>Segment$execute()</code> can be run to rebuild the targets associated with a given segment without adding a new segment to the <code>Pipeline</code> as would be done if we called <code>make_*()</code> again.</p></li>
+<li><p>The <code>Segment</code> holds all execution metadata (e.g. execution result, execution time, etc.). This is updated via the <code>Segment$update_result()</code> method whenever <code>Segment$execute()</code> is called.</p></li>
+<li><p>Added a <code><a href="https://rdrr.io/r/utils/PkgUtils.html">build()</a></code> method to the <code>Pipeline</code> class, which sorts the <code>Segment</code>s topologically and then calls <code>execute()</code> on each in turn.</p></li>
+<li><p>Added a <code>clean()</code> method to the <code>Pipeline</code> class, which deletes the <code>targets</code> associated with each <code>Segment</code>.</p></li>
+<li><p>Removed the now redundant <code>makepipe_result</code> S3 class. All of the information that was held by the <code>makepipe_result</code> is now held by the <code>Segment</code>.</p></li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li><p>Fixed a minor bug in <code>Pipeline$print()</code> which was causing user-supplied annotations to be overwritten (<a href='https://github.com/kinto-b/makepipe/issues/23'>#23</a>).</p></li>
+<li><p>Fixed a minor bug in <code><a href="../reference/make_register.html">make_register()</a></code> (<a href='https://github.com/kinto-b/makepipe/issues/22'>#22</a>). Previously, an error would be thrown when using <code><a href="../reference/make_register.html">make_register()</a></code> outside of a <code>makepipe</code> segment if the user set <code>quiet=TRUE</code>. This is no longer the case.</p></li>
+</ul>
+</div>
+<div id="documentation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#documentation" class="anchor"></a>Documentation</h2>
+<ul>
+<li>Added a getting started vignette (<a href='https://github.com/kinto-b/makepipe/issues/19'>#19</a>).</li>
+</ul>
+</div>
 </div>
     <div id="makepipe-005" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.5">

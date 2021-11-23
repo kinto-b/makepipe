@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Register objects to be returned from make_with_source — make_register • makepipe</title>
+<title>Articles • makepipe</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,11 +46,7 @@
 
 
 
-<meta property="og:title" content="Register objects to be returned from make_with_source — make_register" />
-<meta property="og:description" content="It is sometimes useful to have access to certain objects which are generated as
-side-products in a source script which yields as a main-product one or more
-targets. Typically these objects are used for checking that the targets were
-produced as expected." />
+<meta property="og:title" content="Articles" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -70,7 +66,7 @@ produced as expected." />
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-topic">
+    <div class="container template-article-index">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -125,69 +121,18 @@ produced as expected." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Register objects to be returned from <code>make_with_source</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/kinto-b/makepipe/blob/master/R/make_register.R'><code>R/make_register.R</code></a></small>
-    <div class="hidden name"><code>make_register.Rd</code></div>
+      <h1>Articles</h1>
     </div>
 
-    <div class="ref-description">
-    <p>It is sometimes useful to have access to certain objects which are generated as
-side-products in a source script which yields as a main-product one or more
-targets. Typically these objects are used for checking that the targets were
-produced as expected.</p>
+    <div class="section ">
+      <h3>All vignettes</h3>
+      <p class="section-desc"></p>
+
+      <dl>
+        <dt><a href="makepipe.html">Introduction to makepipe</a></dt>
+        <dd></dt>
+      </dl>
     </div>
-
-    <pre class="usage"><span class='fu'>make_register</span><span class='op'>(</span><span class='va'>value</span>, <span class='va'>name</span>, quiet <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
-
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>value</th>
-      <td><p>A value to be registered in a source script and returned as part
-of the <code>Segment</code></p></td>
-    </tr>
-    <tr>
-      <th>name</th>
-      <td><p>A variable name, given as a character string. No coercion is
-done, and the first element of a character vector of length greater than
-one will be used, with a warning.</p></td>
-    </tr>
-    <tr>
-      <th>quiet</th>
-      <td><p>A logical determining whether or not warnings are signaled when
-<code>make_register()</code> is called outside of a 'makepipe' pipeline</p></td>
-    </tr>
-    </table>
-
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p><code>value</code> invisibly</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
-<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'>  <span class='co'># Imagine this is part of your source script:</span></span>
-<span class='r-in'>  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"input.Rds"</span><span class='op'>)</span></span>
-<span class='r-in'>  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>do_stuff</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
-<span class='r-in'>  <span class='va'>chk</span> <span class='op'>&lt;-</span> <span class='fu'>do_check</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
-<span class='r-in'>  <span class='fu'>make_register</span><span class='op'>(</span><span class='va'>chk</span>, <span class='st'>"x_check"</span><span class='op'>)</span></span>
-<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"output.Rds"</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'>  <span class='co'># You will have access to `chk` in your pipeline script:</span></span>
-<span class='r-in'>  <span class='va'>step_one</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_with_source.html'>make_with_source</a></span><span class='op'>(</span></span>
-<span class='r-in'>    <span class='st'>"source.R"</span>,</span>
-<span class='r-in'>    <span class='st'>"output.Rds"</span>,</span>
-<span class='r-in'>    <span class='st'>"input.Rds"</span>,</span>
-<span class='r-in'>  <span class='op'>)</span></span>
-<span class='r-in'>  <span class='va'>step_one</span><span class='op'>$</span><span class='va'>result</span><span class='op'>$</span><span class='va'>chk</span></span>
-<span class='r-in'><span class='op'>}</span></span>
-</pre>
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <nav id="toc" data-toggle="toc" class="sticky-top">
-      <h2 data-toc-skip>Contents</h2>
-    </nav>
   </div>
 </div>
 

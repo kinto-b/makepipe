@@ -82,7 +82,7 @@ dependencies, and sources." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -93,6 +93,9 @@ dependencies, and sources." />
     <span class="fas fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/makepipe.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -142,9 +145,7 @@ dependencies, and sources.</p>
     <h2 class="hasAnchor" id="public-fields"><a class="anchor" href="#public-fields"></a>Public fields</h2>
 
     <p><div class="r6-fields"></p><dl>
-<dt><code>edges</code></dt><dd><p>A data frame</p></dd>
-
-<dt><code>nodes</code></dt><dd><p>A data frame</p></dd>
+<dt><code>segments</code></dt><dd><p>A list of <code>Segment</code> objects</p></dd>
 
 </dl><p></div></p>
     <h2 class="hasAnchor" id="methods"><a class="anchor" href="#methods"></a>Methods</h2>
@@ -155,16 +156,34 @@ dependencies, and sources.</p>
 <ul>
 <li><p><a href='#method-add_source_segment'><code>Pipeline$add_source_segment()</code></a></p></li>
 <li><p><a href='#method-add_recipe_segment'><code>Pipeline$add_recipe_segment()</code></a></p></li>
-<li><p><a href='#method-style_nodes'><code>Pipeline$style_nodes()</code></a></p></li>
+<li><p><a href='#method-build'><code>Pipeline$build()</code></a></p></li>
+<li><p><a href='#method-clean'><code>Pipeline$clean()</code></a></p></li>
+<li><p><a href='#method-annotate'><code>Pipeline$annotate()</code></a></p></li>
+<li><p><a href='#method-refresh'><code>Pipeline$refresh()</code></a></p></li>
 <li><p><a href='#method-print'><code>Pipeline$print()</code></a></p></li>
 <li><p><a href='#method-save'><code>Pipeline$save()</code></a></p></li>
 <li><p><a href='#method-clone'><code>Pipeline$clone()</code></a></p></li>
 </ul>
 <p><hr>
 <a id="method-add_source_segment"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>add_source_segment()</code></h3>
+<p>Add an edge to <code>edges</code></p>
+
+<p>Add any nodes in <code>private$edges</code> that are missing from
+<code>private$nodes</code> into <code>private$nodes</code></p>
+
+<p>Reconstruct Pipeline edges from Segment edges. Called
+primarily to update outofdateness</p>
+
 <p>Add a pipeline segment corresponding to a <code><a href='make_with_source.html'>make_with_source()</a></code>
 call</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>add_source_segment</span><span class='op'>(</span><span class='va'>source</span>, <span class='va'>targets</span>, <span class='va'>dependencies</span>, <span class='va'>packages</span><span class='op'>)</span></pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>add_source_segment</span><span class='op'>(</span>
+  <span class='va'>source</span>,
+  <span class='va'>targets</span>,
+  <span class='va'>dependencies</span>,
+  <span class='va'>packages</span>,
+  <span class='va'>envir</span>,
+  <span class='va'>force</span>
+<span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
@@ -178,19 +197,33 @@ call</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'
 <dt><code>packages</code></dt><dd><p>A character vector of names of packages which <code>targets</code>
 depend on</p></dd>
 
+<dt><code>envir</code></dt><dd><p>The environment in which to execute the <code>source</code> or <code>recipe</code>.</p></dd>
+
+<dt><code>force</code></dt><dd><p>A logical determining whether or not execution of the <code>source</code>
+or <code>recipe</code> will be forced (i.e. happen whether or not the targets are
+out-of-date)</p></dd>
+
+<dt><code>new_edge</code></dt><dd><p>An data.frame constructed with <code>new_edge()</code></p></dd>
+
 </dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
-<p><code>self</code></p>
+<p>The <code>SegmentSource</code> added to the <code>Pipeline</code></p>
 <p><hr>
 <a id="method-add_recipe_segment"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>add_recipe_segment()</code></h3>
 <p>Add a pipeline segment corresponding to a <code><a href='make_with_recipe.html'>make_with_recipe()</a></code>
 call</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>add_recipe_segment</span><span class='op'>(</span><span class='va'>recipe</span>, <span class='va'>targets</span>, <span class='va'>dependencies</span>, <span class='va'>packages</span><span class='op'>)</span></pre><p></div></p>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>add_recipe_segment</span><span class='op'>(</span>
+  <span class='va'>recipe</span>,
+  <span class='va'>targets</span>,
+  <span class='va'>dependencies</span>,
+  <span class='va'>packages</span>,
+  <span class='va'>envir</span>,
+  <span class='va'>force</span>
+<span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
 <p><div class="arguments"></p><dl>
-<dt><code>recipe</code></dt><dd><p>A character vector containing a deparsed expression, which
-would make the <code>targets</code> if evaluated.</p></dd>
+<dt><code>recipe</code></dt><dd><p>A language object which, when evaluated, makes the <code>targets</code></p></dd>
 
 <dt><code>targets</code></dt><dd><p>A character vector of paths to files</p></dd>
 
@@ -200,16 +233,53 @@ would make the <code>targets</code> if evaluated.</p></dd>
 <dt><code>packages</code></dt><dd><p>A character vector of names of packages which <code>targets</code>
 depend on</p></dd>
 
+<dt><code>envir</code></dt><dd><p>The environment in which to execute the <code>source</code> or <code>recipe</code>.</p></dd>
+
+<dt><code>force</code></dt><dd><p>A logical determining whether or not execution of the <code>source</code>
+or <code>recipe</code> will be forced (i.e. happen whether or not the targets are
+out-of-date)</p></dd>
+
+</dl><p></div></p>
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
+<p>The <code>SegmentRecipe</code> added to the <code>Pipeline</code></p>
+<p><hr>
+<a id="method-build"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code><a href='https://rdrr.io/r/utils/PkgUtils.html'>build()</a></code></h3>
+<p>Build all targets</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>build</span><span class='op'>(</span>quiet <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"makepipe.quiet"</span><span class='op'>)</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>quiet</code></dt><dd><p>A logical determining whether or not messages are signaled</p></dd>
+
 </dl><p></div></p>
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p><code>self</code></p>
 <p><hr>
-<a id="method-style_nodes"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>style_nodes()</code></h3>
-<p>Style pipeline nodes</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
-<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>style_nodes</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+<a id="method-clean"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>clean()</code></h3>
+<p>Clean all targets</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>clean</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
 
 <h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Returns</h4>
 <p><code>self</code></p>
+<p><hr>
+<a id="method-annotate"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>annotate()</code></h3>
+<p>Apply annotations to Pipeline</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>annotate</span><span class='op'>(</span><span class='va'>tooltips</span>, <span class='va'>labels</span><span class='op'>)</span></pre><p></div></p>
+
+<h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Arguments</h4>
+<p><div class="arguments"></p><dl>
+<dt><code>tooltips</code></dt><dd><p>A named character vector mapping nodes in the <code>Pipeline</code> onto
+tooltips to display on hover-over.</p></dd>
+
+<dt><code>labels</code></dt><dd><p>A named character vector mapping nodes in the <code>Pipeline</code> onto
+labels to display beside them.</p></dd>
+
+</dl><p></div></p>
+<p><hr>
+<a id="method-refresh"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code>refresh()</code></h3>
+<p>Refresh Pipeline to check outofdateness</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>
+<p><div class="r"></p><pre><span class='va'>Pipeline</span><span class='op'>$</span><span class='fu'>refresh</span><span class='op'>(</span><span class='op'>)</span></pre><p></div></p>
+
 <p><hr>
 <a id="method-print"></a></p><h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Method <code><a href='https://rdrr.io/r/base/print.html'>print()</a></code></h3>
 <p>Display pipeline</p><h4 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Usage</h4>

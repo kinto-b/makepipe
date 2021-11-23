@@ -1,6 +1,7 @@
 pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2021-11-10T23:14Z
+articles:
+  makepipe: makepipe.html
+last_built: 2021-11-23T02:56Z
 
