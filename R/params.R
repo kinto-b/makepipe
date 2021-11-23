@@ -9,5 +9,8 @@
 #'   default, execution will take place in a fresh environment whose parent is
 #'   the calling environment.
 #' @param quiet A logical determining whether or not messages are signaled
+#' @param force A logical determining whether or not execution of the `source`
+#'   or `recipe` will be forced (i.e. happen whether or not the targets are
+#'   out-of-date)
 #' @name make_params
 NULL

@@ -7,10 +7,11 @@
 make_with_recipe(
   recipe,
   targets,
-  dependencies,
+  dependencies = NULL,
   packages = NULL,
   envir = new.env(parent = parent.frame()),
   quiet = getOption("makepipe.quiet"),
+  force = FALSE,
   ...
 )
 }
@@ -31,11 +32,14 @@ the calling environment.}
 
 \item{quiet}{A logical determining whether or not messages are signaled}
 
+\item{force}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
+
 \item{...}{Additional parameters to pass to \code{base::eval()}}
 }
 \value{
-The result of evaluating the \code{recipe} if the \code{targets} are out of
-date otherwise `NULL``
+A \code{Segment} object containing execution metadata.
 }
 \description{
 Make targets out of dependencies using a recipe

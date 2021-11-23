@@ -8,7 +8,7 @@ make_register(value, name, quiet = FALSE)
 }
 \arguments{
 \item{value}{A value to be registered in a source script and returned as part
-of the \code{makepipe_result}}
+of the \code{Segment}}
 
 \item{name}{A variable name, given as a character string. No coercion is
 done, and the first element of a character vector of length greater than

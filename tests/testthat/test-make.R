@@ -46,6 +46,7 @@ expect_uptodate <- function(expr) {
 test_that("targets rebuilt if older than source", {
   order_filetimes(dependency, target1, source1)
   expect_outofdate(quote(make_with_source(source1, target1, dependency)))
+  expect_outofdate(quote(make_with_source(source1, target1, NULL)))
 })
 
 test_that("targets rebuilt if older than dependency", {
@@ -64,6 +65,23 @@ test_that("targets rebuilt if non-existent", {
     "filedoesntexist.Rds",
     dependency
   )))
+
+  expect_outofdate(quote(make_with_source(
+    source1,
+    "filedoesntexist.Rds",
+    NULL # Dependencies NULL
+  )))
+})
+
+test_that("targets rebuilt if forced", {
+  order_filetimes(source1, dependency, target1)
+  expect_outofdate(quote(make_with_source(source1, target1, dependency, force = TRUE)))
+  expect_outofdate(quote(make_with_recipe(2+2, target1, dependency, force = TRUE)))
+})
+
+test_that("targets not rebuilt they exist and have no dependencies", {
+  order_filetimes(source1, dependency, target1)
+  expect_uptodate(quote(make_with_recipe(2+2, target1, NULL)))
 })
 
 test_that("targets not rebuilt if newer than dependency and source", {

@@ -18,9 +18,7 @@ Other pipeline:
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{edges}}{A data frame}
-
-\item{\code{nodes}}{A data frame}
+\item{\code{segments}}{A list of \code{Segment} objects}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,7 +27,10 @@ Other pipeline:
 \itemize{
 \item \href{#method-add_source_segment}{\code{Pipeline$add_source_segment()}}
 \item \href{#method-add_recipe_segment}{\code{Pipeline$add_recipe_segment()}}
-\item \href{#method-style_nodes}{\code{Pipeline$style_nodes()}}
+\item \href{#method-build}{\code{Pipeline$build()}}
+\item \href{#method-clean}{\code{Pipeline$clean()}}
+\item \href{#method-annotate}{\code{Pipeline$annotate()}}
+\item \href{#method-refresh}{\code{Pipeline$refresh()}}
 \item \href{#method-print}{\code{Pipeline$print()}}
 \item \href{#method-save}{\code{Pipeline$save()}}
 \item \href{#method-clone}{\code{Pipeline$clone()}}
@@ -39,10 +40,28 @@ Other pipeline:
 \if{html}{\out{<a id="method-add_source_segment"></a>}}
 \if{latex}{\out{\hypertarget{method-add_source_segment}{}}}
 \subsection{Method \code{add_source_segment()}}{
+Add an edge to \code{edges}
+
+
+Add any nodes in \code{private$edges} that are missing from
+\code{private$nodes} into \code{private$nodes}
+
+
+Reconstruct Pipeline edges from Segment edges. Called
+primarily to update outofdateness
+
+
 Add a pipeline segment corresponding to a \code{make_with_source()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(source, targets, dependencies, packages)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_source_segment(
+  source,
+  targets,
+  dependencies,
+  packages,
+  envir,
+  force
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -57,11 +76,19 @@ call
 
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
+
+\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
+
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
+
+\item{\code{new_edge}}{An data.frame constructed with \code{new_edge()}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\code{self}
+The \code{SegmentSource} added to the \code{Pipeline}
 }
 }
 \if{html}{\out{<hr>}}
@@ -71,14 +98,20 @@ depend on}
 Add a pipeline segment corresponding to a \code{make_with_recipe()}
 call
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(recipe, targets, dependencies, packages)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$add_recipe_segment(
+  recipe,
+  targets,
+  dependencies,
+  packages,
+  envir,
+  force
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{recipe}}{A character vector containing a deparsed expression, which
-would make the \code{targets} if evaluated.}
+\item{\code{recipe}}{A language object which, when evaluated, makes the \code{targets}}
 
 \item{\code{targets}}{A character vector of paths to files}
 
@@ -87,6 +120,32 @@ would make the \code{targets} if evaluated.}
 
 \item{\code{packages}}{A character vector of names of packages which \code{targets}
 depend on}
+
+\item{\code{envir}}{The environment in which to execute the \code{source} or \code{recipe}.}
+
+\item{\code{force}}{A logical determining whether or not execution of the \code{source}
+or \code{recipe} will be forced (i.e. happen whether or not the targets are
+out-of-date)}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The \code{SegmentRecipe} added to the \code{Pipeline}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-build"></a>}}
+\if{latex}{\out{\hypertarget{method-build}{}}}
+\subsection{Method \code{build()}}{
+Build all targets
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$build(quiet = getOption("makepipe.quiet"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{quiet}}{A logical determining whether or not messages are signaled}
 }
 \if{html}{\out{</div>}}
 }
@@ -95,17 +154,48 @@ depend on}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-style_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-style_nodes}{}}}
-\subsection{Method \code{style_nodes()}}{
-Style pipeline nodes
+\if{html}{\out{<a id="method-clean"></a>}}
+\if{latex}{\out{\hypertarget{method-clean}{}}}
+\subsection{Method \code{clean()}}{
+Clean all targets
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$style_nodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$clean()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 \code{self}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-annotate"></a>}}
+\if{latex}{\out{\hypertarget{method-annotate}{}}}
+\subsection{Method \code{annotate()}}{
+Apply annotations to Pipeline
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$annotate(tooltips, labels)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tooltips}}{A named character vector mapping nodes in the \code{Pipeline} onto
+tooltips to display on hover-over.}
+
+\item{\code{labels}}{A named character vector mapping nodes in the \code{Pipeline} onto
+labels to display beside them.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-refresh"></a>}}
+\if{latex}{\out{\hypertarget{method-refresh}{}}}
+\subsection{Method \code{refresh()}}{
+Refresh Pipeline to check outofdateness
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$refresh()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
