@@ -61,8 +61,8 @@ Segment <- R6::R6Class("Segment",
       if (!is.null(dependencies)) stopifnot_class(dependencies, "character")
       if (!is.null(packages)) stopifnot_class(packages, "character")
       stopifnot_class(envir, "environment")
-      stopifnot("`executed` must be either `TRUE` or `FALSE`" = isTRUE(executed) | isFALSE(executed))
-      stopifnot("`force` must be either `TRUE` or `FALSE`" = isTRUE(force) | isFALSE(force))
+      stopifnot_class(executed, "logical")
+      stopifnot_class(force, "logical")
       if (!is.null(execution_time)) stopifnot_class(execution_time, "difftime")
 
       find.package(packages) # Error if package cannot be found
