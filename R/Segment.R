@@ -67,13 +67,6 @@ Segment <- R6::R6Class("Segment",
 
       find.package(packages) # Error if package cannot be found
 
-      miss_deps <- FALSE
-      if (!is.null(dependencies)) miss_deps <- !file.exists(dependencies)
-      if (any(miss_deps)) {
-        stop('One or more `dependencies` do not exist: ', dependencies[miss_deps],
-             call. = FALSE)
-      }
-
       if (any(targets %in% dependencies)) {
         stop("`dependencies` must not be among the `targets`", call. = FALSE)
       }

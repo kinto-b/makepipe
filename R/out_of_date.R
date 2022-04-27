@@ -17,7 +17,10 @@ out_of_date <- function(targets, dependencies, packages = NULL) {
     if (!file.exists(fp_x)) return(TRUE)
     unlist(lapply(dependencies, function(fp_y) {
       # Target x older than dependency y?
-      if (!file.exists(fp_y)) stop('One or more `dependencies` do not exist: ', fp_y, call. = FALSE)
+      if (!file.exists(fp_y)) {
+        warning('One or more `dependencies` do not exist: ', fp_y, call. = FALSE)
+        return(TRUE)
+      }
       file.mtime(fp_x) < file.mtime(fp_y)
     }))
   })))

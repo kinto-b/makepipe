@@ -132,12 +132,12 @@ test_that("targets not rebuilt if newer than package", {
 
 # Errors -----------------------------------------------------------------------
 ## make_with_source ------------------------------------------------------------
-test_that("error thrown if dependency doesn't exist", {
-  expect_error(make_with_source(
+test_that("warning signalled if dependency doesn't exist", {
+  expect_warning(make_with_source(
     source1,
     target1,
     "filedoesntexist.Rds"
-  ))
+  ), "filedoesntexist.Rds")
 })
 
 test_that("error thrown if source doesn't exist", {
@@ -167,12 +167,12 @@ test_that("error thrown if make_*() contains loops", {
 })
 
 ## make_with_recipe ------------------------------------------------------------
-test_that("error thrown if dependency doesn't exist", {
-  expect_error(make_with_recipe(
+test_that("warning signalled if dependency doesn't exist", {
+  expect_warning(make_with_recipe(
     {1+1},
     target1,
     "filedoesntexist.Rds"
-  ))
+  ), "filedoesntexist.Rds")
 })
 
 ## Environment -----------------------------------------------------------------
