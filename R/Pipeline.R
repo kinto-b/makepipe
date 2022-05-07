@@ -91,7 +91,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
       titles <- old_nodes$title
       names(titles) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, labels, "title")
+      nodes <- apply_annotations(nodes, titles, "title")
 
       private$nodes <- nodes
       invisible(self)
@@ -211,9 +211,20 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
     #' @description Display pipeline
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+    #'   `nomnoml::nomnoml()`
+    #' @return `self`
+    nomnoml = function(...) {
+      self$refresh()
+      out <- pipeline_nomnoml(nodes = private$nodes, edges = private$edges, ...)
+      print(out)
+      invisible(self)
+    },
+
+    #' @description Display pipeline
+    #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
     #' @return `self`
-    print = function(...) {
+    visnetwork = function(...) {
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
@@ -230,7 +241,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
     #' @return `self`
-    save = function(file, selfcontained = TRUE, background = "white", ...) {
+    save_visnetwork = function(file, selfcontained = TRUE, background = "white", ...) {
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
@@ -515,3 +526,39 @@ apply_annotations <- function(nodes, annotations, at) {
   new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "..annotation"))]
   new_nodes
 }
+
+
+## Nomnoml ---------------------------------------------------------------------
+
+pipeline_nomnoml <- function(nodes, edges, add = NULL, ...) {
+  # TODO: Display out-of-dateness
+  # TODO: Differentiate recipe, source, etc.
+
+  # Deduplicate labels
+  dups <- duplicated(nodes$label)
+  if (any(dups)) {
+    warning("Replacing duplicate node labels with node ids")
+    nodes$label <- nodes$id
+  }
+
+  # Add notes
+  nodes$label <- ifelse(
+    nodes$title != "",
+    paste(nodes$label, stringr::str_wrap(nodes$title, 30), sep = "|"),
+    nodes$label
+  )
+
+  # Graph
+  nom_fr <- nodes$label[match(edges$from, nodes$id)]
+  nom_to <- nodes$label[match(edges$to, nodes$id)]
+  nom_edges <- paste0("[", nom_fr, "]", "-->", "[", nom_to, "]")
+  nom_edges <- paste(nom_edges, collapse = "\n")
+
+  # Addenda (e.g. styles)
+  add <- paste(add, collapse = "\n")
+  out <- paste(nom_edges, add, collapse = "\n")
+
+  nomnoml::nomnoml(out, ...)
+}
+
+
