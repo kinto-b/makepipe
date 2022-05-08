@@ -277,6 +277,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #'   `visNetwork::visNetwork()`
     #' @return `self`
     visnetwork = function(...) {
+      stop_required("visNetwork")
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
@@ -303,6 +304,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #'   `visNetwork::visNetwork()`
     #' @return `self`
     save_visnetwork = function(file, selfcontained = TRUE, background = "white", ...) {
+      stop_required("visNetwork")
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
@@ -311,9 +313,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
     #' @description Save pipeline nomnoml
     #' @param file File to save the png into
+    #' @param width Image width
+    #' @param height Image height
     #' @param ...  Arguments to pass to `self$nomnoml()`
     #' @return `self`
     save_nomnoml = function(file, width = NULL, height = NULL, ...) {
+      stop_required("webshot")
       stopifnot("`file` must be a .png path" = grepl(x=file, ".png$"))
       wd <- getwd()
       on.exit(setwd(wd))
@@ -553,6 +558,8 @@ sort_topologically <- function(edges) {
 #' @return A visNetwork
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
+  stop_required("visNetwork")
+
   # visNetwork expects tooltips to be stored in `title` column
   nodes$title <- nodes$note
 
@@ -687,13 +694,14 @@ pipeline_nomnoml_code <- function(nodes,
   nodes$color <- ifelse(nodes$.source, "blue", nodes$color)
 
   # Build boxes
+
   nodes$box <- NA
   nodes$box <- sprintf(
     "[<%s%s> %s | %s]",
     nodes$color,
     nodes$shape,
     nodes$label,
-    stringr::str_wrap(nodes$note, 30)
+    strwrap2(nodes$note, 40)
   )
   nodes$box  <- sub(" \\|\\s* ]$", "]", nodes$box) # Cleanup if no note
 

@@ -6,44 +6,43 @@
 \alias{save_pipeline}
 \title{Visualise the Pipeline.}
 \usage{
-show_pipeline(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...)
+show_pipeline(
+  pipeline = get_pipeline(),
+  as = c("nomnoml", "visnetwork"),
+  labels = NULL,
+  notes = NULL,
+  ...
+)
 
 save_pipeline(
   file,
   pipeline = get_pipeline(),
-  tooltips = NULL,
+  as = c("nomnoml", "visnetwork"),
   labels = NULL,
-  selfcontained = TRUE,
-  background = "white",
+  notes = NULL,
   ...
 )
 }
 \arguments{
 \item{pipeline}{A pipeline. See \link{Pipeline} for more details.}
 
-\item{tooltips}{A named character vector mapping nodes in the \code{pipeline} onto
-tooltips to display on hover-over.}
+\item{as}{A string determining whether to use \code{nomnoml} or \code{visNetwork}}
 
 \item{labels}{A named character vector mapping nodes in the \code{pipeline} onto
 labels to display beside them.}
 
-\item{...}{Arguments (other than \code{nodes} and \code{edges}) to pass to
-\code{visNetwork::visNetwork()}}
+\item{notes}{A named character vector mapping nodes in the \code{Pipeline} onto
+notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).}
 
-\item{file}{File to save HTML into}
+\item{...}{Arguments passed onto \code{Pipeline$nomnoml()} or \code{Pipeline$visnetwork}}
 
-\item{selfcontained}{Whether to save the HTML as a single self-contained
-file (with external resources base64 encoded) or a file with external
-resources placed in an adjacent directory.}
-
-\item{background}{Text string giving the html background color of the widget.
-Defaults to white.}
+\item{file}{File to save png (nomnoml) or html (visnetwork) into}
 }
 \description{
-Produce an HTML flowchart visualisation of the pipeline.
+Produce a flowchart visualisation of the pipeline.
 }
 \details{
-Tooltips and labels must be supplied as named character vector where the
+Labels and notes must be supplied as named character vector where the
 names correspond to the filepaths of nodes (i.e. \code{targets}, \code{dependencies},
 or \code{source} scripts)
 }
@@ -61,8 +60,8 @@ make_with_source(
   "data/2 data.R"
 )
 
-# Visualise pipeline with custom tooltips
-show_pipeline(tooltips = c(
+# Visualise pipeline with custom notes
+show_pipeline(notes = c(
   "data/0 raw_data.R" = "Raw survey data",
   "data/0 raw_pop.R" = "Raw population data",
   "data/1 data.R" = "Survey data with recodes applied",

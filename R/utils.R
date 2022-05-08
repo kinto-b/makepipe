@@ -20,6 +20,40 @@ stopifnot_class <- function(x, class) {
   }
 }
 
+
+#' Require a package from Suggests
+#'
+#' @param pkg The name of a package
+#'
+#' @noRd
+#' @keywords internal
+stop_required <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(
+      "Package \"", pkg, "\" needed for this function to work.",
+      "Please install it.",
+      call. = FALSE)
+  }
+}
+
+#' Wrap strings
+#'
+#' @inheritParams base::strwrap
+#'
+#' @return A character vector
+#' @noRd
+#' @keywords internal
+#'
+#' @examples
+#' x <- "Throw a nicely formatted error if a given object doesn't have a particular class"
+#'
+#' strwrap(c(x, x), 40)
+#' strwrap2(c(x, x), 40)
+strwrap2 <- function(x, width) {
+  x <- as.character(x)
+  unlist(lapply(strwrap(x, width, simplify=FALSE), paste, collapse="\n"))
+}
+
 #' Deparse
 #'
 #' Pinched from `flow` :p

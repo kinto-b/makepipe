@@ -20,15 +20,17 @@ URL: https://kinto-b.github.io/makepipe/,
 BugReports: https://github.com/kinto-b/makepipe/issues
 Imports: 
     cli,
+    nomnoml,
     R6,
-    utils,
-    visNetwork
+    utils
 Suggests: 
     knitr,
     covr,
     testthat (>= 3.0.0),
     withr,
-    rmarkdown
+    rmarkdown,
+    webshot,
+    visNetwork
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
