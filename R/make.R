@@ -5,6 +5,8 @@
 #'
 #' @inheritParams make_params
 #' @param source The path to an R script which makes the `targets`
+#' @param note A description of what the `source` does, displayed in pipeline
+#'   visualisations
 #' @param ... Additional parameters to pass to `base::source()`
 #'
 #' @return A `Segment` object containing execution metadata.
@@ -47,7 +49,10 @@
 make_with_source <- function(source, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"),
-                             force = FALSE, ...) {
+                             force = FALSE,
+                             label = NULL,
+                             note = NULL,
+                             ...) {
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
@@ -56,6 +61,7 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
   segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir, force)
   out <- segment$execute(quiet = quiet)
 
+  add_note_and_label(pipeline, segment, label, note)
   invisible(out)
 }
 
@@ -69,6 +75,8 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
 #'
 #' @inheritParams make_params
 #' @param recipe A chunk of R code which makes the `targets`
+#' @param note A description of what the `recipe` does, displayed in pipeline
+#'   visualisations. If `NULL`, the `recipe` code is used.
 #' @param ... Additional parameters to pass to `base::eval()`
 #' @return A `Segment` object containing execution metadata.
 #' @export
@@ -122,7 +130,10 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
 make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NULL,
                              envir = new.env(parent = parent.frame()),
                              quiet = getOption("makepipe.quiet"),
-                             force = FALSE, ...) {
+                             force = FALSE,
+                             label = NULL,
+                             note = NULL,
+                             ...) {
   recipe <- substitute(recipe)
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
@@ -132,5 +143,17 @@ make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NU
   segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir, force)
   out <- segment$execute(quiet = quiet)
 
+  add_note_and_label(pipeline, segment, label, note)
   invisible(out)
+}
+
+
+# Internal ----------------------------------------------------------------
+
+add_note_and_label <- function(pipeline, segment, label, note) {
+  node_id <- as.character(segment$nodes[segment$nodes$.source, ]$id)
+  if(!is.null(label)) names(label) <- node_id
+  if(!is.null(note)) names(note) <- node_id
+  pipeline$annotate(labels = label, notes = note)
+  invisible(NULL)
 }

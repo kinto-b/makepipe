@@ -12,6 +12,8 @@ make_with_source(
   envir = new.env(parent = parent.frame()),
   quiet = getOption("makepipe.quiet"),
   force = FALSE,
+  label = NULL,
+  note = NULL,
   ...
 )
 }
@@ -35,6 +37,12 @@ the calling environment.}
 \item{force}{A logical determining whether or not execution of the \code{source}
 or \code{recipe} will be forced (i.e. happen whether or not the targets are
 out-of-date)}
+
+\item{label}{A short label for the \code{source} or \code{recipe}, displayed in pipeline
+visualisations. If \code{NULL}, the \code{basename(source)} or 'Recipe' will be used.}
+
+\item{note}{A description of what the \code{source} does, displayed in pipeline
+visualisations}
 
 \item{...}{Additional parameters to pass to \code{base::source()}}
 }
