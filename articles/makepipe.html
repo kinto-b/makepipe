@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/makepipe.html">Get started</a>
 </li>
@@ -62,7 +58,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/kinto-b/makepipe/">
+  <a href="https://github.com/kinto-b/makepipe/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -83,7 +79,7 @@
       <h1 data-toc-skip>Introduction to makepipe</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/kinto-b/makepipe/blob/master/vignettes/makepipe.Rmd"><code>vignettes/makepipe.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/kinto-b/makepipe/blob/HEAD/vignettes/makepipe.Rmd" class="external-link"><code>vignettes/makepipe.Rmd</code></a></small>
       <div class="hidden name"><code>makepipe.Rmd</code></div>
 
     </div>
@@ -96,14 +92,14 @@
 <li><p>It makes code self-documenting in a double sense. Firstly, it forces data scientists to make the relationships between the different parts of their code base explicit <strong>within</strong> the code base itself. Secondly, it exhibits those relationships as a directed acyclical graph (i.e. a flowchart) which can be separated from the code base and shared.</p></li>
 </ul>
 <p>It does these things without requiring major upfront investments in the way of code functionalisation or the like. Indeed, one will not ordinarily need to modify one’s existing code at all in order to implement a makepipe pipeline.</p>
-<div id="converting-an-existing-workflow" class="section level1">
-<h1 class="hasAnchor">
-<a href="#converting-an-existing-workflow" class="anchor"></a>Converting an existing workflow</h1>
+<div class="section level2">
+<h2 id="converting-an-existing-workflow">Converting an existing workflow<a class="anchor" aria-label="anchor" href="#converting-an-existing-workflow"></a>
+</h2>
 <p>Assuming your workflow consists of a series of R scripts – <code>one.R</code>, <code>two.R</code>, etc. – you can construct a makepipe <code>Pipeline</code> simply by sourcing them using <code><a href="../reference/make_with_source.html">make_with_source()</a></code>.</p>
 <p>You’ll just need to supply, along with the path to the <code>source</code> script, a set of <code>targets</code> (i.e. paths to files that the script is supposed to make) and optionally a set of <code>dependencies</code> (i.e. paths to files that the script needs so as to make the <code>targets</code>).</p>
 <p>For example, you’ll create a <code>pipeline.R</code> script containing the following:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://kinto-b.github.io/makepipe/">makepipe</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kinto-b.github.io/makepipe/" class="external-link">makepipe</a></span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
   source <span class="op">=</span> <span class="st">"one.R"</span>, 
@@ -114,7 +110,7 @@
 <span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
   source <span class="op">=</span> <span class="st">"two.R"</span>, 
   targets <span class="op">=</span> <span class="st">"data/2 data.Rds"</span>, 
-  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>
+  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="co"># etc.</span></code></pre></div>
@@ -148,34 +144,34 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>This will display a flow chart exhibiting the relationships between the <code>targets</code>, <code>dependencies</code>, and code.</p>
-<div id="make_" class="section level2">
-<h2 class="hasAnchor">
-<a href="#make_" class="anchor"></a><code>make_*()</code>
-</h2>
+<div class="section level3">
+<h3 id="make_">
+<code>make_*()</code><a class="anchor" aria-label="anchor" href="#make_"></a>
+</h3>
 <p>We used <code><a href="../reference/make_with_source.html">make_with_source()</a></code> above since, in most cases, that will be the simplest way to convert an existing workflow. In some cases, however, your pipeline may include short pieces of code that don’t need to reside in their own script. In such cases, you can use <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
-  recipe <span class="op">=</span> <span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html">render</a></span><span class="op">(</span>
+  recipe <span class="op">=</span> <span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span>
         <span class="st">"report.Rmd"</span>,
         output_file <span class="op">=</span> <span class="st">"output/report.html"</span>
     <span class="op">)</span>,
     targets <span class="op">=</span> <span class="st">"output/report.html"</span>,
-    dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"report.Rmd"</span>, <span class="st">"data/2 data.Rds"</span><span class="op">)</span>
+    dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"report.Rmd"</span>, <span class="st">"data/2 data.Rds"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p>As with <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, when a <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> block is run the code (this time the <code>recipe</code>) will only be executed if the relevant <code>targets</code> are out-of-date with respect to their <code>dependencies</code></p>
 </div>
 </div>
-<div id="clean-and-build" class="section level1">
-<h1 class="hasAnchor">
-<a href="#clean-and-build" class="anchor"></a>Clean and build</h1>
-<p>Once you’ve constructed a <code>Pipeline</code> by calling <code>make_*()</code>, you can re-run the entire pipeline using the <code><a href="https://rdrr.io/r/utils/PkgUtils.html">build()</a></code> method. As when using <code>make_*()</code> directly, only code that needs to be run will be when <code><a href="https://rdrr.io/r/utils/PkgUtils.html">build()</a></code> is called.</p>
+<div class="section level2">
+<h2 id="clean-and-build">Clean and build<a class="anchor" aria-label="anchor" href="#clean-and-build"></a>
+</h2>
+<p>Once you’ve constructed a <code>Pipeline</code> by calling <code>make_*()</code>, you can re-run the entire pipeline using the <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> method. As when using <code>make_*()</code> directly, only code that needs to be run will be when <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> is called.</p>
 <p>For example, if you’ve just executed the Pipeline and nothing has changed, then nothing will be re-executed and you’ll be told has much:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span> 
 <span class="co">#&gt; √ Targets are up to date</span>
 <span class="co">#&gt; √ Targets are up to date</span></code></pre></div>
-<p>If you want to start from scratch and ‘rebuild’ all targets, you can use the <code><a href="https://rdrr.io/r/utils/PkgUtils.html">build()</a></code> method together with the <code>clean()</code> method.</p>
+<p>If you want to start from scratch and ‘rebuild’ all targets, you can use the <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> method together with the <code>clean()</code> method.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pipe</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span>
 <span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span>
@@ -184,20 +180,20 @@
 <span class="co">#&gt; √ Finished updating                   </span>
 <span class="co">#&gt; i Targets are out of date. Updating...</span>
 <span class="co">#&gt; √ Finished updating   </span></code></pre></div>
-<p>The <code>clean()</code> and <code><a href="https://rdrr.io/r/utils/PkgUtils.html">build()</a></code> methods are especially useful when used with a <code>Pipeline</code> that has previously been saved out. In particular, if you’ve already created your <code>Pipeline</code> by stringing <code>make_*()</code> calls together and you’ve saved your <code>Pipeline</code> object out as <code>pipeline.Rds</code> you can re-run the whole Pipeline to ensure everything is up-to-date simply by calling:</p>
+<p>The <code>clean()</code> and <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> methods are especially useful when used with a <code>Pipeline</code> that has previously been saved out. In particular, if you’ve already created your <code>Pipeline</code> by stringing <code>make_*()</code> calls together and you’ve saved your <code>Pipeline</code> object out as <code>pipeline.Rds</code> you can re-run the whole Pipeline to ensure everything is up-to-date simply by calling:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="st">"pipeline.Rds"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"pipeline.Rds"</span><span class="op">)</span>
 <span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="return-values-and-registration" class="section level1">
-<h1 class="hasAnchor">
-<a href="#return-values-and-registration" class="anchor"></a>Return values and registration</h1>
+<div class="section level2">
+<h2 id="return-values-and-registration">Return values and registration<a class="anchor" aria-label="anchor" href="#return-values-and-registration"></a>
+</h2>
 <p>Each <code>Segment</code> on the <code>Pipeline</code> is associated with a <code>result</code>. This is akin to a return value. Indeed, in the case of <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> it <em>is</em> the return value of the <code>recipe</code>. For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
     recipe <span class="op">=</span> <span class="op">{</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
     <span class="op">}</span>,
     targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span>
 <span class="op">)</span>
@@ -210,8 +206,8 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
     recipe <span class="op">=</span> <span class="op">{</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
     <span class="op">}</span>,
     targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span>
 <span class="op">)</span>
@@ -220,10 +216,10 @@
 <span class="va">res</span><span class="op">$</span><span class="va">result</span>
 <span class="co">#&gt; NULL</span></code></pre></div>
 <p>Things are a little more complicated in the case of <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, as you can imagine. Given that source scripts do not really have return values, the <code>result</code> cannot be what <code>source</code> returns when run. So what is it?</p>
-<p>The <code>result</code> associated with a source <code>Segment</code> is an environment containing objects ‘registered’ in the <code>source</code> script. Objects are registered using <code><a href="../reference/make_register.html">make_register()</a></code>, which has a similar API to <code><a href="https://rdrr.io/r/base/assign.html">base::assign()</a></code>. Thus, imagine that <code>three.R</code> contains the following code:</p>
+<p>The <code>result</code> associated with a source <code>Segment</code> is an environment containing objects ‘registered’ in the <code>source</code> script. Objects are registered using <code><a href="../reference/make_register.html">make_register()</a></code>, which has a similar API to <code><a href="https://rdrr.io/r/base/assign.html" class="external-link">base::assign()</a></code>. Thus, imagine that <code>three.R</code> contains the following code:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># ...</span>
-<span class="fu">makepipe</span><span class="fu">::</span><span class="fu"><a href="../reference/make_register.html">make_register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="st">"num_rows"</span><span class="op">)</span>
+<span class="fu">makepipe</span><span class="fu">::</span><span class="fu"><a href="../reference/make_register.html">make_register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="st">"num_rows"</span><span class="op">)</span>
 <span class="co"># ...</span></code></pre></div>
 <p>Then we will have:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -242,9 +238,9 @@
 <span class="co">#&gt; [1] 32</span></code></pre></div>
 <p>As with <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>, a <code>result</code> will only be captured if the <code>source</code> script is executed.</p>
 </div>
-<div id="execution-details" class="section level1">
-<h1 class="hasAnchor">
-<a href="#execution-details" class="anchor"></a>Execution details</h1>
+<div class="section level2">
+<h2 id="execution-details">Execution details<a class="anchor" aria-label="anchor" href="#execution-details"></a>
+</h2>
 <p>So when does a <code>source</code> file or a <code>recipe</code> get executed? The answer is: when and only when the relevant <code>targets</code> are out-of-date with respect to the <code>dependencies</code>. But what does that mean? Specifically, the <code>targets</code> are out-of-date if and only if:</p>
 <ul>
 <li><p>One or more of the <code>targets</code> do not exist, OR</p></li>
@@ -271,11 +267,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Kinto Behr.</p>
+  <p></p>
+<p>Developed by Kinto Behr.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -283,6 +281,8 @@
 
   
 
+
+  
 
   </body>
 </html>
