@@ -173,6 +173,7 @@ pipe$annotate(labels = annotation, notes = annotation)
 
 
 test_that("pipeline can be saved as png", {
+  skip_if_not(webshot::is_phantomjs_installed())
   temp_png <- tempfile(fileext = ".png")
   save_pipeline(temp_png, pipeline = pipe)
   expect_snapshot_file(temp_png, "pipeline_png")
