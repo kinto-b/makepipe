@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9001</span>
       </span>
     </div>
 
@@ -50,7 +50,16 @@
       <small>Source: <a href="https://github.com/kinto-b/makepipe/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
-    <div class="section level2"><h2 class="page-header" data-toc-text="development version" id="makepipe-development-version">makepipe (development version)<a class="anchor" aria-label="anchor" href="#makepipe-development-version"></a></h2></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="development version" id="makepipe-development-version">makepipe (development version)<a class="anchor" aria-label="anchor" href="#makepipe-development-version"></a></h2>
+<ul><li><p>BREAKING CHANGE: <code>Pipeline$save()</code> has been deprecated and the arguments to <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code>, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, and <code>Pipeline$annotate()</code> have been changed. This change was made to support the next change which is:</p></li>
+<li>
+<p>Added support for <code>nomnoml</code> flowcharts:</p>
+<ul><li>By default, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code> will now display a <code>nomnoml</code> style flowchart. You can reproduce the old <code>visNetwork</code> style chart using <code>show_pipeline(as="visnetwork")</code>. These are powered by two new methods belonging to the <code>Pipeline</code> class: <code>$nomnoml()</code> and <code>$visnetwork()</code>.</li>
+<li>By default, <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code> will now save an image of the <code>nomnoml</code> chart. You can export the <code>visNetwork</code> chart as an html file using <code>save_pipeline(as="visnetwork")</code>. These are powered by two new methods belonging to the <code>Pipeline</code> class, which replace the deprecated <code>$save()</code> method: <code>$save_nomnoml()</code> and <code>$save_visnetwork()</code>.</li>
+</ul></li>
+<li><p><code>make_with_*()</code> no longer throws an error if <code>dependencies</code> don’t exist. It will be left to the users script/code to handle this situation.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="makepipe-010">makepipe 0.1.0<small>2021-11-23</small><a class="anchor" aria-label="anchor" href="#makepipe-010"></a></h2>
 <div class="section level3">
@@ -62,7 +71,7 @@
 <h3 id="segment-0-1-0">Segment<a class="anchor" aria-label="anchor" href="#segment-0-1-0"></a></h3>
 <ul><li><p>Implemented <code>Segment</code> class to serve as the basic building block for the <code>Pipeline</code> (<a href="https://github.com/kinto-b/makepipe/issues/28" class="external-link">#28</a>). This clarifies the link between the fundamental <code>make_*()</code> functions and the <code>Pipeline</code> object. In particular, each <code>make_*()</code> call constructs a <code>Segment</code> which is appended to the <code>Pipeline</code>.</p></li>
 <li><p>The <code>Segment</code> class has an <code>execute()</code> method, which replicates the execution behaviour of the <code>make_*()</code> functions. Hence <code>Segment$execute()</code> can be run to rebuild the targets associated with a given segment without adding a new segment to the <code>Pipeline</code> as would be done if we called <code>make_*()</code> again.</p></li>
-<li><p>The <code>Segment</code> holds all execution metadata (e.g. execution result, execution time, etc.). This is updated via the <code>Segment$update_result()</code> method whenever <code>Segment$execute()</code> is called.</p></li>
+<li><p>The <code>Segment</code> holds all execution metadata (e.g. execution result, executiontime, etc.). This is updated via the <code>Segment$update_result()</code> method whenever <code>Segment$execute()</code> is called.</p></li>
 <li><p>Added a <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> method to the <code>Pipeline</code> class, which sorts the <code>Segment</code>s topologically and then calls <code>execute()</code> on each in turn.</p></li>
 <li><p>Added a <code>clean()</code> method to the <code>Pipeline</code> class, which deletes the <code>targets</code> associated with each <code>Segment</code>.</p></li>
 <li><p>Removed the now redundant <code>makepipe_result</code> S3 class. All of the information that was held by the <code>makepipe_result</code> is now held by the <code>Segment</code>.</p></li>
