@@ -84,6 +84,10 @@ show_pipeline()
 
 We can also get an interactive visNetwork widget:
 
+``` r
+show_pipeline(as = "visnetwork")
+```
+
 <img src="man/figures/pipeline_visnetwork_uptodate.png" width="75%" style="display: block; margin: auto;" />
 
 Once you’ve constructed a pipeline, you can ‘clean’ it (i.e. delete all

@@ -82,6 +82,10 @@ knitr::include_graphics("man/figures/pipeline_nomnoml_uptodate.png")
 
 We can also get an interactive visNetwork widget:
 
+```r
+show_pipeline(as = "visnetwork")
+```
+
 ```{r out.width = "75%", echo = FALSE, fig.align = "center"}
 knitr::include_graphics("man/figures/pipeline_visnetwork_uptodate.png")
 ```
