@@ -402,7 +402,9 @@ get_pipeline <- function() {
 
 #' Visualise the Pipeline.
 #'
-#' Produce a flowchart visualisation of the pipeline.
+#' Produce a flowchart visualisation of the pipeline. Out-of-date targets will
+#' be coloured red, up-to-date targets will be coloured green, and everything
+#' else will be blue.
 #'
 #' Labels and notes must be supplied as named character vector where the
 #' names correspond to the filepaths of nodes (i.e. `targets`, `dependencies`,
