@@ -31,8 +31,11 @@ Other pipeline:
 \item \href{#method-clean}{\code{Pipeline$clean()}}
 \item \href{#method-annotate}{\code{Pipeline$annotate()}}
 \item \href{#method-refresh}{\code{Pipeline$refresh()}}
+\item \href{#method-nomnoml}{\code{Pipeline$nomnoml()}}
+\item \href{#method-visnetwork}{\code{Pipeline$visnetwork()}}
 \item \href{#method-print}{\code{Pipeline$print()}}
-\item \href{#method-save}{\code{Pipeline$save()}}
+\item \href{#method-save_visnetwork}{\code{Pipeline$save_visnetwork()}}
+\item \href{#method-save_nomnoml}{\code{Pipeline$save_nomnoml()}}
 \item \href{#method-clone}{\code{Pipeline$clone()}}
 }
 }
@@ -172,17 +175,17 @@ Clean all targets
 \subsection{Method \code{annotate()}}{
 Apply annotations to Pipeline
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$annotate(tooltips, labels)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$annotate(labels = NULL, notes = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tooltips}}{A named character vector mapping nodes in the \code{Pipeline} onto
-tooltips to display on hover-over.}
-
 \item{\code{labels}}{A named character vector mapping nodes in the \code{Pipeline} onto
 labels to display beside them.}
+
+\item{\code{notes}}{A named character vector mapping nodes in the \code{Pipeline} onto
+notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).}
 }
 \if{html}{\out{</div>}}
 }
@@ -198,10 +201,94 @@ Refresh Pipeline to check outofdateness
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-nomnoml"></a>}}
+\if{latex}{\out{\hypertarget{method-nomnoml}{}}}
+\subsection{Method \code{nomnoml()}}{
+Display the pipeline with nomnoml
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$nomnoml(
+  direction = c("down", "right"),
+  arrow_size = 1,
+  edge_style = c("hard", "rounded"),
+  bend_size = 0.3,
+  font = "Courier",
+  font_size = 12,
+  line_width = 3,
+  padding = 16,
+  spacing = 40,
+  leading = 1.25,
+  stroke = "#33322E",
+  fill_arrows = FALSE,
+  gutter = 5,
+  edge_margin = 0
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{direction}}{The direction the flowchart should go in}
+
+\item{\code{arrow_size}}{The arrowhead size}
+
+\item{\code{edge_style}}{The arrow edge style}
+
+\item{\code{bend_size}}{The degree of rounding in the arrows (requires
+\code{edge_style=rounded})}
+
+\item{\code{font}}{The name of a font to use}
+
+\item{\code{font_size}}{The font size}
+
+\item{\code{line_width}}{The line width for arrows and box outlines}
+
+\item{\code{padding}}{The amount of padding \emph{within} boxes}
+
+\item{\code{spacing}}{The amount of spacing \emph{between} boxes,}
+
+\item{\code{leading}}{The amount of spacing between lines of text}
+
+\item{\code{stroke}}{The color of arrows, text, and box outlines}
+
+\item{\code{fill_arrows}}{Whether arrow heads are full triangles (\code{TRUE}) or
+angled (\code{FALSE})}
+
+\item{\code{gutter}}{The amount space to leave around the flowchart}
+
+\item{\code{edge_margin}}{The amount of space to leave between boxes and arrows}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-visnetwork"></a>}}
+\if{latex}{\out{\hypertarget{method-visnetwork}{}}}
+\subsection{Method \code{visnetwork()}}{
+Display the pipeline with nomnoml
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$visnetwork(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Arguments (other than \code{nodes} and \code{edges}) to pass to
+\code{visNetwork::visNetwork()}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
-Display pipeline
+Display
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$print(...)}\if{html}{\out{</div>}}
 }
@@ -219,12 +306,12 @@ Display pipeline
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-save"></a>}}
-\if{latex}{\out{\hypertarget{method-save}{}}}
-\subsection{Method \code{save()}}{
-Save pipeline
+\if{html}{\out{<a id="method-save_visnetwork"></a>}}
+\if{latex}{\out{\hypertarget{method-save_visnetwork}{}}}
+\subsection{Method \code{save_visnetwork()}}{
+Save pipeline visNetwork
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save(file, selfcontained = TRUE, background = "white", ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save_visnetwork(file, selfcontained = TRUE, background = "white", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -241,6 +328,32 @@ widget. Defaults to white.}
 
 \item{\code{...}}{Arguments (other than \code{nodes} and \code{edges}) to pass to
 \code{visNetwork::visNetwork()}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save_nomnoml"></a>}}
+\if{latex}{\out{\hypertarget{method-save_nomnoml}{}}}
+\subsection{Method \code{save_nomnoml()}}{
+Save pipeline nomnoml
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save_nomnoml(file, width = NULL, height = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{File to save the png into}
+
+\item{\code{width}}{Image width}
+
+\item{\code{height}}{Image height}
+
+\item{\code{...}}{Arguments to pass to \code{self$nomnoml()}}
 }
 \if{html}{\out{</div>}}
 }

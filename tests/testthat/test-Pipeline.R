@@ -160,6 +160,36 @@ test_that("out-of-dateness is kept up-to-date", {
   expect_outofdate(target1)
 })
 
+
+# save_pipeline -----------------------------------------------------------
+set_pipeline(PipelineTest$new())
+order_filetimes(dependency, target1, source1)
+make_with_source(source1, target1, dependency, quiet = TRUE)
+pipe <- get_pipeline()
+
+annotation <- c("one", "two", "three")
+names(annotation) <- c(dependency, source1, target1)
+pipe$annotate(labels = annotation, notes = annotation)
+
+
+test_that("pipeline can be saved as png", {
+  skip_on_ci()
+  skip_on_cran()
+  skip_if_not(webshot::is_phantomjs_installed())
+
+  temp_png <- tempfile(fileext = ".png")
+  save_pipeline(temp_png, pipeline = pipe)
+  expect_snapshot_file(temp_png, "pipeline_png")
+  unlink(temp_png)
+})
+
+test_that("pipeline can be saved as html", {
+  temp_html <- tempfile(fileext = ".html")
+  save_pipeline(temp_html, pipeline = pipe, as = "visnetwork")
+  expect(file.exists(temp_html), failure_message = "HTML didn't save properly")
+  unlink(temp_html)
+})
+
 # Annotations ------------------------------------------------------------------
 set_pipeline(PipelineTest$new())
 order_filetimes(dependency, target1, source1)
@@ -169,19 +199,19 @@ pipe <- get_pipeline()
 test_that("annotations aren't overwritten by print method", {
   annotation <- c("one", "two", "three")
   names(annotation) <- c(dependency, source1, target1)
-  pipe$annotate(labels = annotation, tooltips = annotation)
+  pipe$annotate(labels = annotation, notes = annotation)
 
   print(pipe)
-  expect_identical(sort(pipe$get_nodes()$title), sort(c("one", "two", "three")))
+  expect_identical(sort(pipe$get_nodes()$note), sort(c("one", "two", "three")))
   expect_identical(sort(pipe$get_nodes()$label), sort(c("one", "two", "three")))
 
   # Change annotations
   annotation <- c("1", "2", "3")
   names(annotation) <- c(dependency, source1, target1)
-  pipe$annotate(labels = annotation, tooltips = annotation)
+  pipe$annotate(labels = annotation, notes = annotation)
 
   print(pipe)
-  expect_identical(sort(pipe$get_nodes()$title), sort(c("1", "2", "3")))
+  expect_identical(sort(pipe$get_nodes()$note), sort(c("1", "2", "3")))
   expect_identical(sort(pipe$get_nodes()$label), sort(c("1", "2", "3")))
 })
 
@@ -191,31 +221,31 @@ test_that("duplicate annotations are disallowed", {
   names(annotation) <- rep(dependency, 2)
 
   expect_error(pipe$annotate(
-    tooltips = annotation,
+    notes = annotation,
     labels = NULL
   ), regexp = "must not be duplicated")
 
   expect_error(pipe$annotate(
     labels = annotation,
-    tooltips = NULL
+    notes = NULL
   ), regexp = "must not be duplicated")
 })
 
 # Non-existent
 test_that("annotations cannot be applied to nodes that don't exist", {
   expect_error(pipe$annotate(
-    tooltips = c("R/aaa.R" = "input"),
+    notes = c("R/aaa.R" = "input"),
     labels = NULL
   ), regexp = "not nodes in `Pipeline`")
 })
 
 # Non-character
 test_that("annotations cannot must be character", {
-  tooltips <- c(1)
-  names(tooltips) <- dependency
+  notes <- c(1)
+  names(notes) <- dependency
 
   expect_error(pipe$annotate(
-    tooltips = tooltips,
+    notes = notes,
     labels = NULL
   ), regexp = "must be of class character")
 })

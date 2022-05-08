@@ -40,7 +40,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     nodes = data.frame(
       id = factor(),
       label = character(0),
-      title = character(0),
+      note = character(0),
       .source = logical(0),
       .recipe = logical(0),
       .pkg = logical(0),
@@ -79,19 +79,19 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
         nodes <- unique(do.call(rbind, nodes))
       }
 
-      # Add titles/labels
+      # Add notes/labels
       lbl <- basename(as.character(nodes$id))
       nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
-      nodes$title <- ""
+      nodes$note <- as.character(nodes$id)
 
-      # Restore old titles/labels
+      # Restore old notes/labels
       labels <- old_nodes$label
       names(labels) <- as.character(old_nodes$id)
       nodes <- apply_annotations(nodes, labels, "label")
 
-      titles <- old_nodes$title
-      names(titles) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, labels, "title")
+      notes <- old_nodes$note
+      names(notes) <- as.character(old_nodes$id)
+      nodes <- apply_annotations(nodes, notes, "note")
 
       private$nodes <- nodes
       invisible(self)
@@ -182,14 +182,14 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     },
 
     #' @description Apply annotations to Pipeline
-    #' @param tooltips A named character vector mapping nodes in the `Pipeline` onto
-    #'   tooltips to display on hover-over.
     #' @param labels A named character vector mapping nodes in the `Pipeline` onto
     #'   labels to display beside them.
-    annotate = function(tooltips, labels) {
-      if (!is.null(tooltips)) {
-        validate_annotation(tooltips, "tooltips", private$nodes)
-        new_nodes <- apply_annotations(private$nodes, tooltips, "title")
+    #' @param notes A named character vector mapping nodes in the `Pipeline` onto
+    #'   notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).
+    annotate = function(labels = NULL, notes = NULL) {
+      if (!is.null(notes)) {
+        validate_annotation(notes, "notes", private$nodes)
+        new_nodes <- apply_annotations(private$nodes, notes, "note")
         private$nodes <- new_nodes
       }
 
@@ -209,18 +209,91 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       invisible(self)
     },
 
-    #' @description Display pipeline
+    #' @description Display the pipeline with nomnoml
+    #'
+    #' @return `self`
+    #' @param direction The direction the flowchart should go in
+    #' @param arrow_size The arrowhead size
+    #' @param edge_style The arrow edge style
+    #' @param bend_size The degree of rounding in the arrows (requires
+    #'   `edge_style=rounded`)
+    #' @param font The name of a font to use
+    #' @param font_size The font size
+    #' @param line_width The line width for arrows and box outlines
+    #' @param padding The amount of padding *within* boxes
+    #' @param spacing The amount of spacing *between* boxes,
+    #' @param leading The amount of spacing between lines of text
+    #' @param stroke The color of arrows, text, and box outlines
+    #' @param fill_arrows Whether arrow heads are full triangles (`TRUE`) or
+    #'   angled (`FALSE`)
+    #' @param gutter The amount space to leave around the flowchart
+    #' @param edge_margin The amount of space to leave between boxes and arrows
+
+    nomnoml = function(direction = c("down", "right"),
+                       arrow_size = 1,
+                       edge_style = c("hard", "rounded"),
+                       bend_size = 0.3,
+                       font = "Courier",
+                       font_size = 12,
+                       line_width = 3,
+                       padding = 16,
+                       spacing = 40,
+                       leading = 1.25,
+                       stroke = "#33322E",
+                       fill_arrows = FALSE,
+                       gutter = 5,
+                       edge_margin = 0) {
+      self$refresh()
+      out <- pipeline_nomnoml_code(
+        nodes = private$nodes,
+        edges = private$edges,
+        direction = direction,
+        # ranker = ranker,
+        arrow_size = arrow_size,
+        edge_style = edge_style,
+        bend_size = bend_size,
+        font = font,
+        font_size = font_size,
+        line_width = line_width,
+        padding = padding,
+        spacing = spacing,
+        leading = leading,
+        stroke = stroke,
+        # fill = fill,
+        # title = title,
+        # zoom = zoom,
+        fill_arrows = fill_arrows,
+        # acyclicer = acyclicer,
+        gutter = gutter,
+        edge_margin = edge_margin
+      )
+
+      print(nomnoml::nomnoml(out))
+      invisible(self)
+    },
+
+    #' @description Display the pipeline with nomnoml
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
     #' @return `self`
-    print = function(...) {
+    visnetwork = function(...) {
+      stop_required("visNetwork")
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
       invisible(self)
     },
 
-    #' @description Save pipeline
+    #' @description Display
+    #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
+    #'   `visNetwork::visNetwork()`
+    #' @return `self`
+    print = function(...) {
+      self$nomnoml()
+      invisible(self)
+    },
+
+    #' @description Save pipeline visNetwork
     #' @param file File to save HTML into
     #' @param selfcontained Whether to save the HTML as a single self-contained
     #'   file (with external resources base64 encoded) or a file with external
@@ -230,10 +303,49 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
     #' @return `self`
-    save = function(file, selfcontained = TRUE, background = "white", ...) {
+    save_visnetwork = function(file, selfcontained = TRUE, background = "white", ...) {
+      stop_required("visNetwork")
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
+      invisible(self)
+    },
+
+    #' @description Save pipeline nomnoml
+    #' @param file File to save the png into
+    #' @param width Image width
+    #' @param height Image height
+    #' @param ...  Arguments to pass to `self$nomnoml()`
+    #' @return `self`
+    save_nomnoml = function(file, width = NULL, height = NULL, ...) {
+      stop_required("webshot")
+      stopifnot("`file` must be a .png path" = grepl(x=file, ".png$"))
+      wd <- getwd()
+      on.exit(setwd(wd))
+
+      self$refresh()
+      code <- pipeline_nomnoml_code(nodes = private$nodes, edges = private$edges, ...)
+
+      x <- list(code = code, svg = FALSE)
+      widget <- htmlwidgets::createWidget(
+        name = "nomnoml",
+        x, width = width, height = height,
+        package = "nomnoml"
+      )
+
+      html <- tempfile("flow_", fileext = ".html")
+      htmlwidgets::saveWidget(widget, html)
+
+      out <- tempfile("out_", fileext = ".png")
+
+      setwd(tempdir())
+      webshot::webshot(basename(html), out, selector = "canvas")
+      setwd(wd)
+
+      file.copy(out, file)
+      unlink(out)
+      unlink(html)
+
       invisible(self)
     }
   )
@@ -290,25 +402,22 @@ get_pipeline <- function() {
 
 #' Visualise the Pipeline.
 #'
-#' Produce an HTML flowchart visualisation of the pipeline.
+#' Produce a flowchart visualisation of the pipeline. Out-of-date targets will
+#' be coloured red, up-to-date targets will be coloured green, and everything
+#' else will be blue.
 #'
-#' Tooltips and labels must be supplied as named character vector where the
+#' Labels and notes must be supplied as named character vector where the
 #' names correspond to the filepaths of nodes (i.e. `targets`, `dependencies`,
 #' or `source` scripts)
 #'
-#' @param file File to save HTML into
+#' @param file File to save png (nomnoml) or html (visnetwork) into
 #' @param pipeline A pipeline. See [Pipeline] for more details.
-#' @param tooltips A named character vector mapping nodes in the `pipeline` onto
-#'   tooltips to display on hover-over.
+#' @param as A string determining whether to use `nomnoml` or `visNetwork`
 #' @param labels A named character vector mapping nodes in the `pipeline` onto
 #'   labels to display beside them.
-#' @param selfcontained Whether to save the HTML as a single self-contained
-#'   file (with external resources base64 encoded) or a file with external
-#'   resources placed in an adjacent directory.
-#' @param background Text string giving the html background color of the widget.
-#'   Defaults to white.
-#' @param ...  Arguments (other than `nodes` and `edges`) to pass to
-#'   `visNetwork::visNetwork()`
+#' @param notes A named character vector mapping nodes in the `Pipeline` onto
+#'   notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).
+#' @param ...  Arguments passed onto `Pipeline$nomnoml()` or `Pipeline$visnetwork`
 #'
 #' @name pipeline-vis
 #' @family pipeline
@@ -326,8 +435,8 @@ get_pipeline <- function() {
 #'   "data/2 data.R"
 #' )
 #'
-#' # Visualise pipeline with custom tooltips
-#' show_pipeline(tooltips = c(
+#' # Visualise pipeline with custom notes
+#' show_pipeline(notes = c(
 #'   "data/0 raw_data.R" = "Raw survey data",
 #'   "data/0 raw_pop.R" = "Raw population data",
 #'   "data/1 data.R" = "Survey data with recodes applied",
@@ -337,16 +446,28 @@ get_pipeline <- function() {
 NULL
 #' @rdname pipeline-vis
 #' @export
-show_pipeline <- function(pipeline = get_pipeline(), tooltips = NULL, labels = NULL, ...) {
-  pipeline$annotate(tooltips, labels)
-  pipeline$print()
+show_pipeline <- function(pipeline = get_pipeline(),
+                          as = c("nomnoml", "visnetwork"),
+                          labels = NULL, notes = NULL, ...) {
+  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  pipeline$annotate(labels, notes)
+  switch(as,
+    nomnoml = pipeline$nomnoml(...),
+    visnetwork = pipeline$visnetwork(...)
+  )
 }
 
 #' @rdname pipeline-vis
 #' @export
-save_pipeline <- function(file, pipeline = get_pipeline(), tooltips = NULL, labels = NULL, selfcontained = TRUE, background = "white", ...) {
-  pipeline$annotate(tooltips, labels)
-  pipeline$save(file, ...)
+save_pipeline <- function(file, pipeline = get_pipeline(),
+                          as = c("nomnoml", "visnetwork"),
+                          labels = NULL, notes = NULL, ...) {
+  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  pipeline$annotate(labels, notes)
+  switch(as,
+         nomnoml = pipeline$save_nomnoml(file, ...),
+         visnetwork = pipeline$save_visnetwork(file, ...)
+  )
 }
 
 
@@ -439,6 +560,10 @@ sort_topologically <- function(edges) {
 #' @return A visNetwork
 #' @noRd
 pipeline_network <- function(nodes, edges, ...) {
+  stop_required("visNetwork")
+
+  # visNetwork expects tooltips to be stored in `title` column
+  nodes$title <- nodes$note
 
   # Add aesthetics to nodes
   nodes$shape <- ifelse(nodes$.recipe, "circle", "square")
@@ -515,3 +640,117 @@ apply_annotations <- function(nodes, annotations, at) {
   new_nodes <- new_nodes[, setdiff(names(new_nodes), c("node_id", "..annotation"))]
   new_nodes
 }
+
+
+## Nomnoml ---------------------------------------------------------------------
+pipeline_nomnoml_code <- function(nodes,
+                                  edges,
+                                  direction = c("down", "right"),
+                                  ranker = c("network-simplex", "tight-tree", "longest-path"),
+                                  arrow_size = 1,
+                                  edge_style = c("hard", "rounded"),
+                                  bend_size = 0.3,
+                                  font = "Courier",
+                                  font_size = 12,
+                                  line_width = 3,
+                                  padding = 16,
+                                  spacing = 40,
+                                  leading = 1.25,
+                                  stroke = "#33322E",
+                                  fill = "#eee8d5",
+                                  title = "filename",
+                                  zoom = 1,
+                                  fill_arrows = FALSE,
+                                  acyclicer = "greedy",
+                                  gutter = 5,
+                                  edge_margin = 0) {
+  direction <- match.arg(direction)
+  edge_style     <- match.arg(edge_style)
+  ranker    <- match.arg(ranker)
+
+  # FALSE or TRUE must become "false" or "true" for nomnoml
+  fill_arrows <- tolower(fill_arrows)
+
+  # Enforce uniquness of label since this is our nomnoml id
+  nodes$label <- make.unique(nodes$label, sep = " +")
+
+  # Drop uninformative notes
+  note_matches_id <- nodes$note==as.character(nodes$id)
+  nodes$note[!nodes$.recipe & note_matches_id] <- ""
+
+  # Now wrap the ones that aren't code
+  note_matches_id <- nodes$note==as.character(nodes$id)
+  nodes$note[!note_matches_id] <- strwrap2(nodes$note[!note_matches_id], 40)
+
+  # Escape special characters
+  nodes$label <- escape_pipes_and_brackets(nodes$label)
+  nodes$note <- escape_pipes_and_brackets(nodes$note)
+
+  # Add aesthetics
+
+  outdated <- nodes$id %in% edges[edges$.outdated, "to"]
+  nodes$shape <- ifelse(nodes$.recipe, "recipe", "box")
+  nodes$shape <- ifelse(nodes$.pkg, "pkg", nodes$shape)
+  nodes$color <- ifelse(outdated, "red", "green")
+  nodes$color <- ifelse(nodes$.source, "blue", nodes$color)
+
+  # Build boxes
+  nodes$box <- NA
+  nodes$box <- sprintf(
+    "[<%s%s> %s | %s]",
+    nodes$color,
+    nodes$shape,
+    nodes$label,
+    nodes$note
+  )
+  nodes$box  <- sub(" \\|\\s* ]$", "]", nodes$box) # Cleanup if no note
+
+  # Graph
+  nom_edges <- sprintf(
+    "%s --> %s",
+    nodes$box[match(edges$from, nodes$id)],
+    nodes$box[match(edges$to, nodes$id)]
+  )
+  nom_edges <- paste(nom_edges, collapse = "\n")
+
+  # Styles
+  header <- paste0(
+    "#.redbox: fill=#ffcaef title=bold align=center\n",
+    "#.greenbox: fill=#caffda title=bold align=center\n",
+    "#.bluebox: fill=#77b6fe title=bold align=center\n",
+    "#.bluerecipe: align=left fill=#77b6fe title=bold\n",
+    "#.bluepkg: visual=database fill=#77b6fe title=bold align=center\n",
+    "#arrowSize: ", arrow_size, "\n",
+    "#bendSize: ", bend_size, "\n",
+    "#direction: ", direction, "\n",
+    "#gutter: ", gutter, "\n",
+    "#edgeMargin: ", edge_margin, "\n",
+    "#edges: ", edge_style, "\n",
+    "#fill: ", fill, "\n",
+    "#fillArrows: ", fill_arrows, "\n",
+    "#font: ", font, "\n",
+    "#fontSize: ", font_size, "\n",
+    "#leading: ", leading, "\n",
+    "#lineWidth: ", line_width, "\n",
+    "#padding: ", padding, "\n",
+    "#spacing: ", spacing, "\n",
+    "#stroke: ", stroke, "\n",
+    "#title: ", title, "\n",
+    "#zoom: ", zoom, "\n",
+    "#acyclicer: ", acyclicer, "\n",
+    "#ranker: ", ranker, "\n"
+  )
+
+  paste0(header,"\n", nom_edges)
+}
+
+
+escape_pipes_and_brackets <- function(x) {
+  x <- gsub("]","\\]", x ,fixed = TRUE)
+  x <- gsub("[","\\[", x ,fixed = TRUE)
+  x <- gsub("|","\\|", x ,fixed = TRUE)
+  x
+}
+
+
+
