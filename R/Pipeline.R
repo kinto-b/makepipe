@@ -671,24 +671,23 @@ pipeline_nomnoml_code <- function(nodes,
   # FALSE or TRUE must become "false" or "true" for nomnoml
   fill_arrows <- tolower(fill_arrows)
 
-  # Relabel
-  num_recipes <- sum(nodes$.recipe)
-  nodes$label[nodes$.recipe] <- paste0(
-    "Recipe ",
-    seq_len(num_recipes), ":;",
-    escape_pipes_and_brackets(nodes$id[nodes$.recipe])
-  )
-
-  dups <- duplicated(nodes$label)
-  if (any(dups)) {
-    warning("Replacing duplicate node labels with node ids")
-    nodes$label[dups] <- nodes$id[dups]
-  }
+  # Enforce uniquness of label since this is our nomnoml id
+  nodes$label <- make.unique(nodes$label, sep = " +")
 
   # Drop uninformative notes
-  nodes$note[nodes$note==as.character(nodes$id)] <- ""
+  note_matches_id <- nodes$note==as.character(nodes$id)
+  nodes$note[!nodes$.recipe & note_matches_id] <- ""
+
+  # Now wrap the ones that aren't code
+  note_matches_id <- nodes$note==as.character(nodes$id)
+  nodes$note[!note_matches_id] <- strwrap2(nodes$note[!note_matches_id], 40)
+
+  # Escape special characters
+  nodes$label <- escape_pipes_and_brackets(nodes$label)
+  nodes$note <- escape_pipes_and_brackets(nodes$note)
 
   # Add aesthetics
+
   outdated <- nodes$id %in% edges[edges$.outdated, "to"]
   nodes$shape <- ifelse(nodes$.recipe, "recipe", "box")
   nodes$shape <- ifelse(nodes$.pkg, "pkg", nodes$shape)
@@ -696,14 +695,13 @@ pipeline_nomnoml_code <- function(nodes,
   nodes$color <- ifelse(nodes$.source, "blue", nodes$color)
 
   # Build boxes
-
   nodes$box <- NA
   nodes$box <- sprintf(
     "[<%s%s> %s | %s]",
     nodes$color,
     nodes$shape,
     nodes$label,
-    strwrap2(nodes$note, 40)
+    nodes$note
   )
   nodes$box  <- sub(" \\|\\s* ]$", "]", nodes$box) # Cleanup if no note
 
