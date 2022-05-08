@@ -160,6 +160,32 @@ test_that("out-of-dateness is kept up-to-date", {
   expect_outofdate(target1)
 })
 
+
+# save_pipeline -----------------------------------------------------------
+set_pipeline(PipelineTest$new())
+order_filetimes(dependency, target1, source1)
+make_with_source(source1, target1, dependency, quiet = TRUE)
+pipe <- get_pipeline()
+
+annotation <- c("one", "two", "three")
+names(annotation) <- c(dependency, source1, target1)
+pipe$annotate(labels = annotation, notes = annotation)
+
+
+test_that("pipeline can be saved as png", {
+  temp_png <- tempfile(fileext = ".png")
+  save_pipeline(temp_png, pipeline = pipe)
+  expect_snapshot_file(temp_png, "pipeline_png")
+  unlink(temp_png)
+})
+
+test_that("pipeline can be saved as html", {
+  temp_html <- tempfile(fileext = ".html")
+  save_pipeline(temp_html, pipeline = pipe, as = "visnetwork")
+  expect(file.exists(temp_html), failure_message = "HTML didn't save properly")
+  unlink(temp_html)
+})
+
 # Annotations ------------------------------------------------------------------
 set_pipeline(PipelineTest$new())
 order_filetimes(dependency, target1, source1)

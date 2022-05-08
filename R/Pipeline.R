@@ -321,7 +321,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       self$refresh()
       code <- pipeline_nomnoml_code(nodes = private$nodes, edges = private$edges, ...)
 
-      x <- list(code = code, svg = svg)
+      x <- list(code = code, svg = FALSE)
       widget <- htmlwidgets::createWidget(
         name = "nomnoml",
         x, width = width, height = height,
@@ -331,11 +331,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       html <- tempfile("flow_", fileext = ".html")
       htmlwidgets::saveWidget(widget, html)
 
-      setwd(tempdir())
       out <- tempfile("out_", fileext = ".png")
-      webshot::webshot(basename(html), out)
 
+      setwd(tempdir())
+      webshot::webshot(basename(html), out, selector = "canvas")
       setwd(wd)
+
       file.copy(out, file)
       unlink(out)
       unlink(html)
@@ -705,17 +706,11 @@ pipeline_nomnoml_code <- function(nodes,
   nom_edges <- paste(nom_edges, collapse = "\n")
 
   # Styles
-  if ("Recipe" %in% nodes$labels) {
-    recipe_style <- "#.bluerecipe: visual=ellipse fill=#77b6fe title=bold\n"
-  } else {
-    recipe_style <- "#.bluerecipe: align=left fill=#77b6fe title=bold\n"
-  }
-
   header <- paste0(
     "#.redbox: fill=#ffcaef title=bold align=center\n",
     "#.greenbox: fill=#caffda title=bold align=center\n",
     "#.bluebox: fill=#77b6fe title=bold align=center\n",
-    recipe_style,
+    "#.bluerecipe: align=left fill=#77b6fe title=bold\n",
     "#.bluepkg: visual=database fill=#77b6fe title=bold align=center\n",
     "#arrowSize: ", arrow_size, "\n",
     "#bendSize: ", bend_size, "\n",
