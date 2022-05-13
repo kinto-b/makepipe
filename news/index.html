@@ -52,13 +52,16 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="makepipe-development-version">makepipe (development version)<a class="anchor" aria-label="anchor" href="#makepipe-development-version"></a></h2>
-<ul><li><p>BREAKING CHANGE: <code>Pipeline$save()</code> has been deprecated and the arguments to <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code>, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, and <code>Pipeline$annotate()</code> have been changed. This change was made to support the next change which is:</p></li>
+<ul><li><p>BREAKING CHANGE: Deprecated <code>Pipeline$save()</code> and changed the arguments for <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code>, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, and <code>Pipeline$annotate()</code>. This change was made to support the next change which is:</p></li>
 <li>
 <p>Added support for <code>nomnoml</code> flowcharts:</p>
 <ul><li>By default, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code> will now display a <code>nomnoml</code> style flowchart. You can reproduce the old <code>visNetwork</code> style chart using <code>show_pipeline(as="visnetwork")</code>. These are powered by two new methods belonging to the <code>Pipeline</code> class: <code>$nomnoml()</code> and <code>$visnetwork()</code>.</li>
 <li>By default, <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code> will now save an image of the <code>nomnoml</code> chart. You can export the <code>visNetwork</code> chart as an html file using <code>save_pipeline(as="visnetwork")</code>. These are powered by two new methods belonging to the <code>Pipeline</code> class, which replace the deprecated <code>$save()</code> method: <code>$save_nomnoml()</code> and <code>$save_visnetwork()</code>.</li>
 </ul></li>
+<li><p>Added <code>note</code> and <code>label</code> arguments to <code>make_*()</code>. This allows makepipe code to be even more self documenting, since notes that might be left as comments above the <code>make_*()</code> segment can now be incorporated into the pipeline itself.</p></li>
 <li><p><code>make_with_*()</code> no longer throws an error if <code>dependencies</code> don’t exist. It will be left to the users script/code to handle this situation.</p></li>
+<li><p>Fixed a bug which prevented <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> from accepting long (&gt;10 line) recipes</p></li>
+<li><p>Added <code><a href="../reference/pipeline-accessors.html">reset_pipeline()</a></code>, a wrapper for <code>set_pipeline(Pipeline$new())</code>, for resetting the active pipeline</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="makepipe-010">makepipe 0.1.0<small>2021-11-23</small><a class="anchor" aria-label="anchor" href="#makepipe-010"></a></h2>

@@ -104,27 +104,51 @@
 </h2>
 <p>To construct a pipeline, one simply needs to chain together a number of <code>make_with_*()</code> statements. When the pipeline is run through, each <code>make_with_*()</code> block is evaluated if and only if the <code>targets</code> are out-of-date with respect to the <code>dependencies</code> (and <code>source</code> file). But, whether or not the block is evaluated, a segment will be added to the Pipeline object behind the scenes. At the end of the script, once the entire pipeline has been run through, one can display the accumulated Pipeline object to produce a flow-chart visualisation of the pipeline. For example:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kinto-b.github.io/makepipe/" class="external-link">makepipe</a></span><span class="op">)</span>
-<span class="fu"><a href="reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
-  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/0_raw_data.csv"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>,
-  source <span class="op">=</span> <span class="st">"1 data_prep.R"</span>,
-  targets <span class="op">=</span> <span class="st">"data/1_data.Rds"</span>
+<code class="sourceCode R"><span class="fu"><a href="reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
+  note <span class="op">=</span> <span class="st">"Clean raw survey data and do derivations"</span>,
+  source <span class="op">=</span> <span class="st">"one.R"</span>,
+  targets <span class="op">=</span> <span class="st">"data/1 data.Rds"</span>,
+  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>
 <span class="op">)</span>
+
 <span class="fu"><a href="reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
-    dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1_data.Rds"</span>, <span class="st">"data/0_pop.Rds"</span><span class="op">)</span>,
-    recipe <span class="op">=</span> <span class="op">{</span>
-      <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span><span class="op">)</span>
-      <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"data/pop_data.Rds"</span><span class="op">)</span>
-      <span class="va">merged_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">pop</span>, by <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">merged_dat</span>, <span class="st">"data/2_data.Rds"</span><span class="op">)</span>
-    <span class="op">}</span>,
-    targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/2_data.Rds"</span><span class="op">)</span>
+  label <span class="op">=</span> <span class="st">"Merge it!"</span>,
+  note <span class="op">=</span> <span class="st">"Merge demographic variables from population data into survey data"</span>,
+  recipe <span class="op">=</span> <span class="op">{</span>
+    <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span><span class="op">)</span>
+    <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"data/pop.Rds"</span><span class="op">)</span>
+    <span class="va">merged_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">pop</span>, by <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">merged_dat</span>, <span class="st">"data/2_data.Rds"</span><span class="op">)</span>
+  <span class="op">}</span>,
+  targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/2 data.Rds"</span><span class="op">)</span>,
+  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span>, <span class="st">"data/pop.Rds"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>
-  <span class="st">"lookup/concordance.csv"</span> <span class="op">=</span> <span class="st">"Postcode concordance"</span>,
-  <span class="st">"data/0_raw_data.csv"</span> <span class="op">=</span> <span class="st">"Raw survey data"</span>
-<span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-example_pipeline.png" width="75%" style="display: block; margin: auto;"></p>
+
+<span class="fu"><a href="reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
+  note <span class="op">=</span> <span class="st">"Convert data from 'wide' to 'long' format"</span>,
+  source <span class="op">=</span> <span class="st">"three.R"</span>,
+  targets <span class="op">=</span> <span class="st">"data/3 data.Rds"</span>,
+  dependencies <span class="op">=</span> <span class="st">"data/2 data.Rds"</span>
+<span class="op">)</span>
+
+<span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/pipeline_nomnoml_uptodate.png" width="75%" style="display: block; margin: auto;"></p>
+<p>We can also get an interactive visNetwork widget:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span>as <span class="op">=</span> <span class="st">"visnetwork"</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/pipeline_visnetwork_uptodate.png" width="75%" style="display: block; margin: auto;"></p>
+<p>Once you’ve constructed a pipeline, you can ‘clean’ it (i.e. delete all registered targets):</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">p</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>Then, when you look again at the visualisation, the target nodes will be red not green since they’re out-of-date:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/pipeline_nomnoml_outofdate.png" width="75%" style="display: block; margin: auto;"></p>
+<p>And then you can ‘rebuild’ to re-execute the entire pipeline and re-create the cleaned targets:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">p</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>
