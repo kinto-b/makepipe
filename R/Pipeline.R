@@ -73,14 +73,17 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       old_nodes <- private$nodes
 
       nodes <- lapply(self$segments, function(x) x$nodes)
-      if (length(nodes) == 1) {
+      if (length(nodes) == 0) {
+        return(invisible(self))
+      } else if (length(nodes) == 1) {
         nodes <- nodes[[1]]
       } else {
         nodes <- unique(do.call(rbind, nodes))
       }
 
       # Add notes/labels
-      lbl <- basename(as.character(nodes$id))
+      lbl <- as.character(nodes$id)
+      lbl[!nodes$.recipe] <- basename(lbl[!nodes$.recipe])
       nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
       nodes$note <- as.character(nodes$id)
 
@@ -101,7 +104,9 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #'   primarily to update outofdateness
     refresh_edges = function() {
       edges <- lapply(self$segments, function(x) x$edges)
-      if (length(edges) == 1) {
+      if (length(edges)==0) {
+        return(invisible(self))
+      } else if (length(edges) == 1) {
         edges <- edges[[1]]
       } else {
         edges <- do.call(rbind, edges)
@@ -154,7 +159,12 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param quiet A logical determining whether or not messages are signaled
     #' @return `self`
     build = function(quiet = getOption("makepipe.quiet")) {
+      if (warn_pipeline_is_empty(self$segments, "Nothing to build")) {
+        return(invisible(self))
+      }
+
       edges <- sort_topologically(private$edges)
+
       executables <- edges[edges$.source, ]
       execution_order <- vapply(
         split(executables, executables$.segment_id),
@@ -174,6 +184,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @description Clean all targets
     #' @return `self`
     clean = function() {
+      if (warn_pipeline_is_empty(self$segments, "Nothing to clean")) {
+        return(invisible(self))
+      }
+
       for (segment in self$segments) {
         file.remove(segment$targets)
       }
@@ -243,6 +257,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
                        fill_arrows = FALSE,
                        gutter = 5,
                        edge_margin = 0) {
+      if (warn_pipeline_is_empty(self$segments, "Nothing to display")) {
+        return(invisible(self))
+      }
+
       self$refresh()
       out <- pipeline_nomnoml_code(
         nodes = private$nodes,
@@ -278,6 +296,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @return `self`
     visnetwork = function(...) {
       stop_required("visNetwork")
+      if (warn_pipeline_is_empty(self$segments, "Nothing to display")) {
+        return(invisible(self))
+      }
+
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       print(out)
@@ -305,6 +327,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @return `self`
     save_visnetwork = function(file, selfcontained = TRUE, background = "white", ...) {
       stop_required("visNetwork")
+      if (warn_pipeline_is_empty(self$segments, "Nothing to save")) {
+        return(invisible(self))
+      }
+
       self$refresh()
       out <- pipeline_network(nodes = private$nodes, edges = private$edges, ...)
       visNetwork::visSave(out, file, selfcontained, background)
@@ -319,6 +345,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @return `self`
     save_nomnoml = function(file, width = NULL, height = NULL, ...) {
       stop_required("webshot")
+      if (warn_pipeline_is_empty(self$segments, "Nothing to save")) {
+        return(invisible(self))
+      }
+
       stopifnot("`file` must be a .png path" = grepl(x=file, ".png$"))
       wd <- getwd()
       on.exit(setwd(wd))
@@ -355,8 +385,9 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 
 #' Access and interface with Pipeline.
 #'
-#' `get_pipeline()`, `set_pipeline()` access and modify the current *active*
-#' pipeline, while all other helper functions do not affect the active pipeline
+#' `get_pipeline()`, `set_pipeline()` and `reset_pipeline()` access and modify
+#' the current *active* pipeline, while all other helper functions do not affect
+#' the active pipeline
 #'
 #'
 #' @param pipeline A pipeline. See [Pipeline] for more details.
@@ -365,9 +396,13 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
 #' @examples
 #' \dontrun{
 #' # Build up a pipeline from scratch and save it out
-#' set_pipeline(Pipeline$new())
+#' reset_pipeline()
 #' # A series of `make_with_*()` blocks go here...
 #' saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+#'
+#' # ... Later on we can read in and set the pipeline
+#' p <- readRDS("data/my_pipeline.Rds")
+#' set_pipeline(p)
 #' }
 NULL
 makepipe_env <- new.env(parent = emptyenv())
@@ -395,6 +430,14 @@ set_pipeline <- function(pipeline) {
 get_pipeline <- function() {
   pipe <- makepipe_env$pipeline
   pipe
+}
+
+#' @rdname pipeline-accessors
+#' @export
+reset_pipeline <- function() {
+  old <- makepipe_env$pipeline
+  makepipe_env$pipeline <- Pipeline$new()
+  invisible(old)
 }
 
 
@@ -473,6 +516,21 @@ save_pipeline <- function(file, pipeline = get_pipeline(),
 
 # Internal ---------------------------------------------------------------------
 
+#' Issue a warning because the pipeline is empty
+#'
+#' @param segments Pipeline segments
+#' @param msg A message to warn with if pipeline is empty
+#'
+#' @return TRUE (if pipeline is empty) or FALSE
+#' @noRd
+#' @keywords internal
+#'
+warn_pipeline_is_empty <- function(segments, msg) {
+  empty <- length(segments) == 0
+  if (empty) warning("`Pipeline` is empty. ", msg, call. = FALSE)
+  empty
+}
+
 #' Propagate out-of-dateness
 #'
 #' Any target that is downstream of an out-of-date target is itself out-of-date.
@@ -485,6 +543,7 @@ save_pipeline <- function(file, pipeline = get_pipeline(),
 #'   `to`.
 #' @noRd
 propagate_outofdateness <- function(edges) {
+  if (is.null(edges)) return(NULL)
   nodes <- unlist(list(edges$from, edges$to))
   nodes_left <- nodes
   edges_left <- edges
@@ -718,7 +777,7 @@ pipeline_nomnoml_code <- function(nodes,
     "#.redbox: fill=#ffcaef title=bold align=center\n",
     "#.greenbox: fill=#caffda title=bold align=center\n",
     "#.bluebox: fill=#77b6fe title=bold align=center\n",
-    "#.bluerecipe: align=left fill=#77b6fe title=bold\n",
+    "#.bluerecipe: align=center fill=#77b6fe title=bold\n",
     "#.bluepkg: visual=database fill=#77b6fe title=bold align=center\n",
     "#arrowSize: ", arrow_size, "\n",
     "#bendSize: ", bend_size, "\n",

@@ -50,26 +50,67 @@ Pipeline object to produce a flow-chart visualisation of the pipeline.
 For example:
 
 ``` r
-library(makepipe)
 make_with_source(
-  dependencies = c("data/0_raw_data.csv", "lookup/concordance.csv"),
-  source = "1 data_prep.R",
-  targets = "data/1_data.Rds"
+  note = "Clean raw survey data and do derivations",
+  source = "one.R",
+  targets = "data/1 data.Rds",
+  dependencies = c("data/raw.Rds", "lookup/concordance.csv")
 )
+
 make_with_recipe(
-    dependencies = c("data/1_data.Rds", "data/0_pop.Rds"),
-    recipe = {
-      dat <- readRDS("data/raw_data.Rds")
-      pop <- readRDS("data/pop_data.Rds")
-      merged_dat <- merge(dat, pop, by = "id")
-      saveRDS(merged_dat, "data/2_data.Rds")
-    },
-    targets = c("data/2_data.Rds")
+  label = "Merge it!",
+  note = "Merge demographic variables from population data into survey data",
+  recipe = {
+    dat <- readRDS("data/1 data.Rds")
+    pop <- readRDS("data/pop.Rds")
+    merged_dat <- merge(dat, pop, by = "id")
+    saveRDS(merged_dat, "data/2_data.Rds")
+  },
+  targets = c("data/2 data.Rds"),
+  dependencies = c("data/1 data.Rds", "data/pop.Rds")
 )
-show_pipeline(labels = c(
-  "lookup/concordance.csv" = "Postcode concordance",
-  "data/0_raw_data.csv" = "Raw survey data"
-))
+
+make_with_source(
+  note = "Convert data from 'wide' to 'long' format",
+  source = "three.R",
+  targets = "data/3 data.Rds",
+  dependencies = "data/2 data.Rds"
+)
+
+show_pipeline()
 ```
 
-<img src="man/figures/README-example_pipeline.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/pipeline_nomnoml_uptodate.png" width="75%" style="display: block; margin: auto;" />
+
+We can also get an interactive visNetwork widget:
+
+``` r
+show_pipeline(as = "visnetwork")
+```
+
+<img src="man/figures/pipeline_visnetwork_uptodate.png" width="75%" style="display: block; margin: auto;" />
+
+Once you’ve constructed a pipeline, you can ‘clean’ it (i.e. delete all
+registered targets):
+
+``` r
+p <- get_pipeline()
+p$clean()
+```
+
+Then, when you look again at the visualisation, the target nodes will be
+red not green since they’re out-of-date:
+
+``` r
+show_pipeline()
+```
+
+<img src="man/figures/pipeline_nomnoml_outofdate.png" width="75%" style="display: block; margin: auto;" />
+
+And then you can ‘rebuild’ to re-execute the entire pipeline and
+re-create the cleaned targets:
+
+``` r
+p <- get_pipeline()
+p$build()
+```

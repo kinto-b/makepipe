@@ -12,5 +12,7 @@
 #' @param force A logical determining whether or not execution of the `source`
 #'   or `recipe` will be forced (i.e. happen whether or not the targets are
 #'   out-of-date)
+#' @param label A short label for the `source` or `recipe`, displayed in pipeline
+#'   visualisations. If `NULL`, the `basename(source)` or 'Recipe' will be used.
 #' @name make_params
 NULL

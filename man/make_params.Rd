@@ -21,6 +21,9 @@ the calling environment.}
 \item{force}{A logical determining whether or not execution of the \code{source}
 or \code{recipe} will be forced (i.e. happen whether or not the targets are
 out-of-date)}
+
+\item{label}{A short label for the \code{source} or \code{recipe}, displayed in pipeline
+visualisations. If \code{NULL}, the \code{basename(source)} or 'Recipe' will be used.}
 }
 \description{
 Parameters for make-like functions

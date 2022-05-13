@@ -39,7 +39,9 @@ notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).}
 \item{file}{File to save png (nomnoml) or html (visnetwork) into}
 }
 \description{
-Produce a flowchart visualisation of the pipeline.
+Produce a flowchart visualisation of the pipeline. Out-of-date targets will
+be coloured red, up-to-date targets will be coloured green, and everything
+else will be blue.
 }
 \details{
 Labels and notes must be supplied as named character vector where the

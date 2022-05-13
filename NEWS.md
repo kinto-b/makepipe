@@ -1,12 +1,18 @@
 # makepipe (development version)
 
-* BREAKING CHANGE: `Pipeline$save()` has been deprecated and the arguments to `save_pipeline()`, `show_pipeline()`, and `Pipeline$annotate()` have been changed. This change was made to support the next change which is:
+* BREAKING CHANGE: Deprecated `Pipeline$save()` and changed the arguments for `save_pipeline()`, `show_pipeline()`, and `Pipeline$annotate()`. This change was made to support the next change which is:
 
 * Added support for `nomnoml` flowcharts:
   + By default, `show_pipeline()` will now display a `nomnoml` style flowchart. You can reproduce the old `visNetwork` style chart using `show_pipeline(as="visnetwork")`. These are powered by two new methods belonging to the `Pipeline` class: `$nomnoml()` and `$visnetwork()`.
   + By default, `save_pipeline()` will now save an image of the `nomnoml` chart. You can export the `visNetwork` chart as an html file using `save_pipeline(as="visnetwork")`. These are powered by two new methods belonging to the `Pipeline` class, which replace the deprecated `$save()` method: `$save_nomnoml()` and `$save_visnetwork()`.
 
+* Added `note` and `label` arguments to `make_*()`. This allows makepipe code to be even more self documenting, since notes that might be left as comments above the `make_*()` segment can now be incorporated into the pipeline itself. 
+
 * `make_with_*()` no longer throws an error if `dependencies` don't exist. It will be left to the users script/code to handle this situation.
+
+* Fixed a bug which prevented `make_with_recipe()` from accepting long (>10 line) recipes
+
+* Added `reset_pipeline()`, a wrapper for `set_pipeline(Pipeline$new())`, for resetting the active pipeline
 
 # makepipe 0.1.0
 

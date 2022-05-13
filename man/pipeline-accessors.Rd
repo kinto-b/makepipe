@@ -5,6 +5,7 @@
 \alias{is_pipeline}
 \alias{set_pipeline}
 \alias{get_pipeline}
+\alias{reset_pipeline}
 \title{Access and interface with Pipeline.}
 \usage{
 is_pipeline(pipeline)
@@ -12,20 +13,27 @@ is_pipeline(pipeline)
 set_pipeline(pipeline)
 
 get_pipeline()
+
+reset_pipeline()
 }
 \arguments{
 \item{pipeline}{A pipeline. See \link{Pipeline} for more details.}
 }
 \description{
-\code{get_pipeline()}, \code{set_pipeline()} access and modify the current \emph{active}
-pipeline, while all other helper functions do not affect the active pipeline
+\code{get_pipeline()}, \code{set_pipeline()} and \code{reset_pipeline()} access and modify
+the current \emph{active} pipeline, while all other helper functions do not affect
+the active pipeline
 }
 \examples{
 \dontrun{
 # Build up a pipeline from scratch and save it out
-set_pipeline(Pipeline$new())
+reset_pipeline()
 # A series of `make_with_*()` blocks go here...
 saveRDS(get_pipeline(), "data/my_pipeline.Rds")
+
+# ... Later on we can read in and set the pipeline
+p <- readRDS("data/my_pipeline.Rds")
+set_pipeline(p)
 }
 }
 \seealso{
