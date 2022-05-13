@@ -312,6 +312,36 @@ test_that("make_with_source result prints nicely", {
 })
 
 
+# Bug fixes --------------------------------------------------------------------
+
+test_that("long recipes are okay", {
+  x <- make_with_recipe(
+    recipe = {
+      new_cars <- cars
+      new_cars$a <- 1
+      new_cars$b <- 2
+      new_cars$c <- 3
+      new_cars$d <- 4
+      new_cars$e <- 5
+      new_cars$f <- 6
+      new_cars$g <- 7
+      new_cars$h <- 8
+      new_cars$i <- 9
+      new_cars$i <- 11
+      new_cars$j <- 12
+      new_cars$k <- 13
+      new_cars$l <- 14
+      new_cars$m <- 15
+      new_cars$n <- 16
+    },
+    dependencies = dependency,
+    targets = target1
+  )
+
+  expect_output(print(x), regexp = "* Recipe: ")
+})
+
+
 # Unlink ------------------------------------------------------------------
 
 unlink(c("dependency", "target1", "target2", "source1", "source2"))

@@ -80,7 +80,8 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       }
 
       # Add notes/labels
-      lbl <- basename(as.character(nodes$id))
+      lbl <- as.character(nodes$id)
+      lbl[!nodes$.recipe] <- basename(lbl[!nodes$.recipe])
       nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
       nodes$note <- as.character(nodes$id)
 
