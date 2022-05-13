@@ -147,6 +147,18 @@ test_that("out-of-dateness is passed along", {
 })
 
 
+# Empty pipelines ---------------------------------------------------------
+
+test_that("warning shown if empty", {
+  reset_pipeline()
+  p <- get_pipeline()
+
+  expect_warning(p$build())
+  expect_warning(p$clean())
+  expect_warning(p$nomnoml())
+  expect_warning(p$print())
+})
+
 # show_pipeline ----------------------------------------------------------------
 
 test_that("out-of-dateness is kept up-to-date", {
