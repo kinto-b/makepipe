@@ -1,3 +1,5 @@
+# makepipe (development version)
+
 # makepipe 0.2.0
 
 * BREAKING CHANGE: Deprecated `Pipeline$save()` and changed the arguments for `save_pipeline()`, `show_pipeline()`, and `Pipeline$annotate()`. This change was made to support the next change which is:
