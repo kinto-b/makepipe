@@ -10,6 +10,10 @@
 
 * `make_with_*()` no longer throws an error if `dependencies` don't exist. It will be left to the users script/code to handle this situation.
 
+* Fixed a bug which prevented `make_with_recipe()` from accepting long (>10 line) recipes
+
+* Added `reset_pipeline()`, a wrapper for `set_pipeline(Pipeline$new())`, for resetting the active pipeline
+
 # makepipe 0.1.0
 
 ## `make_*()`
