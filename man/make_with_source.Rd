@@ -88,6 +88,7 @@ make_with_source(
 }
 \seealso{
 Other make: 
+\code{\link{make_with_dir}()},
 \code{\link{make_with_recipe}()}
 }
 \concept{make}

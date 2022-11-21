@@ -52,15 +52,15 @@ out-of-date)}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Segment$new()}}
-\item \href{#method-print}{\code{Segment$print()}}
-\item \href{#method-update_result}{\code{Segment$update_result()}}
-\item \href{#method-clone}{\code{Segment$clone()}}
+\item \href{#method-Segment-new}{\code{Segment$new()}}
+\item \href{#method-Segment-print}{\code{Segment$print()}}
+\item \href{#method-Segment-update_result}{\code{Segment$update_result()}}
+\item \href{#method-Segment-clone}{\code{Segment$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Segment-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Segment-new}{}}}
 \subsection{Method \code{new()}}{
 Initialise a new Segment
 \subsection{Usage}{
@@ -106,8 +106,8 @@ out-of-date)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Segment-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Segment-print}{}}}
 \subsection{Method \code{print()}}{
 Printing method
 \subsection{Usage}{
@@ -116,8 +116,8 @@ Printing method
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-update_result"></a>}}
-\if{latex}{\out{\hypertarget{method-update_result}{}}}
+\if{html}{\out{<a id="method-Segment-update_result"></a>}}
+\if{latex}{\out{\hypertarget{method-Segment-update_result}{}}}
 \subsection{Method \code{update_result()}}{
 Update the Segment with new execution information
 \subsection{Usage}{
@@ -137,8 +137,8 @@ Update the Segment with new execution information
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Segment-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Segment-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

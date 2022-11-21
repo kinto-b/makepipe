@@ -64,7 +64,7 @@ strwrap2 <- function(x, width) {
 #'
 #' @param call
 #'
-#' @return
+#' @return The deparsed `call`
 #' @noRd
 #' @keywords internal
 #'

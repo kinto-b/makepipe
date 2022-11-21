@@ -100,6 +100,7 @@ make_with_recipe(
 }
 \seealso{
 Other make: 
+\code{\link{make_with_dir}()},
 \code{\link{make_with_source}()}
 }
 \concept{make}
