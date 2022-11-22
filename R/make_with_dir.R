@@ -26,7 +26,7 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
     full.names = TRUE
   )
 
-  roxy_files <- lapply(fp, roxygen2::parse_file, env = envir)
+  roxy_files <- lapply(fp, roxygen2::parse_file, env = NULL)
   roxy_files <- roxy_files[sapply(roxy_files, length)>0]
 
   pipeline <- Pipeline$new()
@@ -52,6 +52,14 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
     names(block_tags) <- lapply(makepipe_block$tags, `[[`, "tag")
     if (!"force" %in% names(block_tags)) block_tags$force <- FALSE
 
+    # Evaluate targets/dependencies
+    if (!is.null(block_tags$dependencies)) {
+      block_tags$dependencies <- evaluate_vector(block_tags$dependencies, envir = envir)
+    }
+    if (!is.null(block_tags$targets)) {
+      block_tags$targets <- evaluate_vector(block_tags$targets, envir = envir)
+    }
+
     # Add segment
     segment <- pipeline$add_source_segment(
       makepipe_block$file,
@@ -70,12 +78,10 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
 
 # Helpers ----------------------------------------------------------------------
 
-parse_vector <- function(x) {
-  x <- trimws(x)
-  x <- gsub("^\\[", "c(", x)
-  x <- gsub("\\]$", ")", x)
-  eval(parse(text=x))
+evaluate_vector <- function(x, envir) {
+  eval(parse(text=paste("c(", x, ")")), envir = envir)
 }
+
 
 #' @importFrom roxygen2 roxy_tag_parse
 #' @export
@@ -86,17 +92,13 @@ roxy_tag_parse.roxy_tag_makepipe <- function(x) {
 #' @importFrom roxygen2 roxy_tag_parse
 #' @export
 roxy_tag_parse.roxy_tag_dependencies <- function(x) {
-  out <- roxygen2::tag_markdown(x)
-  out$val <- eval(parse(text=paste("c(", out$val, ")")))
-  out
+  roxygen2::tag_markdown(x)
 }
 
 #' @importFrom roxygen2 roxy_tag_parse
 #' @export
 roxy_tag_parse.roxy_tag_targets <- function(x) {
-  out <- roxygen2::tag_markdown(x)
-  out$val <- eval(parse(text=paste("c(", out$val, ")")))
-  out
+  roxygen2::tag_markdown(x)
 }
 
 #' @importFrom roxygen2 roxy_tag_parse
