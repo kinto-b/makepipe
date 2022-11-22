@@ -48,8 +48,16 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
     full.names = TRUE
   )
 
+  any_found <- FALSE
   for (fp in source_files) {
-    make_with_tags(fp, envir, quiet)
+    res <- make_with_tags(fp, envir, quiet)
+    if (!is.null(res)) any_found <- TRUE
+  }
+  if (!any_found) {
+    warning(
+      "No `@makepipe` tags found in any R scripts in'", dir, "'",
+      call. = FALSE
+    )
   }
 
   pipeline <- get_pipeline()
@@ -63,37 +71,48 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
 make_with_roxy <- function(source,
                            envir = new.env(parent = parent.frame()),
                            quiet = getOption("makepipe.quiet")) {
-  segment <- make_with_tags(source, envir, quiet)
+  segment <- make_with_tags(source, envir, quiet, warn = TRUE)
+  if (is.null(segment)) return(invisible(NULL))
+
   out <- segment$execute(quiet = quiet)
   invisible(out)
 }
 
 
 # Internal ---------------------------------------------------------------------
-
 #' Make targets out of dependencies using a source file with a roxygen header
 #'
 #' @inheritParams make_params
+#' @param warn A logical determining whether or not a warning is signaled if
+#'   no `@makepipe` tag is found
 #'
 #' @return A `Segment` object containing execution metadata.
 #' @noRd
 #' @keywords internal
 make_with_tags <- function(source,
                            envir = new.env(parent = parent.frame()),
-                           quiet = getOption("makepipe.quiet")) {
+                           quiet = getOption("makepipe.quiet"),
+                           warn = FALSE) {
+  if (!file.exists(source)) stop("Cannot find file '", source, "'", call. = FALSE)
   f <- roxygen2::parse_file(source, envir)
-  if (length(f)==0) return(NULL)
+  if (length(f)==0) {
+    if (warn) warn_no_makepipe_tag(source)
+    return(NULL)
+  }
+
+  is_makepipe_block <- sapply(f, function(block) {
+    "makepipe" %in% sapply(block$tags, `[[`, "tag")
+  })
+  if (sum(is_makepipe_block) == 0) {
+    if (warn) warn_no_makepipe_tag(source)
+    return(NULL)
+  }
 
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
     pipeline <- Pipeline$new()
     set_pipeline(pipeline)
   }
-
-  is_makepipe_block <- sapply(f, function(block) {
-    "makepipe" %in% sapply(block$tags, `[[`, "tag")
-  })
-  if (sum(is_makepipe_block) == 0) next
 
   # Each file can have at most one make declaration
   makepipe_block <- which(is_makepipe_block)[1] # Use first declaration
@@ -134,6 +153,14 @@ make_with_tags <- function(source,
 }
 
 # Helpers ----------------------------------------------------------------------
+
+warn_no_makepipe_tag <- function(source) {
+  warning(
+    "No `@makepipe` tag found in '",
+    basename(source), "'",
+    call. = FALSE
+  )
+}
 
 evaluate_vector <- function(x, envir) {
   eval(parse(text=paste("c(", x, ")")), envir = envir)

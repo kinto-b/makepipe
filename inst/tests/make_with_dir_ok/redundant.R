@@ -1,1 +1,2 @@
-# A script without an @makepipe declaration
+#' A script without an `@makepipe` declaration
+#' @targets "something"
