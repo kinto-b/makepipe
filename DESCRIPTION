@@ -22,7 +22,8 @@ Imports:
     cli,
     nomnoml,
     R6,
-    utils
+    utils,
+    roxygen2
 Suggests: 
     knitr,
     covr,
@@ -31,7 +32,6 @@ Suggests:
     rmarkdown,
     webshot,
     visNetwork,
-    roxygen2
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

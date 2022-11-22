@@ -17,39 +17,51 @@
 #' p <- make_with_dir(build = FALSE)
 #' p$build() # Then execute it yourself
 #' }
-make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE, quiet = getOption("makepipe.quiet")) {
-  stop_required("roxygen2")
-  envir <- new.env(parent = parent.frame())
-
+make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
+                          envir = new.env(parent = parent.frame()),
+                          quiet = getOption("makepipe.quiet")) {
   fp <- list.files(
     dir, recursive = recursive,
     pattern = "\\.R$", ignore.case = TRUE,
     full.names = TRUE
   )
 
-  roxy_files <- lapply(fp, roxygen2::parse_file, env = NULL)
+  roxy_files <- lapply(fp, roxygen2::parse_file, env = envir)
   roxy_files <- roxy_files[sapply(roxy_files, length)>0]
 
   pipeline <- Pipeline$new()
   for (f in roxy_files) {
-    for (block in f) {
-      block_tags <- lapply(block$tags, `[[`, "val")
-      names(block_tags) <- lapply(block$tags, `[[`, "tag")
-      if (!"targets" %in% names(block_tags)) next
-      if (!"force" %in% names(block_tags)) block_tags$force <- FALSE
+    is_makepipe_block <- sapply(f, function(block) {
+      "makepipe" %in% sapply(block$tags, `[[`, "tag")
+    })
+    if (sum(is_makepipe_block) == 0) next
 
-      segment <- pipeline$add_source_segment(
-        block$file,
-        block_tags$targets,
-        block_tags$dependencies,
-        block_tags$packages,
-        envir,
-        block_tags$force
+    # Each file can have at most one make declaration
+    makepipe_block <- which(is_makepipe_block)[1] # Use first declaration
+    makepipe_block <- f[[makepipe_block]]
+    if (sum(is_makepipe_block) > 1) {
+      warning(
+        "More than one makepipe declaration in '",
+        basename(makepipe_block$file), "'. Only the first will be used",
+        call. = FALSE
       )
-      add_note_and_label(pipeline, segment, block_tags$title, block_tags$description)
-
-      break # Each file can have at most one make declaration
     }
+
+    # Extract makepipe tags
+    block_tags <- lapply(makepipe_block$tags, `[[`, "val")
+    names(block_tags) <- lapply(makepipe_block$tags, `[[`, "tag")
+    if (!"force" %in% names(block_tags)) block_tags$force <- FALSE
+
+    # Add segment
+    segment <- pipeline$add_source_segment(
+      makepipe_block$file,
+      block_tags$targets,
+      block_tags$dependencies,
+      block_tags$packages,
+      envir,
+      block_tags$force
+    )
+    add_note_and_label(pipeline, segment, block_tags$title, block_tags$description)
   }
 
   if (build) pipeline$build(quiet)
@@ -65,6 +77,11 @@ parse_vector <- function(x) {
   eval(parse(text=x))
 }
 
+#' @importFrom roxygen2 roxy_tag_parse
+#' @export
+roxy_tag_parse.roxy_tag_makepipe <- function(x) {
+  roxygen2::tag_toggle(x)
+}
 
 #' @importFrom roxygen2 roxy_tag_parse
 #' @export

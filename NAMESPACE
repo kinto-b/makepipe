@@ -2,6 +2,7 @@
 
 S3method(roxy_tag_parse,roxy_tag_dependencies)
 S3method(roxy_tag_parse,roxy_tag_force)
+S3method(roxy_tag_parse,roxy_tag_makepipe)
 S3method(roxy_tag_parse,roxy_tag_packages)
 S3method(roxy_tag_parse,roxy_tag_targets)
 export(Pipeline)
