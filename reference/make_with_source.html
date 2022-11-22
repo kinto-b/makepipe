@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
       </span>
     </div>
 
@@ -56,54 +56,75 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_with_source</span><span class="op">(</span>
-  <span class="va">source</span>,
-  <span class="va">targets</span>,
-  dependencies <span class="op">=</span> <span class="cn">NULL</span>,
-  packages <span class="op">=</span> <span class="cn">NULL</span>,
-  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,
-  quiet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"makepipe.quiet"</span><span class="op">)</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  label <span class="op">=</span> <span class="cn">NULL</span>,
-  note <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_with_source</span><span class="op">(</span></span>
+<span>  <span class="va">source</span>,</span>
+<span>  <span class="va">targets</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"makepipe.quiet"</span><span class="op">)</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  note <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>source</dt>
 <dd><p>The path to an R script which makes the <code>targets</code></p></dd>
+
+
 <dt>targets</dt>
 <dd><p>A character vector of paths to files</p></dd>
+
+
 <dt>dependencies</dt>
 <dd><p>A character vector of paths to files which the <code>targets</code>
 depend on</p></dd>
+
+
 <dt>packages</dt>
 <dd><p>A character vector of names of packages which <code>targets</code>
 depend on</p></dd>
+
+
 <dt>envir</dt>
 <dd><p>The environment in which to execute the <code>source</code> or <code>recipe</code>. By
 default, execution will take place in a fresh environment whose parent is
 the calling environment.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>A logical determining whether or not messages are signaled</p></dd>
+
+
 <dt>force</dt>
 <dd><p>A logical determining whether or not execution of the <code>source</code>
 or <code>recipe</code> will be forced (i.e. happen whether or not the targets are
 out-of-date)</p></dd>
+
+
 <dt>label</dt>
 <dd><p>A short label for the <code>source</code> or <code>recipe</code>, displayed in pipeline
 visualisations. If <code>NULL</code>, the <code>basename(source)</code> or 'Recipe' will be used.</p></dd>
+
+
 <dt>note</dt>
 <dd><p>A description of what the <code>source</code> does, displayed in pipeline
 visualisations</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters to pass to <code><a href="https://rdrr.io/r/base/source.html" class="external-link">base::source()</a></code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>Segment</code> object containing execution metadata.</p>
+    
+
+<p>A <code>Segment</code> object containing execution metadata.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -113,38 +134,38 @@ visualisations</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># Merge files in fresh environment if raw data has been updated since last</span></span>
-<span class="r-in"><span class="co"># merged</span></span>
-<span class="r-in"><span class="fu">make_with_source</span><span class="op">(</span></span>
-<span class="r-in">  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span>
-<span class="r-in">  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span>
-<span class="r-in">  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Merge files in current environment if raw data has been updated since last</span></span>
-<span class="r-in"><span class="co"># merged. (If source executed, all objects bound in source will be available</span></span>
-<span class="r-in"><span class="co"># in current env).</span></span>
-<span class="r-in"><span class="fu">make_with_source</span><span class="op">(</span></span>
-<span class="r-in">  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span>
-<span class="r-in">  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span>
-<span class="r-in">  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span>,</span>
-<span class="r-in">  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Merge files in global environment if raw data has been updated since last</span></span>
-<span class="r-in"><span class="co"># merged. (If source executed, all objects bound in source will be available</span></span>
-<span class="r-in"><span class="co"># in global env).</span></span>
-<span class="r-in"><span class="fu">make_with_source</span><span class="op">(</span></span>
-<span class="r-in">  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span>
-<span class="r-in">  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span>
-<span class="r-in">  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span>,</span>
-<span class="r-in">  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># Merge files in fresh environment if raw data has been updated since last</span></span></span>
+<span class="r-in"><span><span class="co"># merged</span></span></span>
+<span class="r-in"><span><span class="fu">make_with_source</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span></span>
+<span class="r-in"><span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Merge files in current environment if raw data has been updated since last</span></span></span>
+<span class="r-in"><span><span class="co"># merged. (If source executed, all objects bound in source will be available</span></span></span>
+<span class="r-in"><span><span class="co"># in current env).</span></span></span>
+<span class="r-in"><span><span class="fu">make_with_source</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span></span>
+<span class="r-in"><span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Merge files in global environment if raw data has been updated since last</span></span></span>
+<span class="r-in"><span><span class="co"># merged. (If source executed, all objects bound in source will be available</span></span></span>
+<span class="r-in"><span><span class="co"># in global env).</span></span></span>
+<span class="r-in"><span><span class="fu">make_with_source</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  source <span class="op">=</span> <span class="st">"merge_data.R"</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="st">"data/merged_data.Rds"</span>,</span></span>
+<span class="r-in"><span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw_data.Rds"</span>, <span class="st">"data/raw_pop.Rds"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -159,7 +180,7 @@ visualisations</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@ produced as expected."><meta property="og:image" content="/logo.png"><!-- mathja
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
       </span>
     </div>
 
@@ -62,7 +62,7 @@ produced as expected.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_register</span><span class="op">(</span><span class="va">value</span>, <span class="va">name</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_register</span><span class="op">(</span><span class="va">value</span>, <span class="va">name</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -70,38 +70,45 @@ produced as expected.</p>
     <dl><dt>value</dt>
 <dd><p>A value to be registered in a source script and returned as part
 of the <code>Segment</code></p></dd>
+
+
 <dt>name</dt>
 <dd><p>A variable name, given as a character string. No coercion is
 done, and the first element of a character vector of length greater than
 one will be used, with a warning.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>A logical determining whether or not warnings are signaled when
 <code>make_register()</code> is called outside of a 'makepipe' pipeline</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>value</code> invisibly</p>
+    
+
+<p><code>value</code> invisibly</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="co"># Imagine this is part of your source script:</span></span>
-<span class="r-in">  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"input.Rds"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">do_stuff</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">chk</span> <span class="op">&lt;-</span> <span class="fu">do_check</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span class="r-in">  <span class="fu">make_register</span><span class="op">(</span><span class="va">chk</span>, <span class="st">"x_check"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"output.Rds"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># You will have access to `chk` in your pipeline script:</span></span>
-<span class="r-in">  <span class="va">step_one</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
-<span class="r-in">    <span class="st">"source.R"</span>,</span>
-<span class="r-in">    <span class="st">"output.Rds"</span>,</span>
-<span class="r-in">    <span class="st">"input.Rds"</span>,</span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in">  <span class="va">step_one</span><span class="op">$</span><span class="va">result</span><span class="op">$</span><span class="va">chk</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Imagine this is part of your source script:</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"input.Rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">do_stuff</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">chk</span> <span class="op">&lt;-</span> <span class="fu">do_check</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">make_register</span><span class="op">(</span><span class="va">chk</span>, <span class="st">"x_check"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"output.Rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># You will have access to `chk` in your pipeline script:</span></span></span>
+<span class="r-in"><span>  <span class="va">step_one</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"source.R"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"output.Rds"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"input.Rds"</span>,</span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">step_one</span><span class="op">$</span><span class="va">result</span><span class="op">$</span><span class="va">chk</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -116,7 +123,7 @@ one will be used, with a warning.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

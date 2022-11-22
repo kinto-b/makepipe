@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
       </span>
     </div>
 
@@ -73,7 +73,7 @@
 
       
 
-      </header><script src="makepipe_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to makepipe</h1>
@@ -88,170 +88,268 @@
     
 <p>Broadly, <code>makepipe</code> does two things:</p>
 <ul>
-<li><p>It automates code execution using a logic similar to GNU Make. In particular, makepipe ensures that a given piece of code is executed if and only if the <code>targets</code> associated that piece of code are out-of-date with respect to its <code>dependencies</code>. More on this below.</p></li>
-<li><p>It makes code self-documenting in a double sense. Firstly, it forces data scientists to make the relationships between the different parts of their code base explicit <strong>within</strong> the code base itself. Secondly, it exhibits those relationships as a directed acyclical graph (i.e. a flowchart) which can be separated from the code base and shared.</p></li>
+<li><p>It automates code execution using a logic similar to GNU Make. In
+particular, makepipe ensures that a given piece of code is executed if
+and only if the <code>targets</code> associated that piece of code are
+out-of-date with respect to its <code>dependencies</code>. More on this
+below.</p></li>
+<li><p>It makes code self-documenting in a double sense. Firstly, it
+forces data scientists to make the relationships between the different
+parts of their code base explicit <strong>within</strong> the code base
+itself. Secondly, it exhibits those relationships as a directed
+acyclical graph (i.e. a flowchart) which can be separated from the code
+base and shared.</p></li>
 </ul>
-<p>It does these things without requiring major upfront investments in the way of code functionalisation or the like. Indeed, one will not ordinarily need to modify one’s existing code at all in order to implement a makepipe pipeline.</p>
+<p>It does these things without requiring major upfront investments in
+the way of code functionalisation or the like. Indeed, one will not
+ordinarily need to modify one’s existing code at all in order to
+implement a makepipe pipeline.</p>
 <div class="section level2">
 <h2 id="converting-an-existing-workflow">Converting an existing workflow<a class="anchor" aria-label="anchor" href="#converting-an-existing-workflow"></a>
 </h2>
-<p>Assuming your workflow consists of a series of R scripts – <code>one.R</code>, <code>two.R</code>, etc. – you can construct a makepipe <code>Pipeline</code> simply by sourcing them using <code><a href="../reference/make_with_source.html">make_with_source()</a></code>.</p>
-<p>You’ll just need to supply, along with the path to the <code>source</code> script, a set of <code>targets</code> (i.e. paths to files that the script is supposed to make) and optionally a set of <code>dependencies</code> (i.e. paths to files that the script needs so as to make the <code>targets</code>).</p>
-<p>For example, you’ll create a <code>pipeline.R</code> script containing the following:</p>
+<p>Assuming your workflow consists of a series of R scripts –
+<code>one.R</code>, <code>two.R</code>, etc. – you can construct a
+makepipe <code>Pipeline</code> simply by sourcing them using
+<code><a href="../reference/make_with_source.html">make_with_source()</a></code>.</p>
+<p>You’ll just need to supply, along with the path to the
+<code>source</code> script, a set of <code>targets</code> (i.e. paths to
+files that the script is supposed to make) and optionally a set of
+<code>dependencies</code> (i.e. paths to files that the script needs so
+as to make the <code>targets</code>).</p>
+<p>For example, you’ll create a <code>pipeline.R</code> script
+containing the following:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kinto-b.github.io/makepipe/" class="external-link">makepipe</a></span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
-  source <span class="op">=</span> <span class="st">"one.R"</span>, 
-  targets <span class="op">=</span> <span class="st">"data/1 data.Rds"</span>, 
-  dependencies <span class="op">=</span> <span class="st">"data/raw.Rds"</span>
-<span class="op">)</span>
-
-<span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
-  source <span class="op">=</span> <span class="st">"two.R"</span>, 
-  targets <span class="op">=</span> <span class="st">"data/2 data.Rds"</span>, 
-  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="co"># etc.</span></code></pre></div>
-<p>Then, when this code is run through, each <code>source</code> file will be executed if and only if its <code>targets</code> are out-of-date with respect to its <code>dependencies</code> (and <code>source</code> file itself). This means that only those scripts which <em>need</em> to be run will be. So, without requiring you to think about it, you’ll be able to skip unnecessary computations.</p>
-<p>Meanwhile, behind the scenes, each call to <code><a href="../reference/make_with_source.html">make_with_source()</a></code> will add a <code>Segment</code> onto the <code>Pipeline</code>. These <code>Segment</code> objects keep track of the relationships between <code>targets</code>, <code>dependencies</code> and <code>source</code> files and they also log metadata relating to the execution of the <code>source</code> file such as whether it was executed on the last run and how long it took to execute.</p>
-<p>You can inspect this metadata by getting ahold of the <code>Pipeline</code>. For example, you might see something like this:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://kinto-b.github.io/makepipe/" class="external-link">makepipe</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
+<span>  source <span class="op">=</span> <span class="st">"one.R"</span>, </span>
+<span>  targets <span class="op">=</span> <span class="st">"data/1 data.Rds"</span>, </span>
+<span>  dependencies <span class="op">=</span> <span class="st">"data/raw.Rds"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
+<span>  source <span class="op">=</span> <span class="st">"two.R"</span>, </span>
+<span>  targets <span class="op">=</span> <span class="st">"data/2 data.Rds"</span>, </span>
+<span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># etc.</span></span></code></pre></div>
+<p>Then, when this code is run through, each <code>source</code> file
+will be executed if and only if its <code>targets</code> are out-of-date
+with respect to its <code>dependencies</code> (and <code>source</code>
+file itself). This means that only those scripts which <em>need</em> to
+be run will be. So, without requiring you to think about it, you’ll be
+able to skip unnecessary computations.</p>
+<p>Meanwhile, behind the scenes, each call to
+<code><a href="../reference/make_with_source.html">make_with_source()</a></code> will add a <code>Segment</code> onto the
+<code>Pipeline</code>. These <code>Segment</code> objects keep track of
+the relationships between <code>targets</code>,
+<code>dependencies</code> and <code>source</code> files and they also
+log metadata relating to the execution of the <code>source</code> file
+such as whether it was executed on the last run and how long it took to
+execute.</p>
+<p>You can inspect this metadata by getting ahold of the
+<code>Pipeline</code>. For example, you might see something like
+this:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">pipe</span><span class="op">$</span><span class="va">segments</span>
-
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; # makepipe segment</span>
-<span class="co">#&gt; * Source: 'one.R'</span>
-<span class="co">#&gt; * Targets: 'data/1 data.Rds'</span>
-<span class="co">#&gt; * File dependencies: 'data/raw.Rds'</span>
-<span class="co">#&gt; * Executed: TRUE</span>
-<span class="co">#&gt; * Execution time: 22.5 secs</span>
-<span class="co">#&gt; * Result: 0 object(s)</span>
-<span class="co">#&gt; * Environment: 0x00000253c8573268</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; # makepipe segment</span>
-<span class="co">#&gt; * Source: 'two.R'</span>
-<span class="co">#&gt; * Targets: 'data/2 data.Rds'</span>
-<span class="co">#&gt; * File dependencies: 'data/1 data.Rds', 'lookup/concordance.csv'</span>
-<span class="co">#&gt; * Executed: TRUE</span>
-<span class="co">#&gt; * Execution time: 38.2 secs</span>
-<span class="co">#&gt; * Result: 0 object(s)</span>
-<span class="co">#&gt; * Environment: 0x00000253c8738660</span></code></pre></div>
-<p>Additionally, you can visualise the relationships between the various files by viewing the <code>Pipeline</code> itself:</p>
+<code class="sourceCode R"><span><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">pipe</span><span class="op">$</span><span class="va">segments</span></span>
+<span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; # makepipe segment</span></span>
+<span><span class="co">#&gt; * Source: 'one.R'</span></span>
+<span><span class="co">#&gt; * Targets: 'data/1 data.Rds'</span></span>
+<span><span class="co">#&gt; * File dependencies: 'data/raw.Rds'</span></span>
+<span><span class="co">#&gt; * Executed: TRUE</span></span>
+<span><span class="co">#&gt; * Execution time: 22.5 secs</span></span>
+<span><span class="co">#&gt; * Result: 0 object(s)</span></span>
+<span><span class="co">#&gt; * Environment: 0x00000253c8573268</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; # makepipe segment</span></span>
+<span><span class="co">#&gt; * Source: 'two.R'</span></span>
+<span><span class="co">#&gt; * Targets: 'data/2 data.Rds'</span></span>
+<span><span class="co">#&gt; * File dependencies: 'data/1 data.Rds', 'lookup/concordance.csv'</span></span>
+<span><span class="co">#&gt; * Executed: TRUE</span></span>
+<span><span class="co">#&gt; * Execution time: 38.2 secs</span></span>
+<span><span class="co">#&gt; * Result: 0 object(s)</span></span>
+<span><span class="co">#&gt; * Environment: 0x00000253c8738660</span></span></code></pre></div>
+<p>Additionally, you can visualise the relationships between the various
+files by viewing the <code>Pipeline</code> itself:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>This will display a flow chart exhibiting the relationships between the <code>targets</code>, <code>dependencies</code>, and code.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>This will display a flow chart exhibiting the relationships between
+the <code>targets</code>, <code>dependencies</code>, and code.</p>
 <div class="section level3">
 <h3 id="make_">
 <code>make_*()</code><a class="anchor" aria-label="anchor" href="#make_"></a>
 </h3>
-<p>We used <code><a href="../reference/make_with_source.html">make_with_source()</a></code> above since, in most cases, that will be the simplest way to convert an existing workflow. In some cases, however, your pipeline may include short pieces of code that don’t need to reside in their own script. In such cases, you can use <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>:</p>
+<p>We used <code><a href="../reference/make_with_source.html">make_with_source()</a></code> above since, in most cases,
+that will be the simplest way to convert an existing workflow. In some
+cases, however, your pipeline may include short pieces of code that
+don’t need to reside in their own script. In such cases, you can use
+<code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
-  recipe <span class="op">=</span> <span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span>
-        <span class="st">"report.Rmd"</span>,
-        output_file <span class="op">=</span> <span class="st">"output/report.html"</span>
-    <span class="op">)</span>,
-    targets <span class="op">=</span> <span class="st">"output/report.html"</span>,
-    dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"report.Rmd"</span>, <span class="st">"data/2 data.Rds"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
-<p>As with <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, when a <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> block is run the code (this time the <code>recipe</code>) will only be executed if the relevant <code>targets</code> are out-of-date with respect to their <code>dependencies</code></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span></span>
+<span>  recipe <span class="op">=</span> <span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span></span>
+<span>        <span class="st">"report.Rmd"</span>,</span>
+<span>        output_file <span class="op">=</span> <span class="st">"output/report.html"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    targets <span class="op">=</span> <span class="st">"output/report.html"</span>,</span>
+<span>    dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"report.Rmd"</span>, <span class="st">"data/2 data.Rds"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>As with <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, when a
+<code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> block is run the code (this time the
+<code>recipe</code>) will only be executed if the relevant
+<code>targets</code> are out-of-date with respect to their
+<code>dependencies</code></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="clean-and-build">Clean and build<a class="anchor" aria-label="anchor" href="#clean-and-build"></a>
 </h2>
-<p>Once you’ve constructed a <code>Pipeline</code> by calling <code>make_*()</code>, you can re-run the entire pipeline using the <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> method. As when using <code>make_*()</code> directly, only code that needs to be run will be when <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> is called.</p>
-<p>For example, if you’ve just executed the Pipeline and nothing has changed, then nothing will be re-executed and you’ll be told has much:</p>
+<p>Once you’ve constructed a <code>Pipeline</code> by calling
+<code>make_*()</code>, you can re-run the entire pipeline using the
+<code>build()</code> method. As when using <code>make_*()</code>
+directly, only code that needs to be run will be when
+<code>build()</code> is called.</p>
+<p>For example, if you’ve just executed the Pipeline and nothing has
+changed, then nothing will be re-executed and you’ll be told has
+much:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span> 
-<span class="co">#&gt; √ Targets are up to date</span>
-<span class="co">#&gt; √ Targets are up to date</span></code></pre></div>
-<p>If you want to start from scratch and ‘rebuild’ all targets, you can use the <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> method together with the <code>clean()</code> method.</p>
+<code class="sourceCode R"><span><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; √ Targets are up to date</span></span>
+<span><span class="co">#&gt; √ Targets are up to date</span></span></code></pre></div>
+<p>If you want to start from scratch and ‘rebuild’ all targets, you can
+use the <code>build()</code> method together with the
+<code>clean()</code> method.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pipe</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span>
-<span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span>
-
-<span class="co">#&gt; i Targets are out of date. Updating...</span>
-<span class="co">#&gt; √ Finished updating                   </span>
-<span class="co">#&gt; i Targets are out of date. Updating...</span>
-<span class="co">#&gt; √ Finished updating   </span></code></pre></div>
-<p>The <code>clean()</code> and <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code> methods are especially useful when used with a <code>Pipeline</code> that has previously been saved out. In particular, if you’ve already created your <code>Pipeline</code> by stringing <code>make_*()</code> calls together and you’ve saved your <code>Pipeline</code> object out as <code>pipeline.Rds</code> you can re-run the whole Pipeline to ensure everything is up-to-date simply by calling:</p>
+<code class="sourceCode R"><span><span class="va">pipe</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#&gt; i Targets are out of date. Updating...</span></span>
+<span><span class="co">#&gt; √ Finished updating                   </span></span>
+<span><span class="co">#&gt; i Targets are out of date. Updating...</span></span>
+<span><span class="co">#&gt; √ Finished updating   </span></span></code></pre></div>
+<p>The <code>clean()</code> and <code>build()</code> methods are
+especially useful when used with a <code>Pipeline</code> that has
+previously been saved out. In particular, if you’ve already created your
+<code>Pipeline</code> by stringing <code>make_*()</code> calls together
+and you’ve saved your <code>Pipeline</code> object out as
+<code>pipeline.Rds</code> you can re-run the whole Pipeline to ensure
+everything is up-to-date simply by calling:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"pipeline.Rds"</span><span class="op">)</span>
-<span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"pipeline.Rds"</span><span class="op">)</span></span>
+<span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="return-values-and-registration">Return values and registration<a class="anchor" aria-label="anchor" href="#return-values-and-registration"></a>
 </h2>
-<p>Each <code>Segment</code> on the <code>Pipeline</code> is associated with a <code>result</code>. This is akin to a return value. Indeed, in the case of <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> it <em>is</em> the return value of the <code>recipe</code>. For example:</p>
+<p>Each <code>Segment</code> on the <code>Pipeline</code> is associated
+with a <code>result</code>. This is akin to a return value. Indeed, in
+the case of <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> it <em>is</em> the return
+value of the <code>recipe</code>. For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
-    recipe <span class="op">=</span> <span class="op">{</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
-    <span class="op">}</span>,
-    targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span>
-<span class="op">)</span>
-<span class="co">#&gt; i Targets are out of date. Updating...</span>
-<span class="co">#&gt; √ Finished updating                   </span>
-
-<span class="va">res</span><span class="op">$</span><span class="va">result</span>
-<span class="co">#&gt; [1] 32</span></code></pre></div>
-<p>Note, however, that the <code>result</code> is captured when the <code>recipe</code> is executed. If your <code>recipe</code> is never executed, then there will be no <code>result</code> available. Thus, for instance:</p>
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span></span>
+<span>    recipe <span class="op">=</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; i Targets are out of date. Updating...</span></span>
+<span><span class="co">#&gt; √ Finished updating                   </span></span>
+<span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">result</span></span>
+<span><span class="co">#&gt; [1] 32</span></span></code></pre></div>
+<p>Note, however, that the <code>result</code> is captured when the
+<code>recipe</code> is executed. If your <code>recipe</code> is never
+executed, then there will be no <code>result</code> available. Thus, for
+instance:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span>
-    recipe <span class="op">=</span> <span class="op">{</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
-    <span class="op">}</span>,
-    targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span>
-<span class="op">)</span>
-<span class="co">#&gt; √ Targets are up to date</span>
-
-<span class="va">res</span><span class="op">$</span><span class="va">result</span>
-<span class="co">#&gt; NULL</span></code></pre></div>
-<p>Things are a little more complicated in the case of <code><a href="../reference/make_with_source.html">make_with_source()</a></code>, as you can imagine. Given that source scripts do not really have return values, the <code>result</code> cannot be what <code>source</code> returns when run. So what is it?</p>
-<p>The <code>result</code> associated with a source <code>Segment</code> is an environment containing objects ‘registered’ in the <code>source</code> script. Objects are registered using <code><a href="../reference/make_register.html">make_register()</a></code>, which has a similar API to <code><a href="https://rdrr.io/r/base/assign.html" class="external-link">base::assign()</a></code>. Thus, imagine that <code>three.R</code> contains the following code:</p>
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span></span>
+<span>    recipe <span class="op">=</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    targets <span class="op">=</span> <span class="st">"data/mtcars.Rds"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; √ Targets are up to date</span></span>
+<span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">result</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p>Things are a little more complicated in the case of
+<code><a href="../reference/make_with_source.html">make_with_source()</a></code>, as you can imagine. Given that source
+scripts do not really have return values, the <code>result</code> cannot
+be what <code>source</code> returns when run. So what is it?</p>
+<p>The <code>result</code> associated with a source <code>Segment</code>
+is an environment containing objects ‘registered’ in the
+<code>source</code> script. Objects are registered using
+<code><a href="../reference/make_register.html">make_register()</a></code>, which has a similar API to
+<code><a href="https://rdrr.io/r/base/assign.html" class="external-link">base::assign()</a></code>. Thus, imagine that <code>three.R</code>
+contains the following code:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># ...</span>
-<span class="fu">makepipe</span><span class="fu">::</span><span class="fu"><a href="../reference/make_register.html">make_register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="st">"num_rows"</span><span class="op">)</span>
-<span class="co"># ...</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># ...</span></span>
+<span><span class="fu">makepipe</span><span class="fu">::</span><span class="fu"><a href="../reference/make_register.html">make_register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="st">"num_rows"</span><span class="op">)</span></span>
+<span><span class="co"># ...</span></span></code></pre></div>
 <p>Then we will have:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span>
-    source <span class="op">=</span> <span class="st">"three.R"</span>,
-    targets <span class="op">=</span> <span class="st">"data/3 data.Rds"</span>,
-    dependencies <span class="op">=</span> <span class="st">"data/2 data.Rds"</span>
-<span class="op">)</span>
-<span class="co">#&gt; i Targets are out of date. Updating...</span>
-<span class="co">#&gt; √ Finished updating </span>
-
-<span class="va">res</span><span class="op">$</span><span class="va">result</span>
-<span class="co">#&gt; &lt;environment: 0x0000029f6840f610&gt;</span>
-
-<span class="va">res</span><span class="op">$</span><span class="va">result</span><span class="op">$</span><span class="va">num_rows</span>
-<span class="co">#&gt; [1] 32</span></code></pre></div>
-<p>As with <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>, a <code>result</code> will only be captured if the <code>source</code> script is executed.</p>
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
+<span>    source <span class="op">=</span> <span class="st">"three.R"</span>,</span>
+<span>    targets <span class="op">=</span> <span class="st">"data/3 data.Rds"</span>,</span>
+<span>    dependencies <span class="op">=</span> <span class="st">"data/2 data.Rds"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; i Targets are out of date. Updating...</span></span>
+<span><span class="co">#&gt; √ Finished updating </span></span>
+<span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">result</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x0000029f6840f610&gt;</span></span>
+<span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">result</span><span class="op">$</span><span class="va">num_rows</span></span>
+<span><span class="co">#&gt; [1] 32</span></span></code></pre></div>
+<p>As with <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code>, a <code>result</code> will
+only be captured if the <code>source</code> script is executed.</p>
 </div>
 <div class="section level2">
 <h2 id="execution-details">Execution details<a class="anchor" aria-label="anchor" href="#execution-details"></a>
 </h2>
-<p>So when does a <code>source</code> file or a <code>recipe</code> get executed? The answer is: when and only when the relevant <code>targets</code> are out-of-date with respect to the <code>dependencies</code>. But what does that mean? Specifically, the <code>targets</code> are out-of-date if and only if:</p>
+<p>So when does a <code>source</code> file or a <code>recipe</code> get
+executed? The answer is: when and only when the relevant
+<code>targets</code> are out-of-date with respect to the
+<code>dependencies</code>. But what does that mean? Specifically, the
+<code>targets</code> are out-of-date if and only if:</p>
 <ul>
 <li><p>One or more of the <code>targets</code> do not exist, OR</p></li>
-<li><p>One or more of the <code>dependencies</code> is <em>newer</em> (i.e. has a more recent file modification time) than one or more of the <code>targets</code>. In other words, the <code>dependencies</code> have been updated since the <code>targets</code> were last made.</p></li>
+<li><p>One or more of the <code>dependencies</code> is <em>newer</em>
+(i.e. has a more recent file modification time) than one or more of the
+<code>targets</code>. In other words, the <code>dependencies</code> have
+been updated since the <code>targets</code> were last made.</p></li>
 </ul>
-<p>By default the execution will take place in a fresh environment which is a child of the calling environment. So if you’re calling <code>make_*()</code> in a top-level script then the execution will take place in a fresh environment whose parent is the global environment.</p>
-<p>There are a number of less commonly used arguments to <code>make_*()</code> which alter this behaviour. In particular:</p>
+<p>By default the execution will take place in a fresh environment which
+is a child of the calling environment. So if you’re calling
+<code>make_*()</code> in a top-level script then the execution will take
+place in a fresh environment whose parent is the global environment.</p>
+<p>There are a number of less commonly used arguments to
+<code>make_*()</code> which alter this behaviour. In particular:</p>
 <ul>
-<li><p><code>packages</code> can be used to supply the names of packages which serve as dependencies for the <code>targets</code>. If any of these packages have been updated since the <code>targets</code> were last made, the <code>targets</code> will be remade. This is particularly useful when you’re relying on a package for lookups which are liable to change.</p></li>
-<li><p><code>envir</code> can be used to supply an environment in which the execution of the <code>source</code> or <code>recipe</code> will take place. Supplying <code>envir = base::globalenv()</code>, for example, will mean that all execution takes place in the global environment. If you do this, then all the objects bound in the <code>recipe</code>/<code>source</code> will be available in the global environment.</p></li>
-<li><p><code>force</code> can be used to ensure that the <code>recipe</code>/<code>source</code> is executed no matter what. This is useful, e.g., when you are pulling in some data from an external database.</p></li>
+<li><p><code>packages</code> can be used to supply the names of packages
+which serve as dependencies for the <code>targets</code>. If any of
+these packages have been updated since the <code>targets</code> were
+last made, the <code>targets</code> will be remade. This is particularly
+useful when you’re relying on a package for lookups which are liable to
+change.</p></li>
+<li><p><code>envir</code> can be used to supply an environment in which
+the execution of the <code>source</code> or <code>recipe</code> will
+take place. Supplying <code>envir = base::globalenv()</code>, for
+example, will mean that all execution takes place in the global
+environment. If you do this, then all the objects bound in the
+<code>recipe</code>/<code>source</code> will be available in the global
+environment.</p></li>
+<li><p><code>force</code> can be used to ensure that the
+<code>recipe</code>/<code>source</code> is executed no matter what. This
+is useful, e.g., when you are pulling in some data from an external
+database.</p></li>
 </ul>
 </div>
   </div>
@@ -273,7 +371,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -19,7 +19,7 @@ dependencies, and sources."><meta property="og:image" content="/logo.png"><!-- m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
       </span>
     </div>
 
@@ -105,14 +105,14 @@ primarily to update outofdateness</p>
 <p>Add a pipeline segment corresponding to a <code><a href="make_with_source.html">make_with_source()</a></code>
 call</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">add_source_segment</span><span class="op">(</span>
-  <span class="va">source</span>,
-  <span class="va">targets</span>,
-  <span class="va">dependencies</span>,
-  <span class="va">packages</span>,
-  <span class="va">envir</span>,
-  <span class="va">force</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">add_source_segment</span><span class="op">(</span></span>
+<span>  <span class="va">source</span>,</span>
+<span>  <span class="va">targets</span>,</span>
+<span>  <span class="va">dependencies</span>,</span>
+<span>  <span class="va">packages</span>,</span>
+<span>  <span class="va">envir</span>,</span>
+<span>  <span class="va">force</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -161,14 +161,14 @@ out-of-date)</p></dd>
 <p>Add a pipeline segment corresponding to a <code><a href="make_with_recipe.html">make_with_recipe()</a></code>
 call</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">add_recipe_segment</span><span class="op">(</span>
-  <span class="va">recipe</span>,
-  <span class="va">targets</span>,
-  <span class="va">dependencies</span>,
-  <span class="va">packages</span>,
-  <span class="va">envir</span>,
-  <span class="va">force</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">add_recipe_segment</span><span class="op">(</span></span>
+<span>  <span class="va">recipe</span>,</span>
+<span>  <span class="va">targets</span>,</span>
+<span>  <span class="va">dependencies</span>,</span>
+<span>  <span class="va">packages</span>,</span>
+<span>  <span class="va">envir</span>,</span>
+<span>  <span class="va">force</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -209,10 +209,10 @@ out-of-date)</p></dd>
 </div>
 
 </div><p></p><hr><a id="method-build"></a><div class="section">
-<h3 id="method-build-">Method <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">build()</a></code><a class="anchor" aria-label="anchor" href="#method-build-"></a></h3>
+<h3 id="method-build-">Method <code>build()</code><a class="anchor" aria-label="anchor" href="#method-build-"></a></h3>
 <p>Build all targets</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span>quiet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"makepipe.quiet"</span><span class="op">)</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span>quiet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"makepipe.quiet"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -232,7 +232,7 @@ out-of-date)</p></dd>
 <h3 id="method-clean-">Method <code>clean()</code><a class="anchor" aria-label="anchor" href="#method-clean-"></a></h3>
 <p>Clean all targets</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -244,7 +244,7 @@ out-of-date)</p></dd>
 <h3 id="method-annotate-">Method <code>annotate()</code><a class="anchor" aria-label="anchor" href="#method-annotate-"></a></h3>
 <p>Apply annotations to Pipeline</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">annotate</span><span class="op">(</span>labels <span class="op">=</span> <span class="cn">NULL</span>, notes <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">annotate</span><span class="op">(</span>labels <span class="op">=</span> <span class="cn">NULL</span>, notes <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -266,7 +266,7 @@ notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).</p>
 <h3 id="method-refresh-">Method <code>refresh()</code><a class="anchor" aria-label="anchor" href="#method-refresh-"></a></h3>
 <p>Refresh Pipeline to check outofdateness</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">refresh</span><span class="op">(</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">refresh</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
@@ -274,22 +274,22 @@ notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).</p>
 <h3 id="method-nomnoml-">Method <code>nomnoml()</code><a class="anchor" aria-label="anchor" href="#method-nomnoml-"></a></h3>
 <p>Display the pipeline with nomnoml</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">nomnoml</span><span class="op">(</span>
-  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"down"</span>, <span class="st">"right"</span><span class="op">)</span>,
-  arrow_size <span class="op">=</span> <span class="fl">1</span>,
-  edge_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hard"</span>, <span class="st">"rounded"</span><span class="op">)</span>,
-  bend_size <span class="op">=</span> <span class="fl">0.3</span>,
-  font <span class="op">=</span> <span class="st">"Courier"</span>,
-  font_size <span class="op">=</span> <span class="fl">12</span>,
-  line_width <span class="op">=</span> <span class="fl">3</span>,
-  padding <span class="op">=</span> <span class="fl">16</span>,
-  spacing <span class="op">=</span> <span class="fl">40</span>,
-  leading <span class="op">=</span> <span class="fl">1.25</span>,
-  stroke <span class="op">=</span> <span class="st">"#33322E"</span>,
-  fill_arrows <span class="op">=</span> <span class="cn">FALSE</span>,
-  gutter <span class="op">=</span> <span class="fl">5</span>,
-  edge_margin <span class="op">=</span> <span class="fl">0</span>
-<span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">nomnoml</span><span class="op">(</span></span>
+<span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"down"</span>, <span class="st">"right"</span><span class="op">)</span>,</span>
+<span>  arrow_size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  edge_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hard"</span>, <span class="st">"rounded"</span><span class="op">)</span>,</span>
+<span>  bend_size <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  font <span class="op">=</span> <span class="st">"Courier"</span>,</span>
+<span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  line_width <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  padding <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  spacing <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>  leading <span class="op">=</span> <span class="fl">1.25</span>,</span>
+<span>  stroke <span class="op">=</span> <span class="st">"#33322E"</span>,</span>
+<span>  fill_arrows <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  gutter <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  edge_margin <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -363,7 +363,7 @@ angled (<code>FALSE</code>)</p></dd>
 <h3 id="method-visnetwork-">Method <code>visnetwork()</code><a class="anchor" aria-label="anchor" href="#method-visnetwork-"></a></h3>
 <p>Display the pipeline with nomnoml</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">visnetwork</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">visnetwork</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -384,7 +384,7 @@ angled (<code>FALSE</code>)</p></dd>
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Display</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -405,7 +405,7 @@ angled (<code>FALSE</code>)</p></dd>
 <h3 id="method-save-visnetwork-">Method <code>save_visnetwork()</code><a class="anchor" aria-label="anchor" href="#method-save-visnetwork-"></a></h3>
 <p>Save pipeline visNetwork</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">save_visnetwork</span><span class="op">(</span><span class="va">file</span>, selfcontained <span class="op">=</span> <span class="cn">TRUE</span>, background <span class="op">=</span> <span class="st">"white"</span>, <span class="va">...</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">save_visnetwork</span><span class="op">(</span><span class="va">file</span>, selfcontained <span class="op">=</span> <span class="cn">TRUE</span>, background <span class="op">=</span> <span class="st">"white"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -441,7 +441,7 @@ widget. Defaults to white.</p></dd>
 <h3 id="method-save-nomnoml-">Method <code>save_nomnoml()</code><a class="anchor" aria-label="anchor" href="#method-save-nomnoml-"></a></h3>
 <p>Save pipeline nomnoml</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">save_nomnoml</span><span class="op">(</span><span class="va">file</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">save_nomnoml</span><span class="op">(</span><span class="va">file</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -473,7 +473,7 @@ widget. Defaults to white.</p></dd>
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span class="va">Pipeline</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Pipeline</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -501,7 +501,7 @@ widget. Defaults to white.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

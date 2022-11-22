@@ -19,7 +19,7 @@ else will be blue."><meta property="og:image" content="/logo.png"><!-- mathjax -
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
       </span>
     </div>
 
@@ -60,40 +60,51 @@ else will be blue.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">show_pipeline</span><span class="op">(</span>
-  pipeline <span class="op">=</span> <span class="fu"><a href="pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>,
-  as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nomnoml"</span>, <span class="st">"visnetwork"</span><span class="op">)</span>,
-  labels <span class="op">=</span> <span class="cn">NULL</span>,
-  notes <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">save_pipeline</span><span class="op">(</span>
-  <span class="va">file</span>,
-  pipeline <span class="op">=</span> <span class="fu"><a href="pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>,
-  as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nomnoml"</span>, <span class="st">"visnetwork"</span><span class="op">)</span>,
-  labels <span class="op">=</span> <span class="cn">NULL</span>,
-  notes <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">show_pipeline</span><span class="op">(</span></span>
+<span>  pipeline <span class="op">=</span> <span class="fu"><a href="pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nomnoml"</span>, <span class="st">"visnetwork"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  notes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">save_pipeline</span><span class="op">(</span></span>
+<span>  <span class="va">file</span>,</span>
+<span>  pipeline <span class="op">=</span> <span class="fu"><a href="pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nomnoml"</span>, <span class="st">"visnetwork"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  notes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pipeline</dt>
 <dd><p>A pipeline. See <a href="Pipeline.html">Pipeline</a> for more details.</p></dd>
+
+
 <dt>as</dt>
 <dd><p>A string determining whether to use <code>nomnoml</code> or <code>visNetwork</code></p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A named character vector mapping nodes in the <code>pipeline</code> onto
 labels to display beside them.</p></dd>
+
+
 <dt>notes</dt>
 <dd><p>A named character vector mapping nodes in the <code>Pipeline</code> onto
 notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Arguments passed onto <code>Pipeline$nomnoml()</code> or <code>Pipeline$visnetwork</code></p></dd>
+
+
 <dt>file</dt>
 <dd><p>File to save png (nomnoml) or html (visnetwork) into</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -110,27 +121,27 @@ or <code>source</code> scripts)</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># Run pipeline</span></span>
-<span class="r-in"><span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"recode.R"</span>,</span>
-<span class="r-in">  <span class="st">"data/0 raw_data.R"</span>,</span>
-<span class="r-in">  <span class="st">"data/1 data.R"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"merge.R"</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.R"</span>, <span class="st">"data/0 raw_pop.R"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="st">"data/2 data.R"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Visualise pipeline with custom notes</span></span>
-<span class="r-in"><span class="fu">show_pipeline</span><span class="op">(</span>notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"data/0 raw_data.R"</span> <span class="op">=</span> <span class="st">"Raw survey data"</span>,</span>
-<span class="r-in">  <span class="st">"data/0 raw_pop.R"</span> <span class="op">=</span> <span class="st">"Raw population data"</span>,</span>
-<span class="r-in">  <span class="st">"data/1 data.R"</span> <span class="op">=</span> <span class="st">"Survey data with recodes applied"</span>,</span>
-<span class="r-in">  <span class="st">"data/2 data.R"</span> <span class="op">=</span> <span class="st">"Survey data with demographic variables merged in"</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># Run pipeline</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"recode.R"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/0 raw_data.R"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/1 data.R"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="make_with_source.html">make_with_source</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"merge.R"</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/1 data.R"</span>, <span class="st">"data/0 raw_pop.R"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/2 data.R"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Visualise pipeline with custom notes</span></span></span>
+<span class="r-in"><span><span class="fu">show_pipeline</span><span class="op">(</span>notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"data/0 raw_data.R"</span> <span class="op">=</span> <span class="st">"Raw survey data"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/0 raw_pop.R"</span> <span class="op">=</span> <span class="st">"Raw population data"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/1 data.R"</span> <span class="op">=</span> <span class="st">"Survey data with recodes applied"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"data/2 data.R"</span> <span class="op">=</span> <span class="st">"Survey data with demographic variables merged in"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -145,7 +156,7 @@ or <code>source</code> scripts)</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
