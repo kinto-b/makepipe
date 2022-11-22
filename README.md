@@ -7,9 +7,9 @@
 
 [![Codecov test
 coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://app.codecov.io/gh/kinto-b/makepipe?branch=master)
-[![R-CMD-check](https://github.com/kinto-b/makepipe/workflows/R-CMD-check/badge.svg)](https://github.com/kinto-b/makepipe/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/makepipe)](https://CRAN.R-project.org/package=makepipe)
+[![R-CMD-check](https://github.com/kinto-b/makepipe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kinto-b/makepipe/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `makepipe` is to allow for the construction of make-like
