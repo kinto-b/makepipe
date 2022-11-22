@@ -4,7 +4,6 @@
 #' Make targets out of dependencies using a source file
 #'
 #' @inheritParams make_params
-#' @param source The path to an R script which makes the `targets`
 #' @param note A description of what the `source` does, displayed in pipeline
 #'   visualisations
 #' @param ... Additional parameters to pass to `base::source()`
@@ -74,7 +73,6 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
 #' Make targets out of dependencies using a recipe
 #'
 #' @inheritParams make_params
-#' @param recipe A chunk of R code which makes the `targets`
 #' @param note A description of what the `recipe` does, displayed in pipeline
 #'   visualisations. If `NULL`, the `recipe` code is used.
 #' @param ... Additional parameters to pass to `base::eval()`

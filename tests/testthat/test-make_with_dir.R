@@ -6,6 +6,7 @@ target3 <- tempfile(fileext=".txt")
 
 # Success tests ----------------------------------------------------------------
 test_that("make_with_dir ignores scripts without @makepipe", {
+  reset_pipeline()
   p <- make_with_dir(
     system.file("tests", "make_with_dir_ok", package = "makepipe"),
     build=FALSE
@@ -26,6 +27,7 @@ test_that("make_with_dir ignores scripts without @makepipe", {
 })
 
 test_that("make_with_dir evaluates tags using parent environment", {
+  reset_pipeline()
   p <- make_with_dir(
     system.file("tests", "make_with_dir_ok", package = "makepipe"),
     build=FALSE
@@ -50,6 +52,7 @@ test_that("make_with_dir evaluates tags using parent environment", {
 })
 
 test_that("make_with_dir finds scripts in subdir if told to", {
+  reset_pipeline()
   p <- make_with_dir(
     system.file("tests", "make_with_dir_ok", package = "makepipe"),
     build=FALSE, recursive = TRUE
@@ -68,6 +71,7 @@ test_that("make_with_dir finds scripts in subdir if told to", {
 # Failure tests ----------------------------------------------------------------
 
 test_that("make_with_dir warns if more than one @makepipe tag", {
+  reset_pipeline()
   expect_warning(make_with_dir(
     system.file("tests", "make_with_dir_warn", package = "makepipe"),
     build=FALSE

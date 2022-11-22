@@ -1,5 +1,7 @@
 #' Parameters for make-like functions
 #' @keywords internal
+#' @param source The path to an R script which makes the `targets`
+#' @param recipe A chunk of R code which makes the `targets`
 #' @param targets A character vector of paths to files
 #' @param dependencies A character vector of paths to files which the `targets`
 #'   depend on

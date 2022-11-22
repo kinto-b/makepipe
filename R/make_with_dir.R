@@ -1,5 +1,27 @@
 #' Create a pipeline using roxygen tags
 #'
+#' Instead of maintaining a separate pipeline script containing calls to
+#' `make_with_source()`, you can add roxygen-like headers to the .R files in
+#' your pipeline containing the `@makepipe` tag along with `@targets`,
+#' `@dependencies`, and so on. These tags will be parsed by `make_with_dir()`
+#' and used to construct a pipeline. You can call a specific part of the
+#' pipeline that has been documented in this way using `make_with_roxy()`.
+#'
+#' Other than `@makepipe`, which is used to tell whether a given script should
+#' be included in the pipeline, the tags recognised mirror the arguments to
+#' `make_with_source()`. In particular,
+#'
+#' - `@targets` and `@dependencies` are for declaring inputs and outputs, the
+#' expected format is a comma separated list of strings like
+#' `@targets "out1.Rds", "out2.Rds"` but R code like `@targets file.path(DIR, "out.Rds")`
+#' (evaluated in `envir`) works too
+#' - `@packages` is for declaring the packages that the targets depend on, the
+#' expected format is `@packages pkg1 pkg2 etc`
+#' - `@force` is for declaring whether or not execution should be forced, the
+#' expected format is a logical like `TRUE` or `FALSE`
+#'
+#' See the getting started vignette for more information.
+#'
 #' @param dir A character vector of full path names; the default corresponds to the working directory
 #' @param recursive A logical determining whether or not to recurse into
 #'   subdirectories
@@ -20,60 +42,95 @@
 make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
                           envir = new.env(parent = parent.frame()),
                           quiet = getOption("makepipe.quiet")) {
-  fp <- list.files(
+  source_files <- list.files(
     dir, recursive = recursive,
     pattern = "\\.R$", ignore.case = TRUE,
     full.names = TRUE
   )
 
-  roxy_files <- lapply(fp, roxygen2::parse_file, env = NULL)
-  roxy_files <- roxy_files[sapply(roxy_files, length)>0]
-
-  pipeline <- Pipeline$new()
-  for (f in roxy_files) {
-    is_makepipe_block <- sapply(f, function(block) {
-      "makepipe" %in% sapply(block$tags, `[[`, "tag")
-    })
-    if (sum(is_makepipe_block) == 0) next
-
-    # Each file can have at most one make declaration
-    makepipe_block <- which(is_makepipe_block)[1] # Use first declaration
-    makepipe_block <- f[[makepipe_block]]
-    if (sum(is_makepipe_block) > 1) {
-      warning(
-        "More than one makepipe declaration in '",
-        basename(makepipe_block$file), "'. Only the first will be used",
-        call. = FALSE
-      )
-    }
-
-    # Extract makepipe tags
-    block_tags <- lapply(makepipe_block$tags, `[[`, "val")
-    names(block_tags) <- lapply(makepipe_block$tags, `[[`, "tag")
-    if (!"force" %in% names(block_tags)) block_tags$force <- FALSE
-
-    # Evaluate targets/dependencies
-    if (!is.null(block_tags$dependencies)) {
-      block_tags$dependencies <- evaluate_vector(block_tags$dependencies, envir = envir)
-    }
-    if (!is.null(block_tags$targets)) {
-      block_tags$targets <- evaluate_vector(block_tags$targets, envir = envir)
-    }
-
-    # Add segment
-    segment <- pipeline$add_source_segment(
-      makepipe_block$file,
-      block_tags$targets,
-      block_tags$dependencies,
-      block_tags$packages,
-      envir,
-      block_tags$force
-    )
-    add_note_and_label(pipeline, segment, block_tags$title, block_tags$description)
+  for (fp in source_files) {
+    make_with_tags(fp, envir, quiet)
   }
 
+  pipeline <- get_pipeline()
   if (build) pipeline$build(quiet)
   pipeline
+}
+
+
+#' @rdname make_with_dir
+#' @export
+make_with_roxy <- function(source,
+                           envir = new.env(parent = parent.frame()),
+                           quiet = getOption("makepipe.quiet")) {
+  segment <- make_with_tags(source, envir, quiet)
+  out <- segment$execute(quiet = quiet)
+  invisible(out)
+}
+
+
+# Internal ---------------------------------------------------------------------
+
+#' Make targets out of dependencies using a source file with a roxygen header
+#'
+#' @inheritParams make_params
+#'
+#' @return A `Segment` object containing execution metadata.
+#' @noRd
+#' @keywords internal
+make_with_tags <- function(source,
+                           envir = new.env(parent = parent.frame()),
+                           quiet = getOption("makepipe.quiet")) {
+  f <- roxygen2::parse_file(source, envir)
+  if (length(f)==0) return(NULL)
+
+  pipeline <- get_pipeline()
+  if (is.null(pipeline)) {
+    pipeline <- Pipeline$new()
+    set_pipeline(pipeline)
+  }
+
+  is_makepipe_block <- sapply(f, function(block) {
+    "makepipe" %in% sapply(block$tags, `[[`, "tag")
+  })
+  if (sum(is_makepipe_block) == 0) next
+
+  # Each file can have at most one make declaration
+  makepipe_block <- which(is_makepipe_block)[1] # Use first declaration
+  makepipe_block <- f[[makepipe_block]]
+  if (sum(is_makepipe_block) > 1) {
+    warning(
+      "More than one makepipe declaration in '",
+      basename(makepipe_block$file), "'. Only the first will be used",
+      call. = FALSE
+    )
+  }
+
+  # Extract makepipe tags
+  block_tags <- lapply(makepipe_block$tags, `[[`, "val")
+  names(block_tags) <- lapply(makepipe_block$tags, `[[`, "tag")
+  if (!"force" %in% names(block_tags)) block_tags$force <- FALSE
+
+  # Evaluate targets/dependencies
+  if (!is.null(block_tags$dependencies)) {
+    block_tags$dependencies <- evaluate_vector(block_tags$dependencies, envir = envir)
+  }
+  if (!is.null(block_tags$targets)) {
+    block_tags$targets <- evaluate_vector(block_tags$targets, envir = envir)
+  }
+
+  # Add segment
+  segment <- pipeline$add_source_segment(
+    makepipe_block$file,
+    block_tags$targets,
+    block_tags$dependencies,
+    block_tags$packages,
+    envir,
+    block_tags$force
+  )
+  add_note_and_label(pipeline, segment, block_tags$title, block_tags$description)
+
+  segment
 }
 
 # Helpers ----------------------------------------------------------------------
