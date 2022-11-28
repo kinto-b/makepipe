@@ -80,19 +80,19 @@ dependencies, and sources.</p>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-add_source_segment"><code>Pipeline$add_source_segment()</code></a></p></li>
-<li><p><a href="#method-add_recipe_segment"><code>Pipeline$add_recipe_segment()</code></a></p></li>
-<li><p><a href="#method-build"><code>Pipeline$build()</code></a></p></li>
-<li><p><a href="#method-clean"><code>Pipeline$clean()</code></a></p></li>
-<li><p><a href="#method-annotate"><code>Pipeline$annotate()</code></a></p></li>
-<li><p><a href="#method-refresh"><code>Pipeline$refresh()</code></a></p></li>
-<li><p><a href="#method-nomnoml"><code>Pipeline$nomnoml()</code></a></p></li>
-<li><p><a href="#method-visnetwork"><code>Pipeline$visnetwork()</code></a></p></li>
-<li><p><a href="#method-print"><code>Pipeline$print()</code></a></p></li>
-<li><p><a href="#method-save_visnetwork"><code>Pipeline$save_visnetwork()</code></a></p></li>
-<li><p><a href="#method-save_nomnoml"><code>Pipeline$save_nomnoml()</code></a></p></li>
-<li><p><a href="#method-clone"><code>Pipeline$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-add_source_segment"></a><div class="section">
+<ul><li><p><a href="#method-Pipeline-add_source_segment"><code>Pipeline$add_source_segment()</code></a></p></li>
+<li><p><a href="#method-Pipeline-add_recipe_segment"><code>Pipeline$add_recipe_segment()</code></a></p></li>
+<li><p><a href="#method-Pipeline-build"><code>Pipeline$build()</code></a></p></li>
+<li><p><a href="#method-Pipeline-clean"><code>Pipeline$clean()</code></a></p></li>
+<li><p><a href="#method-Pipeline-annotate"><code>Pipeline$annotate()</code></a></p></li>
+<li><p><a href="#method-Pipeline-refresh"><code>Pipeline$refresh()</code></a></p></li>
+<li><p><a href="#method-Pipeline-nomnoml"><code>Pipeline$nomnoml()</code></a></p></li>
+<li><p><a href="#method-Pipeline-visnetwork"><code>Pipeline$visnetwork()</code></a></p></li>
+<li><p><a href="#method-Pipeline-print"><code>Pipeline$print()</code></a></p></li>
+<li><p><a href="#method-Pipeline-save_visnetwork"><code>Pipeline$save_visnetwork()</code></a></p></li>
+<li><p><a href="#method-Pipeline-save_nomnoml"><code>Pipeline$save_nomnoml()</code></a></p></li>
+<li><p><a href="#method-Pipeline-clone"><code>Pipeline$clone()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-Pipeline-add_source_segment"></a><div class="section">
 <h3 id="method-add-source-segment-">Method <code>add_source_segment()</code><a class="anchor" aria-label="anchor" href="#method-add-source-segment-"></a></h3>
 <p>Add an edge to <code>edges</code></p>
 
@@ -156,7 +156,7 @@ out-of-date)</p></dd>
 <p>The <code>SegmentSource</code> added to the <code>Pipeline</code></p>
 </div>
 
-</div><p></p><hr><a id="method-add_recipe_segment"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-add_recipe_segment"></a><div class="section">
 <h3 id="method-add-recipe-segment-">Method <code>add_recipe_segment()</code><a class="anchor" aria-label="anchor" href="#method-add-recipe-segment-"></a></h3>
 <p>Add a pipeline segment corresponding to a <code><a href="make_with_recipe.html">make_with_recipe()</a></code>
 call</p><div class="section">
@@ -208,7 +208,7 @@ out-of-date)</p></dd>
 <p>The <code>SegmentRecipe</code> added to the <code>Pipeline</code></p>
 </div>
 
-</div><p></p><hr><a id="method-build"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-build"></a><div class="section">
 <h3 id="method-build-">Method <code>build()</code><a class="anchor" aria-label="anchor" href="#method-build-"></a></h3>
 <p>Build all targets</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
@@ -228,7 +228,7 @@ out-of-date)</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-clean"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-clean"></a><div class="section">
 <h3 id="method-clean-">Method <code>clean()</code><a class="anchor" aria-label="anchor" href="#method-clean-"></a></h3>
 <p>Clean all targets</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
@@ -240,7 +240,7 @@ out-of-date)</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-annotate"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-annotate"></a><div class="section">
 <h3 id="method-annotate-">Method <code>annotate()</code><a class="anchor" aria-label="anchor" href="#method-annotate-"></a></h3>
 <p>Apply annotations to Pipeline</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
@@ -262,7 +262,7 @@ notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).</p>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-refresh"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-refresh"></a><div class="section">
 <h3 id="method-refresh-">Method <code>refresh()</code><a class="anchor" aria-label="anchor" href="#method-refresh-"></a></h3>
 <p>Refresh Pipeline to check outofdateness</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
@@ -270,7 +270,7 @@ notes to display on beside the labels (nomnoml) or as tooltips (visNetwork).</p>
 </div>
 
 
-</div><p></p><hr><a id="method-nomnoml"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-nomnoml"></a><div class="section">
 <h3 id="method-nomnoml-">Method <code>nomnoml()</code><a class="anchor" aria-label="anchor" href="#method-nomnoml-"></a></h3>
 <p>Display the pipeline with nomnoml</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
@@ -359,7 +359,7 @@ angled (<code>FALSE</code>)</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-visnetwork"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-visnetwork"></a><div class="section">
 <h3 id="method-visnetwork-">Method <code>visnetwork()</code><a class="anchor" aria-label="anchor" href="#method-visnetwork-"></a></h3>
 <p>Display the pipeline with nomnoml</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
@@ -380,7 +380,7 @@ angled (<code>FALSE</code>)</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-print"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Display</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
@@ -401,7 +401,7 @@ angled (<code>FALSE</code>)</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-save_visnetwork"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-save_visnetwork"></a><div class="section">
 <h3 id="method-save-visnetwork-">Method <code>save_visnetwork()</code><a class="anchor" aria-label="anchor" href="#method-save-visnetwork-"></a></h3>
 <p>Save pipeline visNetwork</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
@@ -437,7 +437,7 @@ widget. Defaults to white.</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-save_nomnoml"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-save_nomnoml"></a><div class="section">
 <h3 id="method-save-nomnoml-">Method <code>save_nomnoml()</code><a class="anchor" aria-label="anchor" href="#method-save-nomnoml-"></a></h3>
 <p>Save pipeline nomnoml</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
@@ -469,7 +469,7 @@ widget. Defaults to white.</p></dd>
 <p><code>self</code></p>
 </div>
 
-</div><p></p><hr><a id="method-clone"></a><div class="section">
+</div><p></p><hr><a id="method-Pipeline-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>

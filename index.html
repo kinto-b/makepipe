@@ -150,6 +150,15 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Another way to build a pipeline is to add a roxygen header into your .R scripts containing a special <code>@makepipe</code> tag along with the <code>@targets</code>, <code>@dependencies</code>, and so on. For example, at the top of script <code>one.R</code> you might have</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#'@title Load</span></span>
+<span><span class="co">#'@description Clean raw survey data and do derivations</span></span>
+<span><span class="co">#'@dependencies "data/raw.Rds", "lookup/concordance.csv"</span></span>
+<span><span class="co">#'@targets "data/1 data.Rds"</span></span>
+<span><span class="co">#'@makepipe</span></span>
+<span><span class="cn">NULL</span></span></code></pre></div>
+<p>You can then call <code><a href="reference/make_with_dir.html">make_with_dir()</a></code>, which will construct a pipeline using all the scripts it finds in the provided directory containing the <code>@makepipe</code> tag.</p>
 </div>
 </div>
   </div>

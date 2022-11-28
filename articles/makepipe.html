@@ -204,6 +204,37 @@ don’t need to reside in their own script. In such cases, you can use
 <code>targets</code> are out-of-date with respect to their
 <code>dependencies</code></p>
 </div>
+<div class="section level3">
+<h3 id="roxygen">roxygen<a class="anchor" aria-label="anchor" href="#roxygen"></a>
+</h3>
+<p>Instead of maintaining a separate pipeline script containing calls to
+<code><a href="../reference/make_with_source.html">make_with_source()</a></code>, you can add roxygen-like headers to the
+.R files in your pipeline containing the <code>@makepipe</code> tag
+along with <code>@targets</code>, <code>@dependencies</code>, and so on.
+For example, at the top of script <code>one.R</code> you might have</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#'@title One</span></span>
+<span><span class="co">#'@description This is the first script in our pipeline</span></span>
+<span><span class="co">#'@dependencies "data/raw.Rds"</span></span>
+<span><span class="co">#'@targets "data/1 data.Rds"</span></span>
+<span><span class="co">#'@makepipe</span></span>
+<span><span class="cn">NULL</span></span></code></pre></div>
+<p>You can then call <code><a href="../reference/make_with_dir.html">make_with_dir()</a></code>, which will construct
+a pipeline using all the scripts it finds in the provided directory
+containing the <code>@makepipe</code> tag.</p>
+<p>If you want to use a hybrid approach – keeping the documentation of
+dependencies and targets close to the source code – while maintaining
+the flexibility of a separate pipeline script you can use
+<code><a href="../reference/make_with_dir.html">make_with_roxy()</a></code>. Thus you might have</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/make_with_dir.html">make_with_roxy</a></span><span class="op">(</span><span class="st">"one.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># do other stuff</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/make_with_dir.html">make_with_roxy</a></span><span class="op">(</span><span class="st">"two.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># etc.</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="clean-and-build">Clean and build<a class="anchor" aria-label="anchor" href="#clean-and-build"></a>
@@ -216,7 +247,7 @@ directly, only code that needs to be run will be when
 <p>For example, if you’ve just executed the Pipeline and nothing has
 changed, then nothing will be re-executed and you’ll be told has
 much:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; √ Targets are up to date</span></span>
@@ -224,7 +255,7 @@ much:</p>
 <p>If you want to start from scratch and ‘rebuild’ all targets, you can
 use the <code>build()</code> method together with the
 <code>clean()</code> method.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipe</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -239,7 +270,7 @@ previously been saved out. In particular, if you’ve already created your
 and you’ve saved your <code>Pipeline</code> object out as
 <code>pipeline.Rds</code> you can re-run the whole Pipeline to ensure
 everything is up-to-date simply by calling:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"pipeline.Rds"</span><span class="op">)</span></span>
 <span><span class="va">pipe</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -250,7 +281,7 @@ everything is up-to-date simply by calling:</p>
 with a <code>result</code>. This is akin to a return value. Indeed, in
 the case of <code><a href="../reference/make_with_recipe.html">make_with_recipe()</a></code> it <em>is</em> the return
 value of the <code>recipe</code>. For example:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span></span>
 <span>    recipe <span class="op">=</span> <span class="op">{</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span></span>
@@ -267,7 +298,7 @@ value of the <code>recipe</code>. For example:</p>
 <code>recipe</code> is executed. If your <code>recipe</code> is never
 executed, then there will be no <code>result</code> available. Thus, for
 instance:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_recipe.html">make_with_recipe</a></span><span class="op">(</span></span>
 <span>    recipe <span class="op">=</span> <span class="op">{</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="st">"data/mtcars.Rds"</span><span class="op">)</span></span>
@@ -289,12 +320,12 @@ is an environment containing objects ‘registered’ in the
 <code><a href="../reference/make_register.html">make_register()</a></code>, which has a similar API to
 <code><a href="https://rdrr.io/r/base/assign.html" class="external-link">base::assign()</a></code>. Thus, imagine that <code>three.R</code>
 contains the following code:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ...</span></span>
 <span><span class="fu">makepipe</span><span class="fu">::</span><span class="fu"><a href="../reference/make_register.html">make_register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="st">"num_rows"</span><span class="op">)</span></span>
 <span><span class="co"># ...</span></span></code></pre></div>
 <p>Then we will have:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
 <span>    source <span class="op">=</span> <span class="st">"three.R"</span>,</span>
 <span>    targets <span class="op">=</span> <span class="st">"data/3 data.Rds"</span>,</span>
