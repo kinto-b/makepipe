@@ -137,6 +137,42 @@ As with `make_with_source()`, when a `make_with_recipe()` block is run the
 code (this time the `recipe`) will only be executed if the relevant `targets`
 are out-of-date with respect to their `dependencies`
 
+## roxygen 
+
+Instead of maintaining a separate pipeline script containing calls to
+`make_with_source()`, you can add roxygen-like headers to the .R files in your
+pipeline containing the `@makepipe` tag along with `@targets`, `@dependencies`,
+and so on. For example, at the top of script `one.R` you might have
+
+```r
+#'@title One
+#'@description This is the first script in our pipeline
+#'@dependencies "data/raw.Rds"
+#'@targets "data/1 data.Rds"
+#'@makepipe
+NULL
+```
+
+You can then call `make_with_dir()`, which will construct a pipeline using all
+the scripts it finds in the provided directory containing the `@makepipe` 
+tag. 
+
+If you want to use a hybrid approach -- keeping the documentation of 
+dependencies and targets close to the source code -- while maintaining the 
+flexibility of a separate pipeline script you can use `make_with_roxy()`. Thus
+you might have
+
+```r
+make_with_roxy("one.R")
+
+# do other stuff
+
+make_with_roxy("two.R")
+
+# etc.
+```
+
+
 # Clean and build
 
 Once you've constructed a `Pipeline` by calling `make_*()`, you can re-run the

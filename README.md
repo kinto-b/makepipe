@@ -114,3 +114,21 @@ re-create the cleaned targets:
 p <- get_pipeline()
 p$build()
 ```
+
+Another way to build a pipeline is to add a roxygen header into your .R
+scripts containing a special `@makepipe` tag along with the `@targets`,
+`@dependencies`, and so on. For example, at the top of script `one.R`
+you might have
+
+``` r
+#'@title Load
+#'@description Clean raw survey data and do derivations
+#'@dependencies "data/raw.Rds", "lookup/concordance.csv"
+#'@targets "data/1 data.Rds"
+#'@makepipe
+NULL
+```
+
+You can then call `make_with_dir()`, which will construct a pipeline
+using all the scripts it finds in the provided directory containing the
+`@makepipe` tag.

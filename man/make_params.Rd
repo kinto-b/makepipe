@@ -4,6 +4,10 @@
 \alias{make_params}
 \title{Parameters for make-like functions}
 \arguments{
+\item{source}{The path to an R script which makes the \code{targets}}
+
+\item{recipe}{A chunk of R code which makes the \code{targets}}
+
 \item{targets}{A character vector of paths to files}
 
 \item{dependencies}{A character vector of paths to files which the \code{targets}
