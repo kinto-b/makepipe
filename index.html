@@ -138,20 +138,64 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span>as <span class="op">=</span> <span class="st">"visnetwork"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/pipeline_visnetwork_uptodate.png" width="75%" style="display: block; margin: auto;"></p>
-<p>Once you’ve constructed a pipeline, you can ‘clean’ it (i.e. delete all registered targets):</p>
+<p>Or a text summary (which can be saved to a .md file),</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span>as <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#&gt; # Pipeline</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## one.R</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Clean raw survey data and do derivations</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; * Source: 'one.R'</span></span>
+<span><span class="co">#&gt; * Targets: 'data/1 data.Rds'</span></span>
+<span><span class="co">#&gt; * File dependencies: 'data/raw.Rds', 'lookup/concordance.csv'</span></span>
+<span><span class="co">#&gt; * Executed: FALSE</span></span>
+<span><span class="co">#&gt; * Environment: 0x0000015399acfeb8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## Merge it!</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Merge demographic variables from population data into survey data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; * Recipe: </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     dat &lt;- readRDS("data/1 data.Rds")</span></span>
+<span><span class="co">#&gt;     pop &lt;- readRDS("data/pop.Rds")</span></span>
+<span><span class="co">#&gt;     saveRDS(dat, "data/2_data.Rds")</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; * Targets: 'data/2 data.Rds'</span></span>
+<span><span class="co">#&gt; * File dependencies: 'data/1 data.Rds', 'data/pop.Rds'</span></span>
+<span><span class="co">#&gt; * Executed: TRUE</span></span>
+<span><span class="co">#&gt; * Execution time: 0.00103879 secs</span></span>
+<span><span class="co">#&gt; * Result: 0 object(s)</span></span>
+<span><span class="co">#&gt; * Environment: 0x0000015390c6c568</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ## three.R</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Convert data from 'wide' to 'long' format</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; * Source: 'three.R'</span></span>
+<span><span class="co">#&gt; * Targets: 'data/3 data.Rds'</span></span>
+<span><span class="co">#&gt; * File dependencies: 'data/2 data.Rds'</span></span>
+<span><span class="co">#&gt; * Executed: FALSE</span></span>
+<span><span class="co">#&gt; * Environment: 0x00000153928570f8</span></span></code></pre></div>
+<p>Once you’ve constructed a pipeline, you can ‘clean’ it (i.e. delete all registered targets):</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="fu">clean</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Then, when you look again at the visualisation, the target nodes will be red not green since they’re out-of-date:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/pipeline-vis.html">show_pipeline</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/pipeline_nomnoml_outofdate.png" width="75%" style="display: block; margin: auto;"></p>
 <p>And then you can ‘rebuild’ to re-execute the entire pipeline and re-create the cleaned targets:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pipeline-accessors.html">get_pipeline</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Another way to build a pipeline is to add a roxygen header into your .R scripts containing a special <code>@makepipe</code> tag along with the <code>@targets</code>, <code>@dependencies</code>, and so on. For example, at the top of script <code>one.R</code> you might have</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#'@title Load</span></span>
 <span><span class="co">#'@description Clean raw survey data and do derivations</span></span>
 <span><span class="co">#'@dependencies "data/raw.Rds", "lookup/concordance.csv"</span></span>

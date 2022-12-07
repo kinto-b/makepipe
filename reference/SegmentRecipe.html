@@ -78,14 +78,6 @@ between targets, dependencies, and sources.</p>
 
 </dl><p></p></div>
     </div>
-    <div id="active-bindings">
-    <h2>Active bindings</h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>edges</code></dt>
-<dd><p>Construct edges connecting the dependencies, instructions, and targets</p></dd>
-
-
-</dl><p></p></div>
-    </div>
     <div id="methods">
     <h2>Methods</h2>
     
@@ -93,11 +85,12 @@ between targets, dependencies, and sources.</p>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-SegmentRecipe-new"><code>SegmentRecipe$new()</code></a></p></li>
-<li><p><a href="#method-SegmentRecipe-print"><code>SegmentRecipe$print()</code></a></p></li>
 <li><p><a href="#method-SegmentRecipe-update_result"><code>SegmentRecipe$update_result()</code></a></p></li>
 <li><p><a href="#method-SegmentRecipe-execute"><code>SegmentRecipe$execute()</code></a></p></li>
 <li><p><a href="#method-SegmentRecipe-clone"><code>SegmentRecipe$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-SegmentRecipe-new"></a><div class="section">
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="makepipe" data-topic="Segment" data-id="annotate"><a href="Segment.html#method-annotate"><code>makepipe::Segment$annotate()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="makepipe" data-topic="Segment" data-id="print"><a href="Segment.html#method-print"><code>makepipe::Segment$print()</code></a></span></li>
+</ul></details></p><hr><a id="method-SegmentRecipe-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Initialise a new Segment</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
@@ -164,18 +157,10 @@ out-of-date)</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-SegmentRecipe-print"></a><div class="section">
-<h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
-<p>Printing method</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">SegmentRecipe</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-
 </div><p></p><hr><a id="method-SegmentRecipe-update_result"></a><div class="section">
 <h3 id="method-update-result-">Method <code>update_result()</code><a class="anchor" aria-label="anchor" href="#method-update-result-"></a></h3>
 <p>Update the Segment with new execution information</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">SegmentRecipe</span><span class="op">$</span><span class="fu">update_result</span><span class="op">(</span><span class="va">executed</span>, <span class="va">execution_time</span>, <span class="va">result</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -199,7 +184,7 @@ out-of-date)</p></dd>
 </div><p></p><hr><a id="method-SegmentRecipe-execute"></a><div class="section">
 <h3 id="method-execute-">Method <code>execute()</code><a class="anchor" aria-label="anchor" href="#method-execute-"></a></h3>
 <p>Execute the Segment</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">SegmentRecipe</span><span class="op">$</span><span class="fu">execute</span><span class="op">(</span>envir <span class="op">=</span> <span class="cn">NULL</span>, quiet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"makepipe.quiet"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -223,7 +208,7 @@ out-of-date)</p></dd>
 </div><p></p><hr><a id="method-SegmentRecipe-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">SegmentRecipe</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

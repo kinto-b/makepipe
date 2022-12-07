@@ -104,6 +104,14 @@ out-of-date)</p></dd>
 <dd><p>A difftime, the time taken to execute the instructions</p></dd>
 
 
+<dt><code>label</code></dt>
+<dd><p>A short label for the segment</p></dd>
+
+
+<dt><code>note</code></dt>
+<dd><p>A description of what the segment does</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div id="active-bindings">
@@ -114,6 +122,10 @@ out-of-date)</p></dd>
 
 <dt><code>nodes</code></dt>
 <dd><p>Get nodes corresponding to  dependencies, instructions, and targets</p></dd>
+
+
+<dt><code>text_summary</code></dt>
+<dd><p>A plain text summary of the Segment</p></dd>
 
 
 </dl><p></p></div>
@@ -127,6 +139,7 @@ out-of-date)</p></dd>
 <ul><li><p><a href="#method-Segment-new"><code>Segment$new()</code></a></p></li>
 <li><p><a href="#method-Segment-print"><code>Segment$print()</code></a></p></li>
 <li><p><a href="#method-Segment-update_result"><code>Segment$update_result()</code></a></p></li>
+<li><p><a href="#method-Segment-annotate"><code>Segment$annotate()</code></a></p></li>
 <li><p><a href="#method-Segment-clone"><code>Segment$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Segment-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -222,15 +235,35 @@ out-of-date)</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Segment-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
+</div><p></p><hr><a id="method-Segment-annotate"></a><div class="section">
+<h3 id="method-annotate-">Method <code>annotate()</code><a class="anchor" aria-label="anchor" href="#method-annotate-"></a></h3>
+<p>Apply annotations to Segment</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Segment</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Segment</span><span class="op">$</span><span class="fu">annotate</span><span class="op">(</span>label <span class="op">=</span> <span class="cn">NULL</span>, note <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>label</code></dt>
+<dd><p>A short label for the segment</p></dd>
+
+
+<dt><code>note</code></dt>
+<dd><p>A description of what the segment does</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Segment-clone"></a><div class="section">
+<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Segment</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
