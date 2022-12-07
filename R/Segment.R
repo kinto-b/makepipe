@@ -97,23 +97,10 @@ Segment <- R6::R6Class("Segment",
 
     #' @description Printing method
     print = function() {
-      targets <- paste0("'", paste(self$targets, collapse = "', '"), "'")
-      dependencies <- paste0("'", paste(self$dependencies, collapse = "', '"), "'")
-      if (length(self$packages) > 0) {
-        packages <- paste0("'", paste(self$packages, collapse = "', '"), "'")
-      }
-
       cli::cat_line(cli::col_grey("# makepipe segment"))
-      if (!is.null(self$label)) cli::cat_bullet("Label: ", self$label)
-      if (!is.null(self$note)) cli::cat_bullet("Note: ", self$note)
-      cli::cat_bullet(private$instructions_bullet)
-      cli::cat_bullet("Targets: ", targets)
-      if (length(self$dependencies) > 0) cli::cat_bullet("File dependencies: ", dependencies)
-      if (length(self$packages) > 0) cli::cat_bullet("Package dependencies: ", packages)
-      cli::cat_bullet("Executed: ", self$executed)
-      if (self$executed) cli::cat_bullet("Execution time: ", format(self$execution_time))
-      if (self$executed) cli::cat_bullet(private$result_txt)
-      cli::cat_bullet("Environment: ", env_name(self$envir))
+      cat("\n")
+      cat(paste(self$text_summary, collapse = "\n"))
+      cat("\n")
     },
 
     #' @description Update the Segment with new execution information
@@ -181,6 +168,44 @@ Segment <- R6::R6Class("Segment",
       )
 
       nodes
+    },
+    text_summary = function() {
+      bullet <- function(...) paste0("* ", ...)
+      list_quote <- function(...) paste0("'", paste(..., collapse = "', '"), "'")
+
+      # Title
+      title <- self$label
+      if (is.null(title) & !is.null(self$source)) title <- basename(self$source)
+      if (is.null(title)) title <- "Recipe"
+      out <- c(paste0("## ", title), "")
+
+      # Note
+      if (!is.null(self$note)) out <- c(out, self$note, "")
+
+      # Bullets
+      out <- c(out, bullet(private$instructions_bullet))
+      out <- c(out, bullet("Targets: ", list_quote(self$targets)))
+
+      if (length(self$dependencies) > 0) {
+        out <- c(out, bullet("File dependencies: ", list_quote(self$dependencies)))
+      }
+
+      if (length(self$packages) > 0) {
+        out <- c(out, bullet("Package dependencies: ", list_quote(self$packages)))
+      }
+
+      out <- c(out, bullet("Executed: ", self$executed))
+
+      if (self$executed) {
+        out <- c(out, bullet("Execution time: ", format(self$execution_time)))
+      }
+      if (self$executed) {
+        out <- c(out, bullet(private$result_txt))
+      }
+
+      out <- c(out, bullet("Environment: ", env_name(self$envir)))
+
+      out
     }
   )
 )
