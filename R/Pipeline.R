@@ -213,6 +213,15 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
         private$nodes <- new_nodes
       }
 
+      # Copy label/note info to Segments
+      segment_nodes <- unique(private$edges[private$edges$.source, c("to", ".segment_id")])
+      annotations <- private$nodes[private$nodes$.source, c("id", "label", "note")]
+      annotations <- merge(segment_nodes, annotations, by.x = "to", by.y = "id")
+      for (i in seq_along(annotations$.segment_id)) {
+        id <- annotations$.segment_id[i]
+        self$segments[[id]]$annotate(annotations$label[i], annotations$note[i])
+      }
+
       invisible(self)
     },
 

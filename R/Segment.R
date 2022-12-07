@@ -53,6 +53,11 @@ Segment <- R6::R6Class("Segment",
     executed = FALSE,
     #' @field execution_time A difftime, the time taken to execute the instructions
     execution_time = NULL,
+    #' @field label A short label for the segment
+    label = NULL,
+    #' @field note A description of what the segment does
+    note = NULL,
+
 
     #' @description Initialise a new Segment
     initialize = function(id, targets, dependencies, packages, envir, force,
@@ -99,6 +104,8 @@ Segment <- R6::R6Class("Segment",
       }
 
       cli::cat_line(cli::col_grey("# makepipe segment"))
+      if (!is.null(self$label)) cli::cat_bullet("Label: ", self$label)
+      if (!is.null(self$note)) cli::cat_bullet("Note: ", self$note)
       cli::cat_bullet(private$instructions_bullet)
       cli::cat_bullet("Targets: ", targets)
       if (length(self$dependencies) > 0) cli::cat_bullet("File dependencies: ", dependencies)
@@ -116,6 +123,13 @@ Segment <- R6::R6Class("Segment",
       self$executed <- executed
       self$result <- result
       self$execution_time <- execution_time
+
+      invisible(self)
+    },
+    #' @description Apply annotations to Segment
+    annotate = function(label = NULL, note = NULL) {
+      if (!is.null(label) && !label == "") self$label <- label
+      if (!is.null(note) && !note == "") self$note <- note
 
       invisible(self)
     }
