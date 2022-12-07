@@ -10,4 +10,7 @@
 ^\.covrignore$
 ^CRAN-RELEASE$
 ^doc$
+^docs$
+^pkgdown
 ^Meta$
+^CRAN-SUBMISSION$
