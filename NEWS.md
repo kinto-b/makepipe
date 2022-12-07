@@ -1,4 +1,33 @@
-# makepipe (development version)
+# makepipe 0.2.1
+
+* You can now specify the targets and dependencies (and so on) for each source script in your pipeline **within** that script using roxygen tags like this,
+
+```r
+#'@title Load
+#'@description Clean raw survey data and do derivations
+#'@dependencies "data/raw.Rds", "lookup/concordance.csv"
+#'@targets "data/1 data.Rds"
+#'@makepipe
+NULL
+```
+
+The entire pipeline can then be executed in one fell-swoop with `make_with_dir()`, simply by passing through the directory in which the scripts are located. Alternatively, you can construct your pipeline piece by piece using `make_with_roxy()`. For example, using the tags above, you would have
+
+```r
+# This:
+make_with_roxy("load.R")
+
+# Instead of this:
+make_with_source(
+  "load.R", 
+  targets = "data/1 data.Rds", 
+  dependencies = c("data/raw.Rds", "lookup/concordance.csv"),
+  label = "Load",
+  note = "Clean raw survey data and do derivations"
+)
+```
+
+* You can now produce a plain text summary of your pipeline using `show_pipeline(as = "text")`. You can also save this using, e.g., `save_pipeline(file = "pipeline.md", as = "text")`.
 
 # makepipe 0.2.0
 
