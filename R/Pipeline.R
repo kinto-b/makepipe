@@ -212,9 +212,10 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       }
 
       # Copy label/note info to Segments
-      segment_nodes <- unique(private$edges[private$edges$.source, c("to", ".segment_id")])
+      segment_nodes <- private$nodes$id[private$nodes$.source]
+      segment_nodes <- private$edges[private$edges$from %in% segment_nodes, c("from", ".segment_id")]
       annotations <- private$nodes[private$nodes$.source, c("id", "label", "note")]
-      annotations <- merge(segment_nodes, annotations, by.x = "to", by.y = "id")
+      annotations <- merge(segment_nodes, annotations, by.x = "from", by.y = "id")
       for (i in seq_along(annotations$.segment_id)) {
         id <- annotations$.segment_id[i]
         self$segments[[id]]$annotate(annotations$label[i], annotations$note[i])
@@ -313,6 +314,13 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       invisible(self)
     },
 
+    #' @description Display a text summary of the pipeline
+    #' @return `self`
+    text_summary = function() {
+      out <- pipeline_text_summary(private$nodes, private$edges, self$segments)
+      cat(paste(out, collapse = "\n"))
+    },
+
     #' @description Display
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
@@ -382,6 +390,19 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       file.copy(out, file)
       unlink(out)
       unlink(html)
+
+      invisible(self)
+    },
+
+    #' @description Save a text summary of the pipeline
+    #' @param file File to save text summary into
+    #' @return `self`
+    save_text_summary = function(file) {
+      is_txt <- grepl(x=file, ".(txt|md)$", ignore.case = TRUE)
+      stopifnot("`file` must be a .txt or .md path" = is_txt)
+
+      out <- pipeline_text_summary(private$nodes, private$edges, self$segments)
+      writeLines(out, con = file)
 
       invisible(self)
     }
@@ -832,4 +853,21 @@ escape_pipes_and_brackets <- function(x) {
 }
 
 
+# Text summary ------------------------------------------------------------
+
+pipeline_text_summary <- function(nodes, edges, segments) {
+  edges <- sort_topologically(edges)
+
+  # Sort segments by topological order
+  segment_nodes <- nodes$id[nodes$.source]
+  segment_nodes <- edges[edges$from %in% segment_nodes, c("from", ".segment_id", "level")]
+  segment_nodes <- segment_nodes[order(segment_nodes$level), ]
+
+  out <- c("# Pipeline", "")
+  for (i in segment_nodes$.segment_id) {
+    out <- c(out, segments[[i]]$text_summary, "")
+  }
+
+  out
+}
 
