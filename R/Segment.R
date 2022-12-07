@@ -16,6 +16,8 @@
 #' @param force A logical determining whether or not execution of the `source`
 #'   or `recipe` will be forced (i.e. happen whether or not the targets are
 #'   out-of-date)
+#' @param label A short label for the segment
+#' @param note A description of what the segment does
 #' @param result An object, whatever is returned by executing the instructions
 #' @param executed A logical, whether or not the instructions were executed
 #' @param execution_time A difftime, the time taken to execute the instructions
@@ -169,6 +171,8 @@ Segment <- R6::R6Class("Segment",
 
       nodes
     },
+
+    #' @field text_summary A plain text summary of the Segment
     text_summary = function() {
       bullet <- function(...) paste0("* ", ...)
       list_quote <- function(...) paste0("'", paste(..., collapse = "', '"), "'")

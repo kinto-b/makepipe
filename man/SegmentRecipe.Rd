@@ -25,23 +25,23 @@ Other segment:
 }
 \if{html}{\out{</div>}}
 }
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{edges}}{Construct edges connecting the dependencies, instructions, and targets}
-}
-\if{html}{\out{</div>}}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-SegmentRecipe-new}{\code{SegmentRecipe$new()}}
-\item \href{#method-SegmentRecipe-print}{\code{SegmentRecipe$print()}}
 \item \href{#method-SegmentRecipe-update_result}{\code{SegmentRecipe$update_result()}}
 \item \href{#method-SegmentRecipe-execute}{\code{SegmentRecipe$execute()}}
 \item \href{#method-SegmentRecipe-clone}{\code{SegmentRecipe$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="makepipe" data-topic="Segment" data-id="annotate"><a href='../../makepipe/html/Segment.html#method-Segment-annotate'><code>makepipe::Segment$annotate()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="makepipe" data-topic="Segment" data-id="print"><a href='../../makepipe/html/Segment.html#method-Segment-print'><code>makepipe::Segment$print()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SegmentRecipe-new"></a>}}
 \if{latex}{\out{\hypertarget{method-SegmentRecipe-new}{}}}
@@ -91,16 +91,6 @@ out-of-date)}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SegmentRecipe-print"></a>}}
-\if{latex}{\out{\hypertarget{method-SegmentRecipe-print}{}}}
-\subsection{Method \code{print()}}{
-Printing method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SegmentRecipe$print()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SegmentRecipe-update_result"></a>}}
