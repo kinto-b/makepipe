@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">makepipe</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
       </span>
     </div>
 
@@ -51,8 +51,32 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="makepipe-development-version">makepipe (development version)<a class="anchor" aria-label="anchor" href="#makepipe-development-version"></a></h2>
-</div>
+<h2 class="page-header" data-toc-text="0.2.1" id="makepipe-021">makepipe 0.2.1<small>2022-12-07</small><a class="anchor" aria-label="anchor" href="#makepipe-021"></a></h2>
+<ul><li>You can now specify the targets and dependencies (and so on) for each source script in your pipeline <strong>within</strong> that script using roxygen tags like this,</li>
+</ul><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co">#'@title Load</span></span>
+<span><span class="co">#'@description Clean raw survey data and do derivations</span></span>
+<span><span class="co">#'@dependencies "data/raw.Rds", "lookup/concordance.csv"</span></span>
+<span><span class="co">#'@targets "data/1 data.Rds"</span></span>
+<span><span class="co">#'@makepipe</span></span>
+<span><span class="cn">NULL</span></span></code></pre></div>
+<p>The entire pipeline can then be executed in one fell-swoop with <code><a href="../reference/make_with_dir.html">make_with_dir()</a></code>, simply by passing through the directory in which the scripts are located. Alternatively, you can construct your pipeline piece by piece using <code><a href="../reference/make_with_dir.html">make_with_roxy()</a></code>. For example, using the tags above, you would have</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># This:</span></span>
+<span><span class="fu"><a href="../reference/make_with_dir.html">make_with_roxy</a></span><span class="op">(</span><span class="st">"load.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Instead of this:</span></span>
+<span><span class="fu"><a href="../reference/make_with_source.html">make_with_source</a></span><span class="op">(</span></span>
+<span>  <span class="st">"load.R"</span>, </span>
+<span>  targets <span class="op">=</span> <span class="st">"data/1 data.Rds"</span>, </span>
+<span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/raw.Rds"</span>, <span class="st">"lookup/concordance.csv"</span><span class="op">)</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"Load"</span>,</span>
+<span>  note <span class="op">=</span> <span class="st">"Clean raw survey data and do derivations"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<ul><li>You can now produce a plain text summary of your pipeline using <code>show_pipeline(as = "text")</code>. You can also save this using, e.g., <code>save_pipeline(file = "pipeline.md", as = "text")</code>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="makepipe-020">makepipe 0.2.0<small>2022-05-13</small><a class="anchor" aria-label="anchor" href="#makepipe-020"></a></h2>
 <ul><li><p>BREAKING CHANGE: Deprecated <code>Pipeline$save()</code> and changed the arguments for <code><a href="../reference/pipeline-vis.html">save_pipeline()</a></code>, <code><a href="../reference/pipeline-vis.html">show_pipeline()</a></code>, and <code>Pipeline$annotate()</code>. This change was made to support the next change which is:</p></li>
