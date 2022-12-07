@@ -81,20 +81,18 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
         nodes <- unique(do.call(rbind, nodes))
       }
 
-      # Add notes/labels
-      lbl <- as.character(nodes$id)
-      lbl[!nodes$.recipe] <- basename(lbl[!nodes$.recipe])
-      nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
-      nodes$note <- as.character(nodes$id)
-
       # Restore old notes/labels
-      labels <- old_nodes$label
-      names(labels) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, labels, "label")
+      nodes$label <- ""
+      nodes$note  <- ""
+      if (nrow(old_nodes) > 0) {
+        labels <- old_nodes$label
+        names(labels) <- as.character(old_nodes$id)
+        nodes <- apply_annotations(nodes, labels, "label")
 
-      notes <- old_nodes$note
-      names(notes) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, notes, "note")
+        notes <- old_nodes$note
+        names(notes) <- as.character(old_nodes$id)
+        nodes <- apply_annotations(nodes, notes, "note")
+      }
 
       private$nodes <- nodes
       invisible(self)
@@ -630,6 +628,15 @@ sort_topologically <- function(edges) {
 pipeline_network <- function(nodes, edges, ...) {
   stop_required("visNetwork")
 
+  # Add default notes/labels
+  recipe_no_label <- nodes$.recipe & (nodes$label == "")
+  nodes$label[recipe_no_label] <- "Recipe"
+  no_label <-nodes$label == ""
+  nodes$label[no_label] <- basename(as.character(nodes$id[no_label]))
+  no_note <- (nodes$note == "")
+  nodes$note[no_note] <- as.character(nodes$id[no_note])
+
+
   # visNetwork expects tooltips to be stored in `title` column
   nodes$title <- nodes$note
 
@@ -739,12 +746,16 @@ pipeline_nomnoml_code <- function(nodes,
   # FALSE or TRUE must become "false" or "true" for nomnoml
   fill_arrows <- tolower(fill_arrows)
 
+  # Add default notes/labels
+  recipe_no_label <- nodes$.recipe & (nodes$label == "")
+  nodes$label[recipe_no_label] <- "Recipe"
+  no_label <-nodes$label == ""
+  nodes$label[no_label] <- basename(as.character(nodes$id[no_label]))
+  recipe_no_note <- nodes$.recipe & (nodes$note == "")
+  nodes$note[recipe_no_note] <- as.character(nodes$id[recipe_no_note])
+
   # Enforce uniquness of label since this is our nomnoml id
   nodes$label <- make.unique(nodes$label, sep = " +")
-
-  # Drop uninformative notes
-  note_matches_id <- nodes$note==as.character(nodes$id)
-  nodes$note[!nodes$.recipe & note_matches_id] <- ""
 
   # Now wrap the ones that aren't code
   note_matches_id <- nodes$note==as.character(nodes$id)
