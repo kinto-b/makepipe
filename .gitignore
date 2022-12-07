@@ -8,3 +8,5 @@ man/figures/archive
 inst/doc
 /doc/
 /Meta/
+docs
+pkgdown
