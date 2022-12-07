@@ -8,7 +8,7 @@
 \usage{
 show_pipeline(
   pipeline = get_pipeline(),
-  as = c("nomnoml", "visnetwork"),
+  as = c("nomnoml", "visnetwork", "text"),
   labels = NULL,
   notes = NULL,
   ...
@@ -17,7 +17,7 @@ show_pipeline(
 save_pipeline(
   file,
   pipeline = get_pipeline(),
-  as = c("nomnoml", "visnetwork"),
+  as = c("nomnoml", "visnetwork", "text"),
   labels = NULL,
   notes = NULL,
   ...

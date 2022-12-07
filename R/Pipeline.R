@@ -81,20 +81,18 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
         nodes <- unique(do.call(rbind, nodes))
       }
 
-      # Add notes/labels
-      lbl <- as.character(nodes$id)
-      lbl[!nodes$.recipe] <- basename(lbl[!nodes$.recipe])
-      nodes$label <- ifelse(nodes$.recipe, "Recipe", lbl)
-      nodes$note <- as.character(nodes$id)
-
       # Restore old notes/labels
-      labels <- old_nodes$label
-      names(labels) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, labels, "label")
+      nodes$label <- ""
+      nodes$note  <- ""
+      if (nrow(old_nodes) > 0) {
+        labels <- old_nodes$label
+        names(labels) <- as.character(old_nodes$id)
+        nodes <- apply_annotations(nodes, labels, "label")
 
-      notes <- old_nodes$note
-      names(notes) <- as.character(old_nodes$id)
-      nodes <- apply_annotations(nodes, notes, "note")
+        notes <- old_nodes$note
+        names(notes) <- as.character(old_nodes$id)
+        nodes <- apply_annotations(nodes, notes, "note")
+      }
 
       private$nodes <- nodes
       invisible(self)
@@ -213,6 +211,16 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
         private$nodes <- new_nodes
       }
 
+      # Copy label/note info to Segments
+      segment_nodes <- private$nodes$id[private$nodes$.source]
+      segment_nodes <- private$edges[private$edges$from %in% segment_nodes, c("from", ".segment_id")]
+      annotations <- private$nodes[private$nodes$.source, c("id", "label", "note")]
+      annotations <- merge(segment_nodes, annotations, by.x = "from", by.y = "id")
+      for (i in seq_along(annotations$.segment_id)) {
+        id <- annotations$.segment_id[i]
+        self$segments[[id]]$annotate(annotations$label[i], annotations$note[i])
+      }
+
       invisible(self)
     },
 
@@ -306,6 +314,13 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       invisible(self)
     },
 
+    #' @description Display a text summary of the pipeline
+    #' @return `self`
+    text_summary = function() {
+      out <- pipeline_text_summary(private$nodes, private$edges, self$segments)
+      cat(paste(out, collapse = "\n"))
+    },
+
     #' @description Display
     #' @param ...  Arguments (other than `nodes` and `edges`) to pass to
     #'   `visNetwork::visNetwork()`
@@ -375,6 +390,19 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       file.copy(out, file)
       unlink(out)
       unlink(html)
+
+      invisible(self)
+    },
+
+    #' @description Save a text summary of the pipeline
+    #' @param file File to save text summary into
+    #' @return `self`
+    save_text_summary = function(file) {
+      is_txt <- grepl(x=file, ".(txt|md)$", ignore.case = TRUE)
+      stopifnot("`file` must be a .txt or .md path" = is_txt)
+
+      out <- pipeline_text_summary(private$nodes, private$edges, self$segments)
+      writeLines(out, con = file)
 
       invisible(self)
     }
@@ -490,26 +518,28 @@ NULL
 #' @rdname pipeline-vis
 #' @export
 show_pipeline <- function(pipeline = get_pipeline(),
-                          as = c("nomnoml", "visnetwork"),
+                          as = c("nomnoml", "visnetwork", "text"),
                           labels = NULL, notes = NULL, ...) {
-  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  as <- match.arg(as)
   pipeline$annotate(labels, notes)
   switch(as,
     nomnoml = pipeline$nomnoml(...),
-    visnetwork = pipeline$visnetwork(...)
+    visnetwork = pipeline$visnetwork(...),
+    text = pipeline$text_summary()
   )
 }
 
 #' @rdname pipeline-vis
 #' @export
 save_pipeline <- function(file, pipeline = get_pipeline(),
-                          as = c("nomnoml", "visnetwork"),
+                          as = c("nomnoml", "visnetwork", "text"),
                           labels = NULL, notes = NULL, ...) {
-  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  as <- match.arg(as)
   pipeline$annotate(labels, notes)
   switch(as,
          nomnoml = pipeline$save_nomnoml(file, ...),
-         visnetwork = pipeline$save_visnetwork(file, ...)
+         visnetwork = pipeline$save_visnetwork(file, ...),
+         text = pipeline$save_text_summary(file, ...)
   )
 }
 
@@ -621,6 +651,15 @@ sort_topologically <- function(edges) {
 pipeline_network <- function(nodes, edges, ...) {
   stop_required("visNetwork")
 
+  # Add default notes/labels
+  recipe_no_label <- nodes$.recipe & (nodes$label == "")
+  nodes$label[recipe_no_label] <- "Recipe"
+  no_label <-nodes$label == ""
+  nodes$label[no_label] <- basename(as.character(nodes$id[no_label]))
+  no_note <- (nodes$note == "")
+  nodes$note[no_note] <- as.character(nodes$id[no_note])
+
+
   # visNetwork expects tooltips to be stored in `title` column
   nodes$title <- nodes$note
 
@@ -730,12 +769,16 @@ pipeline_nomnoml_code <- function(nodes,
   # FALSE or TRUE must become "false" or "true" for nomnoml
   fill_arrows <- tolower(fill_arrows)
 
+  # Add default notes/labels
+  recipe_no_label <- nodes$.recipe & (nodes$label == "")
+  nodes$label[recipe_no_label] <- "Recipe"
+  no_label <-nodes$label == ""
+  nodes$label[no_label] <- basename(as.character(nodes$id[no_label]))
+  recipe_no_note <- nodes$.recipe & (nodes$note == "")
+  nodes$note[recipe_no_note] <- as.character(nodes$id[recipe_no_note])
+
   # Enforce uniquness of label since this is our nomnoml id
   nodes$label <- make.unique(nodes$label, sep = " +")
-
-  # Drop uninformative notes
-  note_matches_id <- nodes$note==as.character(nodes$id)
-  nodes$note[!nodes$.recipe & note_matches_id] <- ""
 
   # Now wrap the ones that aren't code
   note_matches_id <- nodes$note==as.character(nodes$id)
@@ -812,4 +855,21 @@ escape_pipes_and_brackets <- function(x) {
 }
 
 
+# Text summary ------------------------------------------------------------
+
+pipeline_text_summary <- function(nodes, edges, segments) {
+  edges <- sort_topologically(edges)
+
+  # Sort segments by topological order
+  segment_nodes <- nodes$id[nodes$.source]
+  segment_nodes <- edges[edges$from %in% segment_nodes, c("from", ".segment_id", "level")]
+  segment_nodes <- segment_nodes[order(segment_nodes$level), ]
+
+  out <- c("# Pipeline", "")
+  for (i in segment_nodes$.segment_id) {
+    out <- c(out, segments[[i]]$text_summary, "")
+  }
+
+  out
+}
 

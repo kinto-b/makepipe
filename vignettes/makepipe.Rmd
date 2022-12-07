@@ -85,6 +85,9 @@ pipe$segments
 
 #> [[1]]
 #> # makepipe segment
+#> 
+#> ## one.R
+#> 
 #> * Source: 'one.R'
 #> * Targets: 'data/1 data.Rds'
 #> * File dependencies: 'data/raw.Rds'
@@ -95,6 +98,9 @@ pipe$segments
 #> 
 #> [[2]]
 #> # makepipe segment
+#> 
+#> ## two.R
+#> 
 #> * Source: 'two.R'
 #> * Targets: 'data/2 data.Rds'
 #> * File dependencies: 'data/1 data.Rds', 'lookup/concordance.csv'

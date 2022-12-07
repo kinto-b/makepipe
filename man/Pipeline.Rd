@@ -33,9 +33,11 @@ Other pipeline:
 \item \href{#method-Pipeline-refresh}{\code{Pipeline$refresh()}}
 \item \href{#method-Pipeline-nomnoml}{\code{Pipeline$nomnoml()}}
 \item \href{#method-Pipeline-visnetwork}{\code{Pipeline$visnetwork()}}
+\item \href{#method-Pipeline-text_summary}{\code{Pipeline$text_summary()}}
 \item \href{#method-Pipeline-print}{\code{Pipeline$print()}}
 \item \href{#method-Pipeline-save_visnetwork}{\code{Pipeline$save_visnetwork()}}
 \item \href{#method-Pipeline-save_nomnoml}{\code{Pipeline$save_nomnoml()}}
+\item \href{#method-Pipeline-save_text_summary}{\code{Pipeline$save_text_summary()}}
 \item \href{#method-Pipeline-clone}{\code{Pipeline$clone()}}
 }
 }
@@ -285,6 +287,19 @@ Display the pipeline with nomnoml
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Pipeline-text_summary"></a>}}
+\if{latex}{\out{\hypertarget{method-Pipeline-text_summary}{}}}
+\subsection{Method \code{text_summary()}}{
+Display a text summary of the pipeline
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$text_summary()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Pipeline-print"></a>}}
 \if{latex}{\out{\hypertarget{method-Pipeline-print}{}}}
 \subsection{Method \code{print()}}{
@@ -354,6 +369,26 @@ Save pipeline nomnoml
 \item{\code{height}}{Image height}
 
 \item{\code{...}}{Arguments to pass to \code{self$nomnoml()}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Pipeline-save_text_summary"></a>}}
+\if{latex}{\out{\hypertarget{method-Pipeline-save_text_summary}{}}}
+\subsection{Method \code{save_text_summary()}}{
+Save a text summary of the pipeline
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$save_text_summary(file)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{File to save text summary into}
 }
 \if{html}{\out{</div>}}
 }

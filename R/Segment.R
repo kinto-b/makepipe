@@ -16,6 +16,8 @@
 #' @param force A logical determining whether or not execution of the `source`
 #'   or `recipe` will be forced (i.e. happen whether or not the targets are
 #'   out-of-date)
+#' @param label A short label for the segment
+#' @param note A description of what the segment does
 #' @param result An object, whatever is returned by executing the instructions
 #' @param executed A logical, whether or not the instructions were executed
 #' @param execution_time A difftime, the time taken to execute the instructions
@@ -29,6 +31,7 @@ Segment <- R6::R6Class("Segment",
   private = list(
     id = NULL,
     instructions_txt = NULL,
+    instructions_bullet = NULL,
     result_txt = NULL
   ),
   public = list(
@@ -52,6 +55,11 @@ Segment <- R6::R6Class("Segment",
     executed = FALSE,
     #' @field execution_time A difftime, the time taken to execute the instructions
     execution_time = NULL,
+    #' @field label A short label for the segment
+    label = NULL,
+    #' @field note A description of what the segment does
+    note = NULL,
+
 
     #' @description Initialise a new Segment
     initialize = function(id, targets, dependencies, packages, envir, force,
@@ -91,21 +99,10 @@ Segment <- R6::R6Class("Segment",
 
     #' @description Printing method
     print = function() {
-      targets <- paste0("'", paste(self$targets, collapse = "', '"), "'")
-      dependencies <- paste0("'", paste(self$dependencies, collapse = "', '"), "'")
-      if (length(self$packages) > 0) {
-        packages <- paste0("'", paste(self$packages, collapse = "', '"), "'")
-      }
-
       cli::cat_line(cli::col_grey("# makepipe segment"))
-      cli::cat_bullet(private$instructions_txt)
-      cli::cat_bullet("Targets: ", targets)
-      if (length(self$dependencies) > 0) cli::cat_bullet("File dependencies: ", dependencies)
-      if (length(self$packages) > 0) cli::cat_bullet("Package dependencies: ", packages)
-      cli::cat_bullet("Executed: ", self$executed)
-      if (self$executed) cli::cat_bullet("Execution time: ", format(self$execution_time))
-      if (self$executed) cli::cat_bullet(private$result_txt)
-      cli::cat_bullet("Environment: ", env_name(self$envir))
+      cat("\n")
+      cat(paste(self$text_summary, collapse = "\n"))
+      cat("\n")
     },
 
     #' @description Update the Segment with new execution information
@@ -115,6 +112,13 @@ Segment <- R6::R6Class("Segment",
       self$executed <- executed
       self$result <- result
       self$execution_time <- execution_time
+
+      invisible(self)
+    },
+    #' @description Apply annotations to Segment
+    annotate = function(label = NULL, note = NULL) {
+      if (!is.null(label) && !label == "") self$label <- label
+      if (!is.null(note) && !note == "") self$note <- note
 
       invisible(self)
     }
@@ -166,6 +170,46 @@ Segment <- R6::R6Class("Segment",
       )
 
       nodes
+    },
+
+    #' @field text_summary A plain text summary of the Segment
+    text_summary = function() {
+      bullet <- function(...) paste0("* ", ...)
+      list_quote <- function(...) paste0("'", paste(..., collapse = "', '"), "'")
+
+      # Title
+      title <- self$label
+      if (is.null(title) & !is.null(self$source)) title <- basename(self$source)
+      if (is.null(title)) title <- "Recipe"
+      out <- c(paste0("## ", title), "")
+
+      # Note
+      if (!is.null(self$note)) out <- c(out, self$note, "")
+
+      # Bullets
+      out <- c(out, bullet(private$instructions_bullet))
+      out <- c(out, bullet("Targets: ", list_quote(self$targets)))
+
+      if (length(self$dependencies) > 0) {
+        out <- c(out, bullet("File dependencies: ", list_quote(self$dependencies)))
+      }
+
+      if (length(self$packages) > 0) {
+        out <- c(out, bullet("Package dependencies: ", list_quote(self$packages)))
+      }
+
+      out <- c(out, bullet("Executed: ", self$executed))
+
+      if (self$executed) {
+        out <- c(out, bullet("Execution time: ", format(self$execution_time)))
+      }
+      if (self$executed) {
+        out <- c(out, bullet(private$result_txt))
+      }
+
+      out <- c(out, bullet("Environment: ", env_name(self$envir)))
+
+      out
     }
   )
 )
@@ -211,22 +255,15 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
       super$initialize(id, targets, dependencies, packages, envir, force, executed, result, execution_time)
 
       instructions_txt <- robust_deparse(recipe)
-      instructions_txt <- paste0("Recipe: \n\n", instructions_txt, "\n")
+      instructions_bullet <- paste0("Recipe: \n\n", instructions_txt, "\n")
       result_txt <- ifelse(is.null(result), "Result: 0 object(s)", "Result: 1 object(s)")
 
       private$instructions_txt <- instructions_txt
+      private$instructions_bullet <- instructions_bullet
       private$result_txt <- result_txt
       self$recipe <- recipe
 
       invisible(self)
-    },
-
-    #' @description Printing method
-    print = function() {
-      instructions_txt <- robust_deparse(self$recipe)
-      instructions_txt <- paste0("Recipe: \n\n", instructions_txt, "\n")
-      private$instructions_txt <- instructions_txt
-      super$print()
     },
 
     #' @description Update the Segment with new execution information
@@ -270,13 +307,6 @@ SegmentRecipe <- R6::R6Class("SegmentRecipe",
       self$update_result(outdated, execution_time, out)
 
       invisible(self)
-    }
-  ),
-  active = list(
-    #' @field edges Construct edges connecting the dependencies, instructions, and targets
-    edges = function() {
-      private$instructions_txt <- robust_deparse(self$recipe)
-      super$edges
     }
   )
 )
@@ -327,17 +357,12 @@ SegmentSource <- R6::R6Class("SegmentSource",
 
        super$initialize(id, targets, dependencies, packages, envir, force, executed, result, execution_time)
 
-       private$instructions_txt <- paste0("Source: '", source, "'")
+       private$instructions_txt <- source
+       private$instructions_bullet <- paste0("Source: '", source, "'")
        private$result_txt <- paste0("Result: ", length(result), " object(s)")
        self$source <- source
 
        invisible(self)
-     },
-
-     #' @description Printing method
-     print = function() {
-       private$instructions_txt <- paste0("Source: '", self$source, "'")
-       super$print()
      },
 
      #' @description Update the Segment with new execution information
@@ -384,13 +409,6 @@ SegmentSource <- R6::R6Class("SegmentSource",
        self$update_result(outdated, execution_time, register_env)
 
        invisible(self)
-     }
-   ),
-   active = list(
-     #' @field edges Construct edges connecting the dependencies, instructions, and targets
-     edges = function() {
-       private$instructions_txt <- self$source
-       super$edges
      }
    )
 )
