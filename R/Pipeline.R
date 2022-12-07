@@ -518,26 +518,28 @@ NULL
 #' @rdname pipeline-vis
 #' @export
 show_pipeline <- function(pipeline = get_pipeline(),
-                          as = c("nomnoml", "visnetwork"),
+                          as = c("nomnoml", "visnetwork", "text"),
                           labels = NULL, notes = NULL, ...) {
-  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  as <- match.arg(as)
   pipeline$annotate(labels, notes)
   switch(as,
     nomnoml = pipeline$nomnoml(...),
-    visnetwork = pipeline$visnetwork(...)
+    visnetwork = pipeline$visnetwork(...),
+    text = pipeline$text_summary()
   )
 }
 
 #' @rdname pipeline-vis
 #' @export
 save_pipeline <- function(file, pipeline = get_pipeline(),
-                          as = c("nomnoml", "visnetwork"),
+                          as = c("nomnoml", "visnetwork", "text"),
                           labels = NULL, notes = NULL, ...) {
-  as <- match.arg(as, c("nomnoml", "visnetwork"))
+  as <- match.arg(as)
   pipeline$annotate(labels, notes)
   switch(as,
          nomnoml = pipeline$save_nomnoml(file, ...),
-         visnetwork = pipeline$save_visnetwork(file, ...)
+         visnetwork = pipeline$save_visnetwork(file, ...),
+         text = pipeline$save_text_summary(file, ...)
   )
 }
 
