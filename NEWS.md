@@ -1,3 +1,24 @@
+# makepipe 0.2.2
+
+* Added a `build` argument to `make_*` family to allow a Pipeline to be built without being executed. Once the pipeline has been fully 'registered' it can be built via
+
+```r
+p <- get_pipeline()
+p$build()
+```
+
+* Added a `touch()` method to `Pipeline` which updates the file modification times of all targets to the current time. This is useful when you know your targets are all up-to-date but makepipe doesn't, for example after a negligible change was made to your source code. The new `build` argument described above comes in handy here: setting `build=FALSE` you can construct the make 'graph' without executing it, then call 
+
+```r
+p <- get_pipeline()
+p$touch()
+```
+
+This will update the times for all the targets in the pipeline so that when you call `p$build()` nothing will happen (unless one of your targets is set to `force=TRUE`).
+
+
+* Upgraded the internal `webshot` dependency to `webshot2`, which doesn't depend on the unmaintained `PhantomJS`. 
+
 # makepipe 0.2.1
 
 * You can now specify the targets and dependencies (and so on) for each source script in your pipeline **within** that script using roxygen tags like this,
