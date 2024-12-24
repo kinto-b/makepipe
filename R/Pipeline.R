@@ -359,7 +359,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param ...  Arguments to pass to `self$nomnoml()`
     #' @return `self`
     save_nomnoml = function(file, width = NULL, height = NULL, ...) {
-      stop_required("webshot")
+      stop_required("webshot2")
       if (warn_pipeline_is_empty(self$segments, "Nothing to save")) {
         return(invisible(self))
       }
@@ -384,7 +384,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       out <- tempfile("out_", fileext = ".png")
 
       setwd(tempdir())
-      webshot::webshot(basename(html), out, selector = "canvas")
+      webshot2::webshot(basename(html), out, selector = "canvas", quiet=TRUE)
       setwd(wd)
 
       file.copy(out, file)
