@@ -2,11 +2,11 @@
 
     Code
       p$build()
-    Message <cliMessage>
+    Message
       i Targets are out of date. Updating...
     Output
       
-    Message <cliMessage>
+    Message
       v Finished updating
       
 
@@ -14,11 +14,11 @@
 
     Code
       p$build()
-    Message <cliMessage>
+    Message
       i Targets are out of date. Updating...
     Output
       
-    Message <cliMessage>
+    Message
       v Finished updating
       
 
