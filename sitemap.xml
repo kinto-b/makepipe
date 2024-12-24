@@ -1,63 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/makepipe.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Pipeline.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Segment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/SegmentRecipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/SegmentSource.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_params.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_register.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_with_dir.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_with_recipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_with_source.html</loc>
-  </url>
-  <url>
-    <loc>/reference/out_of_date.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipeline-accessors.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipeline-vis.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/makepipe.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/Pipeline.html</loc></url>
+<url><loc>/reference/Segment.html</loc></url>
+<url><loc>/reference/SegmentRecipe.html</loc></url>
+<url><loc>/reference/SegmentSource.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/make_params.html</loc></url>
+<url><loc>/reference/make_register.html</loc></url>
+<url><loc>/reference/make_with_dir.html</loc></url>
+<url><loc>/reference/make_with_recipe.html</loc></url>
+<url><loc>/reference/make_with_source.html</loc></url>
+<url><loc>/reference/out_of_date.html</loc></url>
+<url><loc>/reference/pipeline-accessors.html</loc></url>
+<url><loc>/reference/pipeline-vis.html</loc></url>
 </urlset>
+
