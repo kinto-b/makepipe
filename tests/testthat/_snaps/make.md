@@ -1,18 +1,24 @@
-# cleaning triggers rebuild
+# out-of-date targets not built immediately when build=FALSE
 
     Code
-      pipe$build()
-    Message <cliMessage>
+      p$build()
+    Message
       i Targets are out of date. Updating...
     Output
       
-    Message <cliMessage>
+    Message
       v Finished updating
       
+
+---
+
+    Code
+      p$build()
+    Message
       i Targets are out of date. Updating...
     Output
       
-    Message <cliMessage>
+    Message
       v Finished updating
       
 

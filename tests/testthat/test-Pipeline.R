@@ -187,11 +187,10 @@ pipe$annotate(labels = annotation, notes = annotation)
 test_that("pipeline can be saved as png", {
   skip_on_ci()
   skip_on_cran()
-  skip_if_not(webshot::is_phantomjs_installed())
 
   temp_png <- tempfile(fileext = ".png")
   save_pipeline(temp_png, pipeline = pipe)
-  expect_snapshot_file(temp_png, "pipeline_png")
+  expect_snapshot_file(temp_png, "pipeline.png")
   unlink(temp_png)
 })
 
@@ -283,6 +282,24 @@ test_that("cleaning triggers rebuild", {
   expect_snapshot(pipe$build())
 })
 
-# Unlink ------------------------------------------------------------------
+
+# Touch ------------------------------------------------------------------------
+
+test_that("touching removes out-of-dateness", {
+  set_pipeline(PipelineTest$new())
+  order_filetimes(target1, source1, dependency, source2, target2)
+  make_with_source(source1, target1, dependency, quiet = TRUE)
+  make_with_source(source2, target2, target1, quiet = TRUE)
+  pipe <- get_pipeline()
+
+  expect_outofdate(target1)
+  expect_outofdate(target2)
+
+  pipe$touch()
+  expect_uptodate(target1)
+  expect_uptodate(target1)
+})
+
+# Unlink -----------------------------------------------------------------------
 
 unlink(c("dependency", "target1", "target2", "source1", "source2"))

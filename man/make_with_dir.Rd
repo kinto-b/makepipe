@@ -16,7 +16,8 @@ make_with_dir(
 make_with_roxy(
   source,
   envir = new.env(parent = parent.frame()),
-  quiet = getOption("makepipe.quiet")
+  quiet = getOption("makepipe.quiet"),
+  build = TRUE
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ make_with_roxy(
 \item{recursive}{A logical determining whether or not to recurse into
 subdirectories}
 
-\item{build}{A logical determining whether or not the pipeline will be built
+\item{build}{A logical determining whether or not the pipeline/segment will be built
 immediately or simply returned to the user}
 
 \item{envir}{The environment in which to execute the \code{source} or \code{recipe}. By

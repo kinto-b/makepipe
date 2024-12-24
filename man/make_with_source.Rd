@@ -14,6 +14,7 @@ make_with_source(
   force = FALSE,
   label = NULL,
   note = NULL,
+  build = TRUE,
   ...
 )
 }
@@ -43,6 +44,9 @@ visualisations. If \code{NULL}, the \code{basename(source)} or 'Recipe' will be 
 
 \item{note}{A description of what the \code{source} does, displayed in pipeline
 visualisations}
+
+\item{build}{A logical determining whether or not the pipeline/segment will be built
+immediately or simply returned to the user}
 
 \item{...}{Additional parameters to pass to \code{base::source()}}
 }

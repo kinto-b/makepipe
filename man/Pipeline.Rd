@@ -29,6 +29,7 @@ Other pipeline:
 \item \href{#method-Pipeline-add_recipe_segment}{\code{Pipeline$add_recipe_segment()}}
 \item \href{#method-Pipeline-build}{\code{Pipeline$build()}}
 \item \href{#method-Pipeline-clean}{\code{Pipeline$clean()}}
+\item \href{#method-Pipeline-touch}{\code{Pipeline$touch()}}
 \item \href{#method-Pipeline-annotate}{\code{Pipeline$annotate()}}
 \item \href{#method-Pipeline-refresh}{\code{Pipeline$refresh()}}
 \item \href{#method-Pipeline-nomnoml}{\code{Pipeline$nomnoml()}}
@@ -165,6 +166,22 @@ Build all targets
 Clean all targets
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Pipeline$clean()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{self}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Pipeline-touch"></a>}}
+\if{latex}{\out{\hypertarget{method-Pipeline-touch}{}}}
+\subsection{Method \code{touch()}}{
+Touch all targets, updating file modification time to
+current time. This is useful when you know your targets are all
+up-to-date but makepipe doesn't (e.g. after a negligible change was
+made to your source code).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Pipeline$touch()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

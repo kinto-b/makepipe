@@ -28,6 +28,9 @@ out-of-date)}
 
 \item{label}{A short label for the \code{source} or \code{recipe}, displayed in pipeline
 visualisations. If \code{NULL}, the \code{basename(source)} or 'Recipe' will be used.}
+
+\item{build}{A logical determining whether or not the pipeline/segment will be built
+immediately or simply returned to the user}
 }
 \description{
 Parameters for make-like functions

@@ -1,17 +1,17 @@
 # Test files -------------------------------------------------------------------
-dependency <- tempfile(fileext=".csv")
+dependency <- tempfile(fileext = ".csv")
 write.csv(mtcars, dependency)
 
-target1 <- tempfile(fileext=".csv")
+target1 <- tempfile(fileext = ".csv")
 write.csv(mtcars, target1)
 
-target2 <- tempfile(fileext=".txt")
+target2 <- tempfile(fileext = ".txt")
 write.table(mtcars, target2)
 
-source1 <- tempfile(fileext=".R")
+source1 <- tempfile(fileext = ".R")
 file.copy(system.file("tests", "source1.R", package = "makepipe"), source1)
 
-source2 <- tempfile(fileext=".R")
+source2 <- tempfile(fileext = ".R")
 file.copy(system.file("tests", "source2.R", package = "makepipe"), source2)
 
 # Functions --------------------------------------------------------------------
@@ -19,7 +19,7 @@ order_filetimes <- function(...) {
   all_files <- list(...)
   delta <- length(all_files)
   for (i in seq_along(all_files)) {
-    Sys.setFileTime(all_files[[i]], Sys.time()-delta)
+    Sys.setFileTime(all_files[[i]], Sys.time() - delta)
     delta <- delta - 1
   }
 }
@@ -76,12 +76,12 @@ test_that("targets rebuilt if non-existent", {
 test_that("targets rebuilt if forced", {
   order_filetimes(source1, dependency, target1)
   expect_outofdate(quote(make_with_source(source1, target1, dependency, force = TRUE)))
-  expect_outofdate(quote(make_with_recipe(2+2, target1, dependency, force = TRUE)))
+  expect_outofdate(quote(make_with_recipe(2 + 2, target1, dependency, force = TRUE)))
 })
 
 test_that("targets not rebuilt they exist and have no dependencies", {
   order_filetimes(source1, dependency, target1)
-  expect_uptodate(quote(make_with_recipe(2+2, target1, NULL)))
+  expect_uptodate(quote(make_with_recipe(2 + 2, target1, NULL)))
 })
 
 test_that("targets not rebuilt if newer than dependency and source", {
@@ -99,35 +99,76 @@ test_that("targets not rebuilt if newer than package", {
   )))
 })
 
+test_that("out-of-date targets not built immediately when build=FALSE", {
+  reset_pipeline()
+
+  order_filetimes(dependency, target1, source1)
+  expect_silent(make_with_source(source1, target1, dependency, build = FALSE))
+
+  p <- get_pipeline()
+  expect_snapshot(p$build())
+})
+
 ## make_with_recipe ------------------------------------------------------------
 test_that("targets rebuilt if older than dependency", {
   order_filetimes(target1, dependency)
   expect_outofdate(quote(
-    make_with_recipe({
-      mt <- read.csv(dependency, check.names = FALSE)
-      write.csv(mt, target1, row.names = FALSE)
-    }, target1, dependency)
+    make_with_recipe(
+      {
+        mt <- read.csv(dependency, check.names = FALSE)
+        write.csv(mt, target1, row.names = FALSE)
+      },
+      target1,
+      dependency
+    )
   ))
 })
 
 test_that("targets not rebuilt if newer than dependency", {
   order_filetimes(dependency, target1)
   expect_uptodate(quote(
-    make_with_recipe({
-      mt <- read.csv(dependency, check.names = FALSE)
-      write.csv(mt, target1, row.names = FALSE)
-    }, target1, dependency)
+    make_with_recipe(
+      {
+        mt <- read.csv(dependency, check.names = FALSE)
+        write.csv(mt, target1, row.names = FALSE)
+      },
+      target1,
+      dependency
+    )
   ))
 })
 
 test_that("targets not rebuilt if newer than package", {
   order_filetimes(source1, dependency, target1)
   expect_uptodate(quote(make_with_recipe(
-    {1+1},
+    {
+      1 + 1
+    },
     target1,
     dependency,
     packages = "base"
   )))
+})
+
+
+test_that("out-of-date targets not built immediately when build=FALSE", {
+  reset_pipeline()
+
+  order_filetimes(target1, dependency)
+  expect_silent(
+    make_with_recipe(
+      {
+        mt <- read.csv(dependency, check.names = FALSE)
+        write.csv(mt, target1, row.names = FALSE)
+      },
+      target1,
+      dependency,
+      build = FALSE
+    )
+  )
+
+  p <- get_pipeline()
+  expect_snapshot(p$build())
 })
 
 # Errors -----------------------------------------------------------------------
@@ -151,7 +192,7 @@ test_that("error thrown if source doesn't exist", {
 
 test_that("error thrown if make_*() contains loops", {
   expect_error(
-    make_with_recipe(1+1, target1, target1),
+    make_with_recipe(1 + 1, target1, target1),
     "`dependencies` must not be among the `targets`"
   )
 
@@ -169,7 +210,9 @@ test_that("error thrown if make_*() contains loops", {
 ## make_with_recipe ------------------------------------------------------------
 test_that("warning signalled if dependency doesn't exist", {
   expect_warning(make_with_recipe(
-    {1+1},
+    {
+      1 + 1
+    },
     target1,
     "filedoesntexist.Rds"
   ), "filedoesntexist.Rds")
@@ -190,14 +233,24 @@ test_that("by default source eval'd in fresh env whose parent is calling env", {
 test_that("by default recipe eval'd in fresh env whose parent is calling env", {
   order_filetimes(target1, dependency)
 
-  expect_error(make_with_recipe({
-    .res <- object_from_parent_environment*2
-  }, target1, dependency, quiet = TRUE))
+  expect_error(make_with_recipe(
+    {
+      .res <- object_from_parent_environment * 2
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  ))
 
   object_from_parent_environment <- 5
-  make_with_recipe({
-    .res <- object_from_parent_environment*2
-  }, target1, dependency, quiet = TRUE)
+  make_with_recipe(
+    {
+      .res <- object_from_parent_environment * 2
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  )
   expect_error(.res, regexp = "object '.res' not found")
 })
 
@@ -206,7 +259,7 @@ test_that("obj available when eval source in calling env", {
   object_from_parent_environment <- 5
   writeLines(".res <- object_from_parent_environment*2", source)
   make_with_source(source, target1, dependency, envir = environment(), quiet = TRUE)
-  expect_identical(.res, object_from_parent_environment*2)
+  expect_identical(.res, object_from_parent_environment * 2)
 })
 
 test_that("source evaluated in supplied environment", {
@@ -230,10 +283,16 @@ test_that("recipe evaluated in supplied environment", {
   my_env <- new.env()
   my_env$object_from_parent_environment <- 500
 
-  x <- make_with_recipe({
-    .res <- object_from_parent_environment*2
-    .res
-  }, target1, dependency, envir = my_env, quiet = TRUE)
+  x <- make_with_recipe(
+    {
+      .res <- object_from_parent_environment * 2
+      .res
+    },
+    target1,
+    dependency,
+    envir = my_env,
+    quiet = TRUE
+  )
 
   expect_equal(my_env$.res, 1000)
   expect_equal(x$result, 1000)
@@ -243,19 +302,31 @@ test_that("recipe evaluated in supplied environment", {
 
 test_that("make_with_recipe returns what's returned", {
   order_filetimes(target1, dependency)
-  x <- make_with_recipe({
-    res <- 1+1
-    res
-  }, target1, dependency, quiet = TRUE)
+  x <- make_with_recipe(
+    {
+      res <- 1 + 1
+      res
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  )
 
   expect_equal(x$result, 2)
 
   order_filetimes(target1, dependency)
-  x <- make_with_recipe({
-    res <- 1+1
-    if (res == 2) return(5)
-    res
-  }, target1, dependency, quiet = TRUE)
+  x <- make_with_recipe(
+    {
+      res <- 1 + 1
+      if (res == 2) {
+        return(5)
+      }
+      res
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  )
 
   expect_equal(x$result, 5)
 })
@@ -271,10 +342,15 @@ test_that("make_with_source returns what's registered", {
 # Printing ---------------------------------------------------------------------
 test_that("make_with_recipe result prints nicely", {
   order_filetimes(target1, dependency)
-  x <- make_with_recipe({
-    res <- 1+1
-    res
-  }, target1, dependency, quiet = TRUE)
+  x <- make_with_recipe(
+    {
+      res <- 1 + 1
+      res
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  )
 
   expect_output(print(x), regexp = "# makepipe segment")
   expect_output(print(x), regexp = "* Recipe: ")
@@ -286,10 +362,15 @@ test_that("make_with_recipe result prints nicely", {
 
   order_filetimes(dependency, target1)
 
-  x <- make_with_recipe({
-    res <- 1+1
-    res
-  }, target1, dependency, quiet = TRUE)
+  x <- make_with_recipe(
+    {
+      res <- 1 + 1
+      res
+    },
+    target1,
+    dependency,
+    quiet = TRUE
+  )
   x
   expect_output(print(x), regexp = "* Executed: FALSE")
 })
@@ -345,5 +426,3 @@ test_that("long recipes are okay", {
 # Unlink ------------------------------------------------------------------
 
 unlink(c("dependency", "target1", "target2", "source1", "source2"))
-
-

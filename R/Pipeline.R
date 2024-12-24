@@ -193,6 +193,25 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       invisible(self)
     },
 
+    #' @description Touch all targets, updating file modification time to
+    #'   current time. This is useful when you know your targets are all
+    #'   up-to-date but makepipe doesn't (e.g. after a negligible change was
+    #'   made to your source code).
+    #' @return `self`
+    touch = function() {
+      if (warn_pipeline_is_empty(self$segments, "Nothing to touch")) {
+        return(invisible(self))
+      }
+
+      now <- Sys.time()
+      for (segment in self$segments) {
+        Sys.setFileTime(segment$targets, now)
+      }
+
+      invisible(self)
+    },
+
+
     #' @description Apply annotations to Pipeline
     #' @param labels A named character vector mapping nodes in the `Pipeline` onto
     #'   labels to display beside them.
@@ -359,7 +378,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
     #' @param ...  Arguments to pass to `self$nomnoml()`
     #' @return `self`
     save_nomnoml = function(file, width = NULL, height = NULL, ...) {
-      stop_required("webshot")
+      stop_required("webshot2")
       if (warn_pipeline_is_empty(self$segments, "Nothing to save")) {
         return(invisible(self))
       }
@@ -384,7 +403,7 @@ Pipeline <- R6::R6Class(classname = "Pipeline",
       out <- tempfile("out_", fileext = ".png")
 
       setwd(tempdir())
-      webshot::webshot(basename(html), out, selector = "canvas")
+      webshot2::webshot(basename(html), out, selector = "canvas", quiet=TRUE)
       setwd(wd)
 
       file.copy(out, file)

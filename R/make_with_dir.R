@@ -25,8 +25,6 @@
 #' @param dir A character vector of full path names; the default corresponds to the working directory
 #' @param recursive A logical determining whether or not to recurse into
 #'   subdirectories
-#' @param build A logical determining whether or not the pipeline will be built
-#'   immediately or simply returned to the user
 #' @inheritParams make_params
 #'
 #' @return A `Pipeline` object
@@ -43,14 +41,15 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
                           envir = new.env(parent = parent.frame()),
                           quiet = getOption("makepipe.quiet")) {
   source_files <- list.files(
-    dir, recursive = recursive,
+    dir,
+    recursive = recursive,
     pattern = "\\.R$", ignore.case = TRUE,
     full.names = TRUE
   )
 
   any_found <- FALSE
   for (fp in source_files) {
-    res <- make_with_tags(fp, envir, quiet)
+    res <- make_with_tags(fp, envir, quiet, build)
     if (!is.null(res)) any_found <- TRUE
   }
   if (!any_found) {
@@ -70,12 +69,18 @@ make_with_dir <- function(dir = ".", recursive = FALSE, build = TRUE,
 #' @export
 make_with_roxy <- function(source,
                            envir = new.env(parent = parent.frame()),
-                           quiet = getOption("makepipe.quiet")) {
+                           quiet = getOption("makepipe.quiet"),
+                           build = TRUE) {
   segment <- make_with_tags(source, envir, quiet, warn = TRUE)
-  if (is.null(segment)) return(invisible(NULL))
+  if (is.null(segment)) {
+    return(invisible(NULL))
+  }
 
-  out <- segment$execute(quiet = quiet)
-  invisible(out)
+  if (build) {
+    segment$execute(quiet = quiet)
+  }
+
+  invisible(segment)
 }
 
 
@@ -95,7 +100,7 @@ make_with_tags <- function(source,
                            warn = FALSE) {
   if (!file.exists(source)) stop("Cannot find file '", source, "'", call. = FALSE)
   f <- roxygen2::parse_file(source, envir)
-  if (length(f)==0) {
+  if (length(f) == 0) {
     if (warn) warn_no_makepipe_tag(source)
     return(NULL)
   }
@@ -163,7 +168,7 @@ warn_no_makepipe_tag <- function(source) {
 }
 
 evaluate_vector <- function(x, envir) {
-  eval(parse(text=paste("c(", x, ")")), envir = envir)
+  eval(parse(text = paste("c(", x, ")")), envir = envir)
 }
 
 
@@ -189,7 +194,7 @@ roxy_tag_parse.roxy_tag_targets <- function(x) {
 #' @export
 roxy_tag_parse.roxy_tag_force <- function(x) {
   out <- roxygen2::tag_markdown(x)
-  out$val <- eval(parse(text=paste("c(", out$val, ")")))
+  out$val <- eval(parse(text = paste("c(", out$val, ")")))
   out$val <- as.logical(out$val)
   out
 }
@@ -203,4 +208,3 @@ roxy_tag_parse.roxy_tag_packages <- function(x) {
   out$val <- gsub('"', "", out$val)
   out
 }
-
