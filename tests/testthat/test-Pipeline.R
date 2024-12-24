@@ -282,6 +282,24 @@ test_that("cleaning triggers rebuild", {
   expect_snapshot(pipe$build())
 })
 
-# Unlink ------------------------------------------------------------------
+
+# Touch ------------------------------------------------------------------------
+
+test_that("touching removes out-of-dateness", {
+  set_pipeline(PipelineTest$new())
+  order_filetimes(target1, source1, dependency, source2, target2)
+  make_with_source(source1, target1, dependency, quiet = TRUE)
+  make_with_source(source2, target2, target1, quiet = TRUE)
+  pipe <- get_pipeline()
+
+  expect_outofdate(target1)
+  expect_outofdate(target2)
+
+  pipe$touch()
+  expect_uptodate(target1)
+  expect_uptodate(target1)
+})
+
+# Unlink -----------------------------------------------------------------------
 
 unlink(c("dependency", "target1", "target2", "source1", "source2"))
