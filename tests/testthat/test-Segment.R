@@ -1,6 +1,6 @@
 test_that("text_summary looks as expected", {
   reset_pipeline()
-  p <- make_with_dir(system.file("tests", "Segment", package = "makepipe"), build=FALSE)
+  p <- make_with_dir(system.file("tests", "Segment", package = "makepipe"), build = FALSE)
 
   ts_actual <- capture.output(p$text_summary())
   ts_expected <-
@@ -38,5 +38,4 @@ test_that("text_summary looks as expected", {
   expect_match(ts_actual[17], ts_expected[17])
   expect_identical(ts_actual[18:20], ts_expected[18:20])
   expect_match(ts_actual[21], ts_expected[21])
-
 })

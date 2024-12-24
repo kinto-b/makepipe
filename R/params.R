@@ -16,5 +16,7 @@
 #'   out-of-date)
 #' @param label A short label for the `source` or `recipe`, displayed in pipeline
 #'   visualisations. If `NULL`, the `basename(source)` or 'Recipe' will be used.
+#' @param build A logical determining whether or not the pipeline/segment will be built
+#'   immediately or simply returned to the user
 #' @name make_params
 NULL

@@ -1,4 +1,3 @@
-
 # Source -----------------------------------------------------------------------
 
 #' Make targets out of dependencies using a source file
@@ -51,6 +50,7 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
                              force = FALSE,
                              label = NULL,
                              note = NULL,
+                             build = TRUE,
                              ...) {
   pipeline <- get_pipeline()
   if (is.null(pipeline)) {
@@ -58,10 +58,13 @@ make_with_source <- function(source, targets, dependencies = NULL, packages = NU
     set_pipeline(pipeline)
   }
   segment <- pipeline$add_source_segment(source, targets, dependencies, packages, envir, force)
-  out <- segment$execute(quiet = quiet)
+
+  if (build) {
+    segment$execute(quiet = quiet)
+  }
 
   add_note_and_label(pipeline, segment, label, note)
-  invisible(out)
+  invisible(segment)
 }
 
 
@@ -131,6 +134,7 @@ make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NU
                              force = FALSE,
                              label = NULL,
                              note = NULL,
+                             build = TRUE,
                              ...) {
   recipe <- substitute(recipe)
   pipeline <- get_pipeline()
@@ -139,10 +143,13 @@ make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NU
     set_pipeline(pipeline)
   }
   segment <- pipeline$add_recipe_segment(recipe, targets, dependencies, packages, envir, force)
-  out <- segment$execute(quiet = quiet)
+
+  if (build) {
+    segment$execute(quiet = quiet)
+  }
 
   add_note_and_label(pipeline, segment, label, note)
-  invisible(out)
+  invisible(segment)
 }
 
 
@@ -150,8 +157,8 @@ make_with_recipe <- function(recipe, targets, dependencies = NULL, packages = NU
 
 add_note_and_label <- function(pipeline, segment, label, note) {
   node_id <- as.character(segment$nodes[segment$nodes$.source, ]$id)
-  if(!is.null(label)) names(label) <- node_id
-  if(!is.null(note)) names(note) <- node_id
+  if (!is.null(label)) names(label) <- node_id
+  if (!is.null(note)) names(note) <- node_id
   pipeline$annotate(labels = label, notes = note)
   invisible(NULL)
 }
