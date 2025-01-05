@@ -16,9 +16,9 @@ knitr::opts_chunk$set(
 # makepipe <img src='man/figures/logo.png' align="right" height="139"/>
 
 <!-- badges: start -->
-[![Codecov test coverage](https://codecov.io/gh/kinto-b/makepipe/branch/master/graph/badge.svg)](https://app.codecov.io/gh/kinto-b/makepipe?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/makepipe)](https://CRAN.R-project.org/package=makepipe)
 [![R-CMD-check](https://github.com/kinto-b/makepipe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kinto-b/makepipe/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/kinto-b/makepipe/graph/badge.svg)](https://app.codecov.io/gh/kinto-b/makepipe)
 <!-- badges: end -->
 
 The goal of `makepipe` is to allow for the construction of make-like pipelines in R with very minimal overheads. In contrast to `targets` (and its predecessor `drake`) which offers an opinionated pipeline framework that demands highly functionalised code, `makepipe` is easy-going, being adaptable to a wide range  of data science workflows.
